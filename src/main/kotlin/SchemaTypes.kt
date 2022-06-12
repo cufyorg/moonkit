@@ -110,6 +110,19 @@ fun <D, O, T> StringIdSchema() = Schema<D, O, Id<T>>(
 // Reflection
 
 /**
+ * Create a new schema with the given [builder].
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> Schema(
+    builder: Schema<D, O, T>.() -> Unit
+): Schema<D, O, T> {
+    val schema = Schema<D, O, T>()
+    schema.apply(builder)
+    return schema
+}
+
+/**
  * Create a new root schema for the given [klass].
  *
  * The given [klass] must have a constructor with
