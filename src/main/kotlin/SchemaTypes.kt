@@ -1,0 +1,201 @@
+/*
+ *	Copyright 2022 cufy.org
+ *
+ *	Licensed under the Apache License, Version 2.0 (the "License");
+ *	you may not use this file except in compliance with the License.
+ *	You may obtain a copy of the License at
+ *
+ *	    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *	Unless required by applicable law or agreed to in writing, software
+ *	distributed under the License is distributed on an "AS IS" BASIS,
+ *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *	See the License for the specific language governing permissions and
+ *	limitations under the License.
+ */
+package org.cufy.mangaka
+
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
+import org.bson.*
+import org.bson.types.ObjectId
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createType
+
+// Primitive Types
+
+/**
+ * Obtain String schema.
+ *
+ * @since 1.0.0
+ */
+fun <D, O> StringSchema() = Schema<D, O, String>(
+    constructor = { (it as? BsonString)?.value },
+    formatter = { it?.let { BsonString(it) } },
+)
+
+/**
+ * Obtain Boolean schema.
+ *
+ * @since 1.0.0
+ */
+fun <D, O> BooleanSchema() = Schema<D, O, Boolean>(
+    constructor = { (it as? BsonBoolean)?.value },
+    formatter = { it?.let { BsonBoolean(it) } },
+)
+
+/**
+ * Obtain Long (Int64) schema.
+ *
+ * @since 1.0.0
+ */
+fun <D, O> LongSchema() = Schema<D, O, Long>(
+    constructor = { (it as? BsonInt64)?.value },
+    formatter = { it?.let { BsonInt64(it) } },
+)
+
+/**
+ * Obtain Int (Int32) schema.
+ *
+ * @since 1.0.0
+ */
+fun <D, O> IntSchema() = Schema<D, O, Int>(
+    constructor = { (it as? BsonInt32)?.value },
+    formatter = { it?.let { BsonInt32(it) } },
+)
+
+/**
+ * Create a new array schema.
+ *
+ * > The returned schema will NOT have any
+ *   items mapped. So, you can say that the
+ *   items of the array are transient by default.
+ *
+ * > This behaviour is explicitly chosen to mimic the
+ *   mongoose behaviour.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> ArraySchema() = Schema<D, O, MutableList<T>>(
+    constructor = { (it as? BsonArray)?.let { mutableListOf() } },
+    formatter = { it?.let { BsonArray() } }
+)
+
+/**
+ * Obtain Id (ObjectId) schema.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> ObjectIdSchema() = Schema<D, O, Id<T>>(
+    constructor = {
+        (it as? BsonObjectId)
+            ?.let { Id(it.value) }
+    },
+    formatter = {
+        it?.takeIf { ObjectId.isValid(it.value) }
+            ?.let { BsonObjectId(ObjectId(it.value)) }
+    }
+)
+
+/**
+ * Obtain a dynamic Id (ObjectId|String) schema.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> StringIdSchema() = Schema<D, O, Id<T>>(
+    constructor = { (it as? BsonString)?.let { Id(it.value) } },
+    formatter = { it?.let { BsonString(it.value) } }
+)
+
+// Reflection
+
+/**
+ * Create a new root schema for the given [klass].
+ *
+ * The given [klass] must have a constructor with
+ * no required arguments.
+ *
+ * Even if the input or output is null. The
+ * functions' of the schema will always emit a
+ * value.
+ *
+ * > The returned schema will NOT have any
+ *   property registered. So, you can say that the
+ *   properties of the class are transient by default.
+ *
+ * > This behaviour is explicitly chosen to mimic the
+ *   mongoose behaviour.
+ *
+ * @since 1.0.0
+ */
+fun <T : Any> DocumentSchema(
+    klass: KClass<T>,
+    builder: Schema<T, Unit, T>.() -> Unit
+): Schema<T, Unit, T> {
+    val schema = Schema<T, Unit, T>()
+    schema.constructor = { _getInstance(klass) }
+    schema.formatter = { BsonDocument() }
+    schema.apply(builder)
+    return schema
+}
+
+/**
+ * Create a new schema for the given [klass].
+ *
+ * The given [klass] must have a constructor with
+ * no required arguments.
+ *
+ * > The returned schema will NOT have any
+ *   property registered. So, you can say that the
+ *   properties of the class are transient by default.
+ *
+ * > This behaviour is explicitly chosen to mimic the
+ *   mongoose behaviour.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T : Any> ObjectSchema(
+    klass: KClass<T>,
+    builder: Schema<D, O, T>.() -> Unit = {}
+): Schema<D, O, T> {
+    val schema = Schema<D, O, T>()
+    schema.constructor = { (it as? BsonDocument)?.let { _getInstance(klass) } }
+    schema.formatter = { it?.let { BsonDocument() } }
+    schema.apply(builder)
+    return schema
+}
+
+/**
+ * Return a schema for the given enum [klass].
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T : Enum<T>> EnumSchema(
+    klass: KClass<T>,
+    builder: Schema<D, O, T>.() -> Unit = {}
+): Schema<D, O, T> {
+    val schema = Schema<D, O, T>()
+    schema.constructor = {
+        it?.let { it as? BsonString }?.value
+            ?.let { _getEnum(klass, it) }
+    }
+    schema.formatter = {
+        it?.let { BsonString(it.name) }
+    }
+    schema.apply(builder)
+    return schema
+}
+
+// internal
+
+internal fun <T : Any> _getInstance(klass: KClass<T>): T {
+    @Suppress("UNCHECKED_CAST")
+    return Json.decodeFromString(
+        Json.serializersModule.serializer(klass.createType()),
+        "{}"
+    ) as T
+}
+
+internal fun <T : Enum<T>> _getEnum(klass: KClass<T>, name: String): T? {
+    return klass.java.enumConstants.firstOrNull { it.name == name }
+}
