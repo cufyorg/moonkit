@@ -49,9 +49,11 @@ fun <D, O, T> Schema<D, O, Id<T>>.exists(
 ) {
     onValidate { value, validator ->
         validator(value) + run {
-            value?.takeIf { _exists(function(value), value) }
-                ?.let { emptyList() }
-                ?: listOf(MangakaInvalidation(message(value)))
+            when {
+                value != null && !_exists(function(value), value) ->
+                    listOf(MangakaInvalidation(message(value)))
+                else -> emptyList()
+            }
         }
     }
 }
