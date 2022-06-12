@@ -26,7 +26,7 @@ import kotlin.reflect.KMutableProperty1
  * @since 1.0.0
  */
 fun <D, O, T, M : Any> Schema<D, O, T>.field(
-    property: KMutableProperty1<T, M>,
+    property: KMutableProperty1<in T, M>,
     builder: Schema<D, T, M>.() -> Unit = {}
 ) {
     field(
@@ -45,7 +45,7 @@ fun <D, O, T, M : Any> Schema<D, O, T>.field(
  */
 @JvmName("nullableField")
 fun <D, O, T, M> Schema<D, O, T>.field(
-    property: KMutableProperty1<T, M?>,
+    property: KMutableProperty1<in T, M?>,
     builder: Schema<D, T, M & Any>.() -> Unit = {}
 ) {
     field(
