@@ -15,10 +15,8 @@
  */
 package org.cufy.mangaka.extension
 
-import org.cufy.mangaka.MangakaInvalidation
 import org.cufy.mangaka.Schema
 import org.cufy.mangaka.SchemaScope
-import org.cufy.mangaka.onValidate
 
 /**
  * Add a validator that insures the field is not null.
@@ -51,13 +49,7 @@ fun <D, O, T> Schema<D, O, T>.required(
         true
     }
 ) {
-    onValidate { value, validator ->
-        validator(value) + run {
-            when {
-                value == null && function() ->
-                    listOf(MangakaInvalidation(message()))
-                else -> emptyList()
-            }
-        }
+    validate({ message() }) { value ->
+        value != null || !function()
     }
 }

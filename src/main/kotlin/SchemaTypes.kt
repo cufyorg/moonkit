@@ -29,40 +29,40 @@ import kotlin.reflect.full.createType
  *
  * @since 1.0.0
  */
-fun <D, O> StringSchema() = Schema<D, O, String>(
-    constructor = { (it as? BsonString)?.value },
-    formatter = { it?.let { BsonString(it) } },
-)
+fun <D, O> StringSchema() = SchemaType<D, O, String> {
+    constructor { (it as? BsonString)?.value }
+    formatter { it?.let { BsonString(it) } }
+}
 
 /**
  * Obtain Boolean schema.
  *
  * @since 1.0.0
  */
-fun <D, O> BooleanSchema() = Schema<D, O, Boolean>(
-    constructor = { (it as? BsonBoolean)?.value },
-    formatter = { it?.let { BsonBoolean(it) } },
-)
+fun <D, O> BooleanSchema() = SchemaType<D, O, Boolean> {
+    constructor { (it as? BsonBoolean)?.value }
+    formatter { it?.let { BsonBoolean(it) } }
+}
 
 /**
  * Obtain Long (Int64) schema.
  *
  * @since 1.0.0
  */
-fun <D, O> LongSchema() = Schema<D, O, Long>(
-    constructor = { (it as? BsonInt64)?.value },
-    formatter = { it?.let { BsonInt64(it) } },
-)
+fun <D, O> LongSchema() = SchemaType<D, O, Long> {
+    constructor { (it as? BsonInt64)?.value }
+    formatter { it?.let { BsonInt64(it) } }
+}
 
 /**
  * Obtain Int (Int32) schema.
  *
  * @since 1.0.0
  */
-fun <D, O> IntSchema() = Schema<D, O, Int>(
-    constructor = { (it as? BsonInt32)?.value },
-    formatter = { it?.let { BsonInt32(it) } },
-)
+fun <D, O> IntSchema() = SchemaType<D, O, Int> {
+    constructor { (it as? BsonInt32)?.value }
+    formatter { it?.let { BsonInt32(it) } }
+}
 
 /**
  * Create a new array schema.
@@ -76,51 +76,67 @@ fun <D, O> IntSchema() = Schema<D, O, Int>(
  *
  * @since 1.0.0
  */
-fun <D, O, T> ArraySchema() = Schema<D, O, MutableList<T>>(
-    constructor = { (it as? BsonArray)?.let { mutableListOf() } },
-    formatter = { it?.let { BsonArray() } }
-)
+fun <D, O, T> ArraySchema() = SchemaType<D, O, MutableList<T>> {
+    constructor { (it as? BsonArray)?.let { mutableListOf() } }
+    formatter { it?.let { BsonArray() } }
+}
 
 /**
  * Obtain Id (ObjectId) schema.
  *
  * @since 1.0.0
  */
-fun <D, O, T> ObjectIdSchema() = Schema<D, O, Id<T>>(
-    constructor = {
+fun <D, O, T> ObjectIdSchema() = SchemaType<D, O, Id<T>> {
+    constructor {
         (it as? BsonObjectId)
             ?.let { Id(it.value) }
-    },
-    formatter = {
+    }
+    formatter {
         it?.takeIf { ObjectId.isValid(it.value) }
             ?.let { BsonObjectId(ObjectId(it.value)) }
     }
-)
+}
 
 /**
  * Obtain a dynamic Id (ObjectId|String) schema.
  *
  * @since 1.0.0
  */
-fun <D, O, T> StringIdSchema() = Schema<D, O, Id<T>>(
-    constructor = { (it as? BsonString)?.let { Id(it.value) } },
-    formatter = { it?.let { BsonString(it.value) } }
-)
+fun <D, O, T> StringIdSchema() = SchemaType<D, O, Id<T>> {
+    constructor { (it as? BsonString)?.let { Id(it.value) } }
+    formatter { it?.let { BsonString(it.value) } }
+}
 
-// Reflection
+// Builder Types
 
 /**
  * Create a new schema with the given [builder].
  *
  * @since 1.0.0
  */
-fun <D, O, T> Schema(
+fun <D, O, T> SchemaType(
     builder: Schema<D, O, T>.() -> Unit
 ): Schema<D, O, T> {
     val schema = Schema<D, O, T>()
+    schema.constructor = Constructor.Default()
+    schema.formatter = Formatter.Default()
+    schema.validator = Validator.Default()
     schema.apply(builder)
     return schema
 }
+
+fun <D, O, T> SchemaInterface(
+    builder: Schema<D, O, T>.() -> Unit
+): Schema<D, O, T> {
+    val schema = Schema<D, O, T>()
+    schema.constructor = Constructor.Fallback()
+    schema.formatter = Formatter.Fallback()
+    schema.validator = Validator.Fallback()
+    schema.apply(builder)
+    return schema
+}
+
+// Reflection
 
 /**
  * Create a new root schema for the given [klass].
@@ -142,12 +158,12 @@ fun <D, O, T> Schema(
  * @since 1.0.0
  */
 fun <T : Any> DocumentSchema(
-    klass: KClass<T>,
+    klass: KClass<in T>,
     builder: Schema<T, Unit, T>.() -> Unit
 ): Schema<T, Unit, T> {
     val schema = Schema<T, Unit, T>()
-    schema.constructor = { _getInstance(klass) }
-    schema.formatter = { BsonDocument() }
+    schema.constructor { _getInstance(klass) }
+    schema.formatter { BsonDocument() }
     schema.apply(builder)
     return schema
 }
@@ -172,8 +188,8 @@ fun <D, O, T : Any> ObjectSchema(
     builder: Schema<D, O, T>.() -> Unit = {}
 ): Schema<D, O, T> {
     val schema = Schema<D, O, T>()
-    schema.constructor = { (it as? BsonDocument)?.let { _getInstance(klass) } }
-    schema.formatter = { it?.let { BsonDocument() } }
+    schema.constructor { (it as? BsonDocument)?.let { _getInstance(klass) } }
+    schema.formatter { it?.let { BsonDocument() } }
     schema.apply(builder)
     return schema
 }
@@ -188,11 +204,11 @@ fun <D, O, T : Enum<T>> EnumSchema(
     builder: Schema<D, O, T>.() -> Unit = {}
 ): Schema<D, O, T> {
     val schema = Schema<D, O, T>()
-    schema.constructor = {
+    schema.constructor {
         it?.let { it as? BsonString }?.value
             ?.let { _getEnum(klass, it) }
     }
-    schema.formatter = {
+    schema.formatter {
         it?.let { BsonString(it.name) }
     }
     schema.apply(builder)
@@ -201,7 +217,7 @@ fun <D, O, T : Enum<T>> EnumSchema(
 
 // internal
 
-internal fun <T : Any> _getInstance(klass: KClass<T>): T {
+internal fun <T : Any> _getInstance(klass: KClass<in T>): T {
     @Suppress("UNCHECKED_CAST")
     return Json.decodeFromString(
         Json.serializersModule.serializer(klass.createType()),

@@ -105,6 +105,12 @@ internal fun formatterStub(path: String): Nothing {
     )
 }
 
+internal fun validatorStub(path: String): Nothing {
+    throw MangakaException(
+        "Validator not defined at $path"
+    )
+}
+
 internal fun getterStub(path: String): Nothing {
     throw MangakaException(
         "Getter not defined at $path"

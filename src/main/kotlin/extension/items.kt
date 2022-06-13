@@ -66,9 +66,9 @@ fun <D, O, T, M> Schema<D, O, T>.items(
     pusher: suspend SchemaScope<D, T, M>.(value: M?) -> Unit,
     schema: Schema<D, T, M> = Schema()
 ) {
-    onConstruct { bson, constructor ->
+    onConstruct { bson, fallback ->
         // invoke the original constructor
-        val self = constructor(bson)
+        val self = fallback(bson)
 
         // skip value constructing if parent is null
         if (self != null) {
@@ -83,7 +83,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
 
             for (bsonValue in (bson as? BsonArray) ?: emptyList()) {
                 // invoke item constructor
-                val value = schema.constructor(scope, bsonValue)
+                val value = with(scope) { schema.constructor(bsonValue) }
 
                 // inject value to document
                 pusher(scope, value)
@@ -109,7 +109,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
 
             for (value in iterator(scope)) {
                 // invoke item formatter
-                val bsonValue = schema.formatter(scope, value)
+                val bsonValue = with(scope) { schema.formatter(value) }
 
                 // inject bson value to bson self
                 if (bsonValue != null)
@@ -135,7 +135,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
             )
 
             for (value in iterator(scope)) {
-                val valueErrors = schema.validator(scope, value)
+                val valueErrors = with(scope) { schema.validator(value) }
 
                 errors += valueErrors
             }

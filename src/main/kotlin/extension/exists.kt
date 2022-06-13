@@ -16,7 +16,10 @@
 package org.cufy.mangaka.extension
 
 import com.mongodb.client.model.Filters.eq
-import org.cufy.mangaka.*
+import org.cufy.mangaka.Id
+import org.cufy.mangaka.Model
+import org.cufy.mangaka.Schema
+import org.cufy.mangaka.SchemaScope
 
 /**
  * Add a validator that insures the id is pointing
@@ -42,19 +45,13 @@ fun <D, O, T> Schema<D, O, Id<T>>.exists(
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, Id<T>>.exists(
-    message: SchemaScope<D, O, Id<T>>.(Id<T>?) -> String = {
+    message: SchemaScope<D, O, Id<T>>.(Id<T>) -> String = {
         "Validation failed for path $path: Document not found with id $it"
     },
-    function: suspend SchemaScope<D, O, Id<T>>.(Id<T>?) -> Model<T & Any>
+    function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> Model<T & Any>
 ) {
-    onValidate { value, validator ->
-        validator(value) + run {
-            when {
-                value != null && !_exists(function(value), value) ->
-                    listOf(MangakaInvalidation(message(value)))
-                else -> emptyList()
-            }
-        }
+    validate({ message(it!!) }) { value ->
+        value == null || _exists(function(value), value)
     }
 }
 

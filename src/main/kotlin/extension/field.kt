@@ -88,9 +88,9 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
         - Invoke setter.
      */
-    onConstruct { bson, constructor ->
+    onConstruct { bson, fallback ->
         // invoke the original constructor
-        val self = constructor(bson)
+        val self = fallback(bson)
 
         // skip value constructing if parent is null
         if (self != null) {
@@ -105,7 +105,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
             // invoke property constructor
             val bsonValue = (bson as? BsonDocument)?.get(name)
-            val value = schema.constructor(scope, bsonValue)
+            val value = with(scope) { schema.constructor(bsonValue) }
 
             // inject value to document
             setter(scope, value)
@@ -126,9 +126,9 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
         - Otherwise, assign results to output bson.
      */
-    onFormat { self, formatter ->
+    onFormat { self, fallback ->
         // invoke the original formatter
-        val bson = formatter(self)
+        val bson = fallback(self)
 
         // skip value formatting if parent is null
         if (self != null && bson is BsonDocument) {
@@ -143,7 +143,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
             // invoke property formatter
             val value = getter(scope)
-            val bsonValue = schema.formatter(scope, value)
+            val bsonValue = with(scope) { schema.formatter(value) }
 
             // inject bson value to bson self
             if (bsonValue != null)
@@ -160,9 +160,9 @@ fun <D, O, T, M> Schema<D, O, T>.field(
         - Invoke getter then validator.
         - Added value errors to output list.
      */
-    onValidate { self, validator ->
+    onValidate { self, fallback ->
         // invoke the original validator
-        val errors = validator(self).toMutableList()
+        val errors = fallback(self).toMutableList()
 
         // skip value errors if parent is null
         if (self != null) {
@@ -177,7 +177,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
             // invoke property validator
             val value = getter(scope)
-            val valueErrors = schema.validator(scope, value)
+            val valueErrors = with(scope) { schema.validator(value) }
 
             errors += valueErrors
         }

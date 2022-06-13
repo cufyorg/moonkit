@@ -18,6 +18,7 @@ package org.cufy.mangaka
 import org.bson.BsonValue
 import org.cufy.mangaka.internal.constructorStub
 import org.cufy.mangaka.internal.formatterStub
+import org.cufy.mangaka.internal.validatorStub
 
 // Functions
 
@@ -28,28 +29,85 @@ import org.cufy.mangaka.internal.formatterStub
  * bson value and attempt to convert it to an
  * instance of [T].
  *
- * Unless critical, this function is not
- * expected to throw an error because of the
- * type or state of the given [bson] value.
- *
- * If the given [bson] is null, this means
- * that the value is not present and a default
- * value might be returned. It does not
- * explicitly mean to return null.
- *
- * If returned null, this means the constructor
- * failed to construct the value. Or the
- * constructor is explicitly ignoring the value.
- *
- * @receiver the execution scope.
- * @param bson the bson value.
- * @return a new instance of [T].
  * @author LSafer
  * @since 1.0.0
  */
-@Suppress("KDocUnresolvedReference")
-typealias Constructor<D, O, T> =
-        suspend SchemaScope<D, O, T>.(bson: BsonValue?) -> T?
+fun interface Constructor<D, O, T> {
+    /**
+     * This function is expected to receive a
+     * bson value and attempt to convert it to an
+     * instance of [T].
+     *
+     * Unless critical, this function is not
+     * expected to throw an error because of the
+     * type or state of the given [bson] value.
+     *
+     * If the given [bson] is null, this means
+     * that the value is not present and a default
+     * value might be returned. It does not
+     * explicitly mean to return null.
+     *
+     * If returned null, this means the constructor
+     * failed to construct the value. Or the
+     * constructor is explicitly ignoring the value.
+     *
+     * @receiver the execution scope.
+     * @param bson the bson value.
+     * @param constructor the fallback constructor.
+     * @return a new instance of [T].
+     * @author LSafer
+     * @since 1.0.0
+     */
+    suspend operator fun SchemaScope<D, O, T>.invoke(
+        bson: BsonValue?,
+        constructor: Constructor<D, O, T>
+    ): T?
+
+    /**
+     * Construct a new constructor that executes
+     * this constructor with the given [constructor]
+     * as its fallback.
+     *
+     * @since 1.0.0
+     */
+    infix fun then(
+        constructor: Constructor<D, O, T>
+    ): Constructor<D, O, T> {
+        val self = this
+        return Constructor { bson, fallback ->
+            self(bson, constructor then fallback)
+        }
+    }
+
+    companion object {
+        /**
+         * Obtain a constructor that always
+         * returns null.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Default() =
+            Constructor<D, O, T> { _, _ -> null }
+
+        /**
+         * Obtain a constructor that always
+         * invokes the fallback.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Fallback() =
+            Constructor<D, O, T> { p, fb -> fb(p) }
+
+        /**
+         * Obtain a constructor that always
+         * throws an error.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Stub() =
+            Constructor<D, O, T> { _, _ -> constructorStub(path) }
+    }
+}
 
 /**
  * The type of a schema formatter function.
@@ -58,28 +116,84 @@ typealias Constructor<D, O, T> =
  * instance of [T] and attempt to obtain a bson
  * value from it.
  *
- * Unless critical, this function is not
- * expected to throw an error because of the
- * type or state of the given [value].
- *
- * If the given [value] is null, this means
- * that the value is not present and a default
- * value might be returned. It does not
- * explicitly mean to return null.
- *
- * If returned null, this means the formatter
- * failed to format the value. Or the formatter
- * is explicitly ignoring the value.
- *
- * @receiver the execution scope.
- * @param value the instance of [T].
- * @return a bson value.
  * @author LSafer
  * @since 1.0.0
  */
-@Suppress("KDocUnresolvedReference")
-typealias Formatter<D, O, T> =
-        suspend SchemaScope<D, O, T>.(value: T?) -> BsonValue?
+fun interface Formatter<D, O, T> {
+    /**
+     * This function is expected to receive an
+     * instance of [T] and attempt to obtain a bson
+     * value from it.
+     *
+     * Unless critical, this function is not
+     * expected to throw an error because of the
+     * type or state of the given [value].
+     *
+     * If the given [value] is null, this means
+     * that the value is not present and a default
+     * value might be returned. It does not
+     * explicitly mean to return null.
+     *
+     * If returned null, this means the formatter
+     * failed to format the value. Or the formatter
+     * is explicitly ignoring the value.
+     *
+     * @receiver the execution scope.
+     * @param value the instance of [T].
+     * @return a bson value.
+     * @author LSafer
+     * @since 1.0.0
+     */
+    suspend operator fun SchemaScope<D, O, T>.invoke(
+        value: T?,
+        formatter: Formatter<D, O, T>
+    ): BsonValue?
+
+    /**
+     * Construct a new formatter that executes
+     * this formatter with the given [formatter]
+     * as its fallback.
+     *
+     * @since 1.0.0
+     */
+    infix fun then(
+        formatter: Formatter<D, O, T>
+    ): Formatter<D, O, T> {
+        val self = this
+        return Formatter { value, fallback ->
+            self(value, formatter then fallback)
+        }
+    }
+
+    companion object {
+        /**
+         * Obtain a formatter that always
+         * returns null.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Default() =
+            Formatter<D, O, T> { _, _ -> null }
+
+        /**
+         * Obtain a formatter that always
+         * invokes the fallback.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Fallback() =
+            Formatter<D, O, T> { p, fb -> fb(p) }
+
+        /**
+         * Obtain a formatter that always
+         * throws an error.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Stub() =
+            Formatter<D, O, T> { _, _ -> formatterStub(path) }
+    }
+}
 
 /**
  * The type of a schema validator function.
@@ -88,26 +202,82 @@ typealias Formatter<D, O, T> =
  * instance of [T] and return a list of errors
  * from validating it.
  *
- * Unless critical, this function is not
- * expected to throw an error because of the
- * type or state of the given [value].
- *
- * If the given [value] is null, this means
- * that the value is not present. It does not
- * explicitly mean to return an empty list.
- *
- * If returned an empty list, this means the
- * given [value] has passed this validator.
- *
- * @receiver the execution scope.
- * @param value an instance of [T].
- * @return the validation errors.
  * @author LSafer
  * @since 1.0.0
  */
-@Suppress("KDocUnresolvedReference")
-typealias Validator<D, O, T> =
-        suspend SchemaScope<D, O, T>.(value: T?) -> List<Throwable>
+fun interface Validator<D, O, T> {
+    /**
+     * This function is expected to receive an
+     * instance of [T] and return a list of errors
+     * from validating it.
+     *
+     * Unless critical, this function is not
+     * expected to throw an error because of the
+     * type or state of the given [value].
+     *
+     * If the given [value] is null, this means
+     * that the value is not present. It does not
+     * explicitly mean to return an empty list.
+     *
+     * If returned an empty list, this means the
+     * given [value] has passed this validator.
+     *
+     * @receiver the execution scope.
+     * @param value an instance of [T].
+     * @return the validation errors.
+     * @author LSafer
+     * @since 1.0.0
+     */
+    suspend operator fun SchemaScope<D, O, T>.invoke(
+        value: T?,
+        validator: Validator<D, O, T>
+    ): List<Throwable>
+
+    /**
+     * Construct a new validator that executes
+     * this validator with the given [validator]
+     * as its fallback.
+     *
+     * @since 1.0.0
+     */
+    infix fun then(
+        validator: Validator<D, O, T>
+    ): Validator<D, O, T> {
+        val self = this
+        return Validator { value, fallback ->
+            self(value, validator then fallback)
+        }
+    }
+
+    companion object {
+        /**
+         * Obtain a constructor that always
+         * returns an empty list.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Default() =
+            Validator<D, O, T> { _, _ -> emptyList() }
+
+        /**
+         * Obtain a validator that always
+         * invokes the fallback.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Fallback() =
+            Validator<D, O, T> { p, fb -> fb(p) }
+
+        /**
+         * Obtain a validator that always
+         * throws an error.
+         *
+         * @since 1.0.0
+         */
+        fun <D, O, T> Stub() =
+            Validator<D, O, T> { _, _ -> validatorStub(path) }
+    }
+}
 
 // Classes
 
@@ -156,6 +326,48 @@ interface SchemaScope<D, O, T> {
      * @since 1.0.0
      */
     val document: D?
+
+    /**
+     * Invoke the receiver constructor with the
+     * given arguments.
+     *
+     * > This function was made due to the
+     *   weirdness of kotlin extension functions.
+     *
+     * @since 1.0.0
+     */
+    suspend operator fun Constructor<D, O, T>.invoke(
+        bson: BsonValue?,
+        constructor: Constructor<D, O, T> = Constructor.Default()
+    ): T? = this@SchemaScope(bson, constructor)
+
+    /**
+     * Invoke the receiver formatter with the
+     * given arguments.
+     *
+     * > This function was made due to the
+     *   weirdness of kotlin extension functions.
+     *
+     * @since 1.0.0
+     */
+    suspend operator fun Formatter<D, O, T>.invoke(
+        value: T?,
+        formatter: Formatter<D, O, T> = Formatter.Default()
+    ): BsonValue? = this@SchemaScope(value, formatter)
+
+    /**
+     * Invoke the receiver validator with the
+     * given arguments.
+     *
+     * > This function was made due to the
+     *   weirdness of kotlin extension functions.
+     *
+     * @since 1.0.0
+     */
+    suspend operator fun Validator<D, O, T>.invoke(
+        value: T?,
+        validator: Validator<D, O, T> = Validator.Default()
+    ): List<Throwable> = this@SchemaScope(value, validator)
 }
 
 /**
@@ -243,70 +455,102 @@ fun <D, O, T> SchemaScope(
  * @since 1.0.0
  */
 fun <D, O, T> Schema(
-    constructor: Constructor<D, O, T> = { constructorStub(path) },
-    formatter: Formatter<D, O, T> = { formatterStub(path) },
-    validator: Validator<D, O, T> = { emptyList() },
+    constructor: Constructor<D, O, T> = Constructor.Stub(),
+    formatter: Formatter<D, O, T> = Formatter.Stub(),
+    validator: Validator<D, O, T> = Validator.Default(),
 ) = object : Schema<D, O, T> {
     override var constructor = constructor
     override var formatter = formatter
     override var validator = validator
 }
 
+// Setters
+
+/**
+ * Set the constructor of this schema to be the
+ * given [function] overriding any constructor
+ * that was applied previously.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> Schema<D, O, T>.constructor(
+    function: SchemaScope<D, O, T>.(bson: BsonValue?) -> T?
+) {
+    this.constructor = Constructor { bson, _ ->
+        function(bson)
+    }
+}
+
+/**
+ * Set the formatter of this schema to be the
+ * given [function] overriding any formatter that
+ * was applied previously.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> Schema<D, O, T>.formatter(
+    function: SchemaScope<D, O, T>.(value: T?) -> BsonValue?
+) {
+    this.formatter = Formatter { value, _ ->
+        function(value)
+    }
+}
+
+/**
+ * Set the validator of this schema to be the
+ * given [function] overriding any validator that
+ * was applied previously.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> Schema<D, O, T>.validator(
+    function: SchemaScope<D, O, T>.(value: T?) -> List<Throwable>
+) {
+    this.validator = Validator { value, _ ->
+        function(value)
+    }
+}
+
 // Interceptors
 
 /**
- * Apply the given [interceptor] to this schema.
+ * Apply the given constructor [interceptor] to this schema.
  *
  * @param interceptor the interceptor to be applied.
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.onConstruct(
-    interceptor: suspend SchemaScope<D, O, T>.(
-        bson: BsonValue?,
-        constructor: Constructor<D, O, T>
-    ) -> T?
+    interceptor: Constructor<D, O, T>
 ) {
-    this.constructor.let { constructor ->
-        this.constructor = { bson ->
-            interceptor(bson, constructor)
-        }
+    this.constructor.let {
+        this.constructor = interceptor then it
     }
 }
 
 /**
- * Apply the given [interceptor] to this schema.
+ * Apply the given formatter [interceptor] to this schema.
  *
  * @param interceptor the interceptor to be applied.
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.onFormat(
-    interceptor: suspend SchemaScope<D, O, T>.(
-        value: T?,
-        formatter: Formatter<D, O, T>
-    ) -> BsonValue?
+    interceptor: Formatter<D, O, T>
 ) {
-    this.formatter.let { formatter ->
-        this.formatter = { document ->
-            interceptor(document, formatter)
-        }
+    this.formatter.let {
+        this.formatter = interceptor then it
     }
 }
 
 /**
- * Apply the given [interceptor] to this schema.
+ * Apply the given validator [interceptor] to this schema.
  *
  * @param interceptor the interceptor to be applied.
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.onValidate(
-    interceptor: suspend SchemaScope<D, O, T>.(
-        value: T?,
-        validator: Validator<D, O, T>
-    ) -> List<Throwable>
+    interceptor: Validator<D, O, T>
 ) {
-    this.validator.let { validator ->
-        this.validator = { document ->
-            interceptor(document, validator)
-        }
+    this.validator.let {
+        this.validator = interceptor then it
     }
 }

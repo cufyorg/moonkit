@@ -41,13 +41,13 @@ fun <D, O, T> Schema<D, O, T>.validate(
     message: SchemaScope<D, O, T>.(T?) -> String = {
         "Validation failed for path $path"
     },
-    function: SchemaScope<D, O, T>.(T?) -> Boolean
+    function: suspend SchemaScope<D, O, T>.(T?) -> Boolean
 ) {
-    onValidate { document, validator ->
-        validator(document) + run {
-            when (function(document)) {
+    onValidate { value, fallback ->
+        fallback.invoke(value) + run {
+            when (function(value)) {
                 true -> emptyList()
-                false -> listOf(MangakaInvalidation(message(document)))
+                false -> listOf(MangakaInvalidation(message(value)))
             }
         }
     }

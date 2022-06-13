@@ -31,10 +31,10 @@ import org.cufy.mangaka.onFormat
 fun <D, O, T> Schema<D, O, T>.ignore(
     function: SchemaScope<D, O, T>.(T?) -> Boolean
 ) {
-    onFormat { value, formatter ->
+    onFormat { value, fallback ->
         when (function(value)) {
             true -> null
-            false -> formatter(value)
+            false -> fallback(value)
         }
     }
 }

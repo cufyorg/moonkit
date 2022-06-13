@@ -21,57 +21,10 @@ import org.cufy.mangaka.onFormat
 import org.cufy.mangaka.onValidate
 
 /**
- * Intercept the functions of this schema to
- * inherit the given [schema].
+ * Apply the functions of the given [schema] to
+ * intercept the functions of this schema.
  *
- * ### Constructor Interception
- * The constructor of the given [schema] will be
- * invoked first and if returned null, the
- * original constructor will be invoked.
- *
- * ### Formatter Interception
- * The formatter of the given [schema] will be
- * invoked first and if returned null, the
- * original formatter will be invoked.
- *
- * ### Validator Interception
- * The validator of the given [schema] will be
- * invoked first and then the original validator.
- *
- * @param schema the schema to inherit.
- * @since 1.0.0
- */
-infix fun <D, O, T> Schema<D, O, T>.inherits(
-    schema: Schema<D, O, T>
-) = apply {
-    onConstruct { bson, constructor ->
-        schema.constructor.invoke(this, bson) ?: constructor(bson)
-    }
-    onFormat { value, formatter ->
-        schema.formatter.invoke(this, value) ?: formatter(value)
-    }
-    onValidate { value, validator ->
-        schema.validator.invoke(this, value) + validator(value)
-    }
-}
-
-/**
- * Intercept the functions of this schema to
- * implement the given [schema].
- *
- * ### Constructor Interception
- * The constructor of the given [schema] will be
- * invoked if the original constructor returned
- * null.
- *
- * ### Formatter Interception
- * The formatter of the given [schema] will be
- * invoked if the original formatter returned
- * null.
- *
- * ### Validator Interception
- * The validator of the given [schema] will be
- * invoked after the original validator.
+ * TODO documentation for the implements extension
  *
  * @param schema the schema to implement.
  * @since 1.0.0
@@ -80,13 +33,13 @@ infix fun <D, O, T> Schema<D, O, T>.implements(
     schema: Schema<D, O, T>
 ) = apply {
     onConstruct { bson, constructor ->
-        constructor(bson) ?: schema.constructor.invoke(this, bson)
+        schema.constructor(bson, constructor)
     }
     onFormat { value, formatter ->
-        formatter(value) ?: schema.formatter.invoke(this, value)
+        schema.formatter(value, formatter)
     }
     onValidate { value, validator ->
-        validator(value) + schema.validator.invoke(this, value)
+        schema.validator(value, validator)
     }
 }
 

@@ -171,13 +171,13 @@ open class Model<T : Any>(
      * @since 1.0.0
      */
     suspend fun validate(value: T) {
-        val errors = this.schema.validator(SchemaScope(
+        val errors = with(SchemaScope<T, Unit, T>(
             name = name,
             path = name,
             model = this,
             document = value,
             self = Unit
-        ), value)
+        )) { schema.validator(value) }
         if (errors.isNotEmpty())
             throw errors.first()
     }
@@ -243,26 +243,26 @@ open class Model<T : Any>(
     /* Internal */
 
     private suspend fun format(value: T): BsonDocument {
-        val document = this.schema.formatter(SchemaScope(
+        val document = with(SchemaScope<T, Unit, T>(
             name = name,
             path = name,
             model = this,
             document = value,
             self = Unit
-        ), value)
+        )) { schema.formatter(value) }
         document ?: formatFailureError(this.name)
         document as? BsonDocument ?: formatFailureError(this.name)
         return document
     }
 
     private suspend fun construct(bson: BsonDocument?): T {
-        val value = schema.constructor(SchemaScope(
+        val value = with(SchemaScope<T, Unit, T>(
             name = name,
             path = name,
             model = this,
             document = null,
             self = Unit
-        ), bson)
+        )) { schema.constructor(bson) }
         value ?: constructorFailureError(name)
         return value
     }
