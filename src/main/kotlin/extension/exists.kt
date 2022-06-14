@@ -20,6 +20,8 @@ import org.cufy.mangaka.Id
 import org.cufy.mangaka.Model
 import org.cufy.mangaka.Schema
 import org.cufy.mangaka.SchemaScope
+import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.coroutine
 
 /**
  * Add a validator that insures the id is pointing
@@ -55,8 +57,50 @@ fun <D, O, T> Schema<D, O, Id<T>>.exists(
     }
 }
 
+/**
+ * Add a validator that insures the id is pointing
+ * to a valid document.
+ * The given [function] is used to define where to
+ * search for the document.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> Schema<D, O, Id<T>>.existsAt(
+    message: String,
+    function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> String
+) {
+    existsAt({ message }, function)
+}
+
+/**
+ * Add a validator that insures the id is pointing
+ * to a valid document.
+ * The given [function] is used to define where to
+ * search for the document.
+ *
+ * @since 1.0.0
+ */
+fun <D, O, T> Schema<D, O, Id<T>>.existsAt(
+    message: SchemaScope<D, O, Id<T>>.(Id<T>) -> String = {
+        "Validation failed for path $path: Document not found with id $it"
+    },
+    function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> String
+) {
+    validate({ message(it!!) }) { value ->
+        value == null || _exists(function(value).let {
+            model.mangaka.database.database
+                .getCollection(it)
+                .coroutine
+        }, value)
+    }
+}
+
 // internal
 
 internal suspend fun <T> _exists(model: Model<T & Any>, id: Id<T>): Boolean {
     return model.exists(eq("_id", id.normal))
+}
+
+internal suspend fun <T> _exists(collection: CoroutineCollection<*>, id: Id<T>): Boolean {
+    return collection.countDocuments(eq("_id", id.normal)) > 0
 }
