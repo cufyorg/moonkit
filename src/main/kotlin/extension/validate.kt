@@ -44,7 +44,7 @@ fun <D, O, T> Schema<D, O, T>.validate(
     function: suspend SchemaScope<D, O, T>.(T?) -> Boolean
 ) {
     onValidate { value, fallback ->
-        fallback.invoke(value) + run {
+        fallback(this, value) + run {
             when (function(value)) {
                 true -> emptyList()
                 false -> listOf(MangakaInvalidation(message(value)))

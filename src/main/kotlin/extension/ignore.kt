@@ -34,7 +34,7 @@ fun <D, O, T> Schema<D, O, T>.ignore(
     onFormat { value, fallback ->
         when (function(value)) {
             true -> null
-            false -> fallback(value)
+            false -> fallback(this, value)
         }
     }
 }

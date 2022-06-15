@@ -53,15 +53,26 @@ fun interface Constructor<D, O, T> {
      *
      * @receiver the execution scope.
      * @param bson the bson value.
-     * @param constructor the fallback constructor.
+     * @param fallback the fallback constructor.
      * @return a new instance of [T].
      * @author LSafer
      * @since 1.0.0
      */
-    suspend operator fun SchemaScope<D, O, T>.invoke(
+    suspend fun SchemaScope<D, O, T>.construct(
         bson: BsonValue?,
-        constructor: Constructor<D, O, T>
+        fallback: Constructor<D, O, T>
     ): T?
+
+    /**
+     * Invoke this constructor with the given arguments.
+     *
+     * @since 1.0.0
+     */
+    suspend operator fun invoke(
+        scope: SchemaScope<D, O, T>,
+        bson: BsonValue?,
+        fallback: Constructor<D, O, T> = Default()
+    ) = scope.construct(bson, fallback)
 
     /**
      * Construct a new constructor that executes
@@ -75,7 +86,7 @@ fun interface Constructor<D, O, T> {
     ): Constructor<D, O, T> {
         val self = this
         return Constructor { bson, fallback ->
-            self(bson, constructor then fallback)
+            self(this, bson, constructor then fallback)
         }
     }
 
@@ -96,7 +107,7 @@ fun interface Constructor<D, O, T> {
          * @since 1.0.0
          */
         fun <D, O, T> Fallback() =
-            Constructor<D, O, T> { p, fb -> fb(p) }
+            Constructor<D, O, T> { p, fb -> fb(this, p) }
 
         /**
          * Obtain a constructor that always
@@ -144,10 +155,21 @@ fun interface Formatter<D, O, T> {
      * @author LSafer
      * @since 1.0.0
      */
-    suspend operator fun SchemaScope<D, O, T>.invoke(
+    suspend fun SchemaScope<D, O, T>.format(
         value: T?,
-        formatter: Formatter<D, O, T>
+        fallback: Formatter<D, O, T>
     ): BsonValue?
+
+    /**
+     * Invoke this formatter with the given arguments.
+     *
+     * @since 1.0.0
+     */
+    suspend operator fun invoke(
+        scope: SchemaScope<D, O, T>,
+        value: T?,
+        fallback: Formatter<D, O, T> = Default()
+    ) = scope.format(value, fallback)
 
     /**
      * Construct a new formatter that executes
@@ -161,7 +183,7 @@ fun interface Formatter<D, O, T> {
     ): Formatter<D, O, T> {
         val self = this
         return Formatter { value, fallback ->
-            self(value, formatter then fallback)
+            self(this, value, formatter then fallback)
         }
     }
 
@@ -182,7 +204,7 @@ fun interface Formatter<D, O, T> {
          * @since 1.0.0
          */
         fun <D, O, T> Fallback() =
-            Formatter<D, O, T> { p, fb -> fb(p) }
+            Formatter<D, O, T> { p, fb -> fb(this, p) }
 
         /**
          * Obtain a formatter that always
@@ -228,10 +250,21 @@ fun interface Validator<D, O, T> {
      * @author LSafer
      * @since 1.0.0
      */
-    suspend operator fun SchemaScope<D, O, T>.invoke(
+    suspend fun SchemaScope<D, O, T>.validate(
         value: T?,
-        validator: Validator<D, O, T>
+        fallback: Validator<D, O, T>
     ): List<Throwable>
+
+    /**
+     * Invoke this validator with the given arguments.
+     *
+     * @since 1.0.0
+     */
+    suspend operator fun invoke(
+        scope: SchemaScope<D, O, T>,
+        value: T?,
+        fallback: Validator<D, O, T> = Default()
+    ) = scope.validate(value, fallback)
 
     /**
      * Construct a new validator that executes
@@ -245,7 +278,7 @@ fun interface Validator<D, O, T> {
     ): Validator<D, O, T> {
         val self = this
         return Validator { value, fallback ->
-            self(value, validator then fallback)
+            self(this, value, validator then fallback)
         }
     }
 
@@ -266,7 +299,7 @@ fun interface Validator<D, O, T> {
          * @since 1.0.0
          */
         fun <D, O, T> Fallback() =
-            Validator<D, O, T> { p, fb -> fb(p) }
+            Validator<D, O, T> { p, fb -> fb(this, p) }
 
         /**
          * Obtain a validator that always
@@ -326,48 +359,6 @@ interface SchemaScope<D, O, T> {
      * @since 1.0.0
      */
     val document: D?
-
-    /**
-     * Invoke the receiver constructor with the
-     * given arguments.
-     *
-     * > This function was made due to the
-     *   weirdness of kotlin extension functions.
-     *
-     * @since 1.0.0
-     */
-    suspend operator fun Constructor<D, O, T>.invoke(
-        bson: BsonValue?,
-        constructor: Constructor<D, O, T> = Constructor.Default()
-    ): T? = this@SchemaScope(bson, constructor)
-
-    /**
-     * Invoke the receiver formatter with the
-     * given arguments.
-     *
-     * > This function was made due to the
-     *   weirdness of kotlin extension functions.
-     *
-     * @since 1.0.0
-     */
-    suspend operator fun Formatter<D, O, T>.invoke(
-        value: T?,
-        formatter: Formatter<D, O, T> = Formatter.Default()
-    ): BsonValue? = this@SchemaScope(value, formatter)
-
-    /**
-     * Invoke the receiver validator with the
-     * given arguments.
-     *
-     * > This function was made due to the
-     *   weirdness of kotlin extension functions.
-     *
-     * @since 1.0.0
-     */
-    suspend operator fun Validator<D, O, T>.invoke(
-        value: T?,
-        validator: Validator<D, O, T> = Validator.Default()
-    ): List<Throwable> = this@SchemaScope(value, validator)
 }
 
 /**

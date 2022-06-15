@@ -90,7 +90,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
      */
     onConstruct { bson, fallback ->
         // invoke the original constructor
-        val self = fallback(bson)
+        val self = fallback(this, bson)
 
         // skip value constructing if parent is null
         if (self != null) {
@@ -105,7 +105,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
             // invoke property constructor
             val bsonValue = (bson as? BsonDocument)?.get(name)
-            val value = with(scope) { schema.constructor(bsonValue) }
+            val value = schema.constructor(scope, bsonValue)
 
             // inject value to document
             setter(scope, value)
@@ -128,7 +128,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
      */
     onFormat { self, fallback ->
         // invoke the original formatter
-        val bson = fallback(self)
+        val bson = fallback(this, self)
 
         // skip value formatting if parent is null
         if (self != null && bson is BsonDocument) {
@@ -143,7 +143,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
             // invoke property formatter
             val value = getter(scope)
-            val bsonValue = with(scope) { schema.formatter(value) }
+            val bsonValue = schema.formatter(scope, value)
 
             // inject bson value to bson self
             if (bsonValue != null)
@@ -162,7 +162,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
      */
     onValidate { self, fallback ->
         // invoke the original validator
-        val errors = fallback(self).toMutableList()
+        val errors = fallback(this, self).toMutableList()
 
         // skip value errors if parent is null
         if (self != null) {
@@ -177,7 +177,7 @@ fun <D, O, T, M> Schema<D, O, T>.field(
 
             // invoke property validator
             val value = getter(scope)
-            val valueErrors = with(scope) { schema.validator(value) }
+            val valueErrors = schema.validator(scope, value)
 
             errors += valueErrors
         }

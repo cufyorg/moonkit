@@ -68,7 +68,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
 ) {
     onConstruct { bson, fallback ->
         // invoke the original constructor
-        val self = fallback(bson)
+        val self = fallback(this, bson)
 
         // skip value constructing if parent is null
         if (self != null) {
@@ -83,7 +83,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
 
             for (bsonValue in (bson as? BsonArray) ?: emptyList()) {
                 // invoke item constructor
-                val value = with(scope) { schema.constructor(bsonValue) }
+                val value = schema.constructor(scope, bsonValue)
 
                 // inject value to document
                 pusher(scope, value)
@@ -94,7 +94,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
     }
     onFormat { self, formatter ->
         // invoke the original formatter
-        val bson = formatter(self)
+        val bson = formatter(this, self)
 
         // skip value formatting if parent is null
         if (self != null && bson is BsonArray) {
@@ -109,7 +109,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
 
             for (value in iterator(scope)) {
                 // invoke item formatter
-                val bsonValue = with(scope) { schema.formatter(value) }
+                val bsonValue = schema.formatter(scope, value)
 
                 // inject bson value to bson self
                 if (bsonValue != null)
@@ -121,7 +121,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
     }
     onValidate { self, validator ->
         // invoke the original validator
-        val errors = validator(self).toMutableList()
+        val errors = validator(this, self).toMutableList()
 
         // skip value errors if parent is null
         if (self != null) {
@@ -135,7 +135,7 @@ fun <D, O, T, M> Schema<D, O, T>.items(
             )
 
             for (value in iterator(scope)) {
-                val valueErrors = with(scope) { schema.validator(value) }
+                val valueErrors = schema.validator(scope, value)
 
                 errors += valueErrors
             }

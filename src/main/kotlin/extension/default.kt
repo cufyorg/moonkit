@@ -32,9 +32,9 @@ fun <D, O, T> Schema<D, O, T>.default(
     function: suspend SchemaScope<D, O, T>.() -> T?
 ) {
     onConstruct { bson, fallback ->
-        fallback(bson) ?: function()
+        fallback(this, bson) ?: function()
     }
     onFormat { value, fallback ->
-        fallback(value ?: function())
+        fallback(this, value ?: function())
     }
 }

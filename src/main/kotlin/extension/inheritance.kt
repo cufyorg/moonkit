@@ -16,6 +16,7 @@
 package org.cufy.mangaka.extension
 
 import org.cufy.mangaka.Schema
+import org.cufy.mangaka.internal.safeCast
 import org.cufy.mangaka.onConstruct
 import org.cufy.mangaka.onFormat
 import org.cufy.mangaka.onValidate
@@ -30,16 +31,16 @@ import org.cufy.mangaka.onValidate
  * @since 1.0.0
  */
 infix fun <D, O, T> Schema<D, O, T>.implements(
-    schema: Schema<D, O, T>
+    schema: Schema<in D, in O, T>
 ) = apply {
-    onConstruct { bson, constructor ->
-        schema.constructor(bson, constructor)
+    onConstruct { bson, fallback ->
+        schema.constructor.safeCast()(this, bson, fallback)
     }
-    onFormat { value, formatter ->
-        schema.formatter(value, formatter)
+    onFormat { value, fallback ->
+        schema.formatter.safeCast()(this, value, fallback)
     }
-    onValidate { value, validator ->
-        schema.validator(value, validator)
+    onValidate { value, fallback ->
+        schema.validator.safeCast()(this, value, fallback)
     }
 }
 
@@ -51,9 +52,9 @@ infix fun <D, O, T> Schema<D, O, T>.implements(
  * @since 1.0.0
  */
 infix fun <D, O, T> Schema<D, O, T>.extends(
-    schema: Schema<D, O, T>
+    schema: Schema<in D, in O, T>
 ) = apply {
-    this.constructor = schema.constructor
-    this.formatter = schema.formatter
-    this.validator = schema.validator
+    this.constructor = schema.constructor.safeCast()
+    this.formatter = schema.formatter.safeCast()
+    this.validator = schema.validator.safeCast()
 }
