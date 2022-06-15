@@ -15,11 +15,7 @@
  */
 package org.cufy.mangaka.extension
 
-import org.cufy.mangaka.Schema
-import org.cufy.mangaka.internal.safeCast
-import org.cufy.mangaka.onConstruct
-import org.cufy.mangaka.onFormat
-import org.cufy.mangaka.onValidate
+import org.cufy.mangaka.*
 
 /**
  * Apply the functions of the given [schema] to
