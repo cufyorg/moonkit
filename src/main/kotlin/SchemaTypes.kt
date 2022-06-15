@@ -115,35 +115,6 @@ fun <T> StringIdSchema() = SchemaType<_, _, Id<T>> {
     formatter { it?.let { BsonString(it.value) } }
 }
 
-// Builder Types
-
-/**
- * Create a new schema with the given [builder].
- *
- * @since 1.0.0
- */
-fun <D, O, T> SchemaType(
-    builder: Schema<D, O, T>.() -> Unit
-): Schema<D, O, T> {
-    val schema = Schema<D, O, T>()
-    schema.constructor = Constructor.Default()
-    schema.formatter = Formatter.Default()
-    schema.validator = Validator.Default()
-    schema.apply(builder)
-    return schema
-}
-
-fun <D, O, T> SchemaInterface(
-    builder: Schema<D, O, T>.() -> Unit
-): Schema<D, O, T> {
-    val schema = Schema<D, O, T>()
-    schema.constructor = Constructor.Fallback()
-    schema.formatter = Formatter.Fallback()
-    schema.validator = Validator.Fallback()
-    schema.apply(builder)
-    return schema
-}
-
 // Reflection
 
 /**
