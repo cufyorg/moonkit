@@ -29,7 +29,7 @@ fun <D, O, T> Schema<D, O, T>.validate(
     message: String,
     function: suspend SchemaScope<D, O, T>.(T?) -> Boolean
 ) {
-    validate({ message }, function)
+    validate({ "Validation failed for path $path: $message" }, function)
 }
 
 /**
