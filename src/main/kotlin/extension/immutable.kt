@@ -34,9 +34,7 @@ import org.cufy.mangaka.internal.MetaData
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.immutable(
-    function: SchemaScope<D, O, T>.(T?) -> Boolean = {
-        true
-    }
+    function: suspend SchemaScope<D, O, T>.(T?) -> Boolean = { true }
 ) {
     ignore { !_isNew(document) && function(it) }
 }

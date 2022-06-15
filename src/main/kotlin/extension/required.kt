@@ -27,11 +27,9 @@ import org.cufy.mangaka.SchemaScope
  */
 fun <D, O, T> Schema<D, O, T>.required(
     message: String,
-    function: SchemaScope<D, O, T>.() -> Boolean = {
-        true
-    }
+    function: suspend SchemaScope<D, O, T>.() -> Boolean = { true }
 ) {
-    required({ message }, function)
+    validate(message) { it != null || !function() }
 }
 
 /**
@@ -42,14 +40,10 @@ fun <D, O, T> Schema<D, O, T>.required(
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.required(
-    message: SchemaScope<D, O, T>.() -> String = {
+    message: suspend SchemaScope<D, O, T>.() -> String = {
         "Validation failed for path $path: Required field $name is missing."
     },
-    function: SchemaScope<D, O, T>.() -> Boolean = {
-        true
-    }
+    function: suspend SchemaScope<D, O, T>.() -> Boolean = { true }
 ) {
-    validate({ message() }) { value ->
-        value != null || !function()
-    }
+    validate({ message() }) { it != null || !function() }
 }

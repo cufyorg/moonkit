@@ -20,7 +20,6 @@ import org.cufy.mangaka.Id
 import org.cufy.mangaka.Model
 import org.cufy.mangaka.Schema
 import org.cufy.mangaka.SchemaScope
-import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
 
 /**
@@ -33,9 +32,9 @@ import org.litote.kmongo.coroutine.coroutine
  */
 fun <D, O, T> Schema<D, O, Id<T>>.exists(
     message: String,
-    function: suspend SchemaScope<D, O, Id<T>>.(Id<T>?) -> Model<T & Any>
+    function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> Model<T & Any>
 ) {
-    exists({ message }, function)
+    insure(message) { _exists(function(it), it) }
 }
 
 /**
@@ -47,14 +46,12 @@ fun <D, O, T> Schema<D, O, Id<T>>.exists(
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, Id<T>>.exists(
-    message: SchemaScope<D, O, Id<T>>.(Id<T>) -> String = {
+    message: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> String = {
         "Validation failed for path $path: Document not found with id $it"
     },
     function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> Model<T & Any>
 ) {
-    validate({ message(it!!) }) { value ->
-        value == null || _exists(function(value), value)
-    }
+    insure(message) { _exists(function(it), it) }
 }
 
 /**
@@ -69,7 +66,7 @@ fun <D, O, T> Schema<D, O, Id<T>>.existsAt(
     message: String,
     function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> String
 ) {
-    existsAt({ message }, function)
+    insure(message) { _exists(model, function(it), it) }
 }
 
 /**
@@ -81,18 +78,12 @@ fun <D, O, T> Schema<D, O, Id<T>>.existsAt(
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, Id<T>>.existsAt(
-    message: SchemaScope<D, O, Id<T>>.(Id<T>) -> String = {
+    message: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> String = {
         "Validation failed for path $path: Document not found with id $it"
     },
     function: suspend SchemaScope<D, O, Id<T>>.(Id<T>) -> String
 ) {
-    validate({ message(it!!) }) { value ->
-        value == null || _exists(function(value).let {
-            model.mangaka.database.database
-                .getCollection(it)
-                .coroutine
-        }, value)
-    }
+    insure(message) { _exists(model, function(it), it) }
 }
 
 // internal
@@ -101,6 +92,9 @@ internal suspend fun <T> _exists(model: Model<T & Any>, id: Id<T>): Boolean {
     return model.exists(eq("_id", id.normal))
 }
 
-internal suspend fun <T> _exists(collection: CoroutineCollection<*>, id: Id<T>): Boolean {
-    return collection.countDocuments(eq("_id", id.normal)) > 0
+internal suspend fun <T> _exists(model: Model<*>, collection: String, id: Id<T>): Boolean {
+    return model.mangaka.database.database
+        .getCollection(collection)
+        .coroutine
+        .countDocuments(eq("_id", id.normal)) > 0
 }

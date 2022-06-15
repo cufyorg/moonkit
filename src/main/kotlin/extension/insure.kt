@@ -12,9 +12,9 @@ import org.cufy.mangaka.SchemaScope
  */
 fun <D, O, T> Schema<D, O, T>.insure(
     message: String,
-    function: SchemaScope<D, O, T>.(T) -> Boolean
+    function: suspend SchemaScope<D, O, T>.(T) -> Boolean
 ) {
-    insure({ message }, function)
+    validate(message) { it == null || function(it) }
 }
 
 /**
@@ -25,12 +25,10 @@ fun <D, O, T> Schema<D, O, T>.insure(
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.insure(
-    message: SchemaScope<D, O, T>.(T) -> String = {
+    message: suspend SchemaScope<D, O, T>.(T) -> String = {
         "Validation failed for path $path"
     },
     function: suspend SchemaScope<D, O, T>.(T) -> Boolean
 ) {
-    validate({ message(it!!) }) {
-        it == null || function(it)
-    }
+    validate({ message(it!!) }) { it == null || function(it) }
 }

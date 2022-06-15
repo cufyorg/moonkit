@@ -27,7 +27,7 @@ import org.cufy.mangaka.onValidate
  */
 fun <D, O, T> Schema<D, O, T>.validate(
     message: String,
-    function: SchemaScope<D, O, T>.(T?) -> Boolean
+    function: suspend SchemaScope<D, O, T>.(T?) -> Boolean
 ) {
     validate({ message }, function)
 }
@@ -38,7 +38,7 @@ fun <D, O, T> Schema<D, O, T>.validate(
  * @since 1.0.0
  */
 fun <D, O, T> Schema<D, O, T>.validate(
-    message: SchemaScope<D, O, T>.(T?) -> String = {
+    message: suspend SchemaScope<D, O, T>.(T?) -> String = {
         "Validation failed for path $path"
     },
     function: suspend SchemaScope<D, O, T>.(T?) -> Boolean
