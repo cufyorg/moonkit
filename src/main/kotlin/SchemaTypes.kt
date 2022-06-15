@@ -29,7 +29,7 @@ import kotlin.reflect.full.createType
  *
  * @since 1.0.0
  */
-fun <D, O> StringSchema() = SchemaType<D, O, String> {
+fun StringSchema() = SchemaType {
     constructor { (it as? BsonString)?.value }
     formatter { it?.let { BsonString(it) } }
 }
@@ -39,7 +39,7 @@ fun <D, O> StringSchema() = SchemaType<D, O, String> {
  *
  * @since 1.0.0
  */
-fun <D, O> BooleanSchema() = SchemaType<D, O, Boolean> {
+fun BooleanSchema() = SchemaType {
     constructor { (it as? BsonBoolean)?.value }
     formatter { it?.let { BsonBoolean(it) } }
 }
@@ -49,7 +49,7 @@ fun <D, O> BooleanSchema() = SchemaType<D, O, Boolean> {
  *
  * @since 1.0.0
  */
-fun <D, O> Int64Schema() = SchemaType<D, O, Long> {
+fun Int64Schema() = SchemaType {
     constructor { (it as? BsonInt64)?.value }
     formatter { it?.let { BsonInt64(it) } }
 }
@@ -59,7 +59,7 @@ fun <D, O> Int64Schema() = SchemaType<D, O, Long> {
  *
  * @since 1.0.0
  */
-fun <D, O> Int32Schema() = SchemaType<D, O, Int> {
+fun Int32Schema() = SchemaType {
     constructor { (it as? BsonInt32)?.value }
     formatter { it?.let { BsonInt32(it) } }
 }
@@ -76,7 +76,7 @@ fun <D, O> Int32Schema() = SchemaType<D, O, Int> {
  *
  * @since 1.0.0
  */
-fun <D, O, T> ArraySchema() = SchemaType<D, O, MutableList<T>> {
+fun <T> ArraySchema() = SchemaType<_, _, MutableList<T>> {
     constructor { (it as? BsonArray)?.let { mutableListOf() } }
     formatter { it?.let { BsonArray() } }
 }
@@ -86,7 +86,7 @@ fun <D, O, T> ArraySchema() = SchemaType<D, O, MutableList<T>> {
  *
  * @since 1.0.0
  */
-fun <D, O, T> ObjectIdSchema() = SchemaType<D, O, Id<T>> {
+fun <T> ObjectIdSchema() = SchemaType<_, _, Id<T>> {
     constructor {
         (it as? BsonObjectId)
             ?.let { Id(it.value) }
@@ -102,7 +102,7 @@ fun <D, O, T> ObjectIdSchema() = SchemaType<D, O, Id<T>> {
  *
  * @since 1.0.0
  */
-fun <D, O, T> StringIdSchema() = SchemaType<D, O, Id<T>> {
+fun <T> StringIdSchema() = SchemaType<_, _, Id<T>> {
     constructor { (it as? BsonString)?.let { Id(it.value) } }
     formatter { it?.let { BsonString(it.value) } }
 }
@@ -159,7 +159,7 @@ fun <D, O, T> SchemaInterface(
  */
 fun <D, O, T : Any> DocumentSchema(
     klass: KClass<in T>,
-    builder: Schema<D, O, T>.() -> Unit
+    builder: Schema<D, O, T>.() -> Unit = {}
 ): Schema<D, O, T> {
     val schema = Schema<D, O, T>()
     schema.constructor { _getInstance(klass) }
