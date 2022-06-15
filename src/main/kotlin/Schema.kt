@@ -74,22 +74,6 @@ fun interface Constructor<D, O, T> {
         fallback: Constructor<D, O, T> = Default()
     ) = scope.construct(bson, fallback)
 
-    /**
-     * Construct a new constructor that executes
-     * this constructor with the given [constructor]
-     * as its fallback.
-     *
-     * @since 1.0.0
-     */
-    infix fun then(
-        constructor: Constructor<D, O, T>
-    ): Constructor<D, O, T> {
-        val self = this
-        return Constructor { bson, fallback ->
-            self(this, bson, constructor then fallback)
-        }
-    }
-
     companion object {
         /**
          * Obtain a constructor that always
@@ -171,22 +155,6 @@ fun interface Formatter<D, O, T> {
         fallback: Formatter<D, O, T> = Default()
     ) = scope.format(value, fallback)
 
-    /**
-     * Construct a new formatter that executes
-     * this formatter with the given [formatter]
-     * as its fallback.
-     *
-     * @since 1.0.0
-     */
-    infix fun then(
-        formatter: Formatter<D, O, T>
-    ): Formatter<D, O, T> {
-        val self = this
-        return Formatter { value, fallback ->
-            self(this, value, formatter then fallback)
-        }
-    }
-
     companion object {
         /**
          * Obtain a formatter that always
@@ -265,22 +233,6 @@ fun interface Validator<D, O, T> {
         value: T?,
         fallback: Validator<D, O, T> = Default()
     ) = scope.validate(value, fallback)
-
-    /**
-     * Construct a new validator that executes
-     * this validator with the given [validator]
-     * as its fallback.
-     *
-     * @since 1.0.0
-     */
-    infix fun then(
-        validator: Validator<D, O, T>
-    ): Validator<D, O, T> {
-        val self = this
-        return Validator { value, fallback ->
-            self(this, value, validator then fallback)
-        }
-    }
 
     companion object {
         /**
@@ -502,6 +454,56 @@ fun <D, O, T> Schema<D, O, T>.validator(
     }
 }
 
+// Infix
+
+/**
+ * Construct a new constructor that executes
+ * this constructor with the given [constructor]
+ * as its fallback.
+ *
+ * @since 1.0.0
+ */
+operator fun <D, O, T> Constructor<D, O, T>.plus(
+    constructor: Constructor<D, O, T>
+): Constructor<D, O, T> {
+    val self = this
+    return Constructor { bson, fallback ->
+        self(this, bson, constructor + fallback)
+    }
+}
+
+/**
+ * Construct a new formatter that executes
+ * this formatter with the given [formatter]
+ * as its fallback.
+ *
+ * @since 1.0.0
+ */
+operator fun <D, O, T> Formatter<D, O, T>.plus(
+    formatter: Formatter<D, O, T>
+): Formatter<D, O, T> {
+    val self = this
+    return Formatter { value, fallback ->
+        self(this, value, formatter + fallback)
+    }
+}
+
+/**
+ * Construct a new validator that executes
+ * this validator with the given [validator]
+ * as its fallback.
+ *
+ * @since 1.0.0
+ */
+operator fun <D, O, T> Validator<D, O, T>.plus(
+    validator: Validator<D, O, T>
+): Validator<D, O, T> {
+    val self = this
+    return Validator { value, fallback ->
+        self(this, value, validator + fallback)
+    }
+}
+
 // Interceptors
 
 /**
@@ -514,7 +516,7 @@ fun <D, O, T> Schema<D, O, T>.onConstruct(
     interceptor: Constructor<D, O, T>
 ) {
     this.constructor.let {
-        this.constructor = interceptor then it
+        this.constructor = interceptor + it
     }
 }
 
@@ -528,7 +530,7 @@ fun <D, O, T> Schema<D, O, T>.onFormat(
     interceptor: Formatter<D, O, T>
 ) {
     this.formatter.let {
-        this.formatter = interceptor then it
+        this.formatter = interceptor + it
     }
 }
 
@@ -542,7 +544,7 @@ fun <D, O, T> Schema<D, O, T>.onValidate(
     interceptor: Validator<D, O, T>
 ) {
     this.validator.let {
-        this.validator = interceptor then it
+        this.validator = interceptor + it
     }
 }
 
