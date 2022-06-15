@@ -198,6 +198,18 @@ open class Model<T : Any>(
     }
 
     /**
+     * Find a document with the given [id]
+     * and convert it to an instance of type [T].
+     *
+     * @since 1.0.0
+     */
+    suspend fun findOneById(id: Id<T>): T? {
+        val result = this.collection.findOneById(id.normal)
+        result ?: return null
+        return this(result)
+    }
+
+    /**
      * Find documents matching the given [filter]
      * and convert them to instances of type [T].
      *
