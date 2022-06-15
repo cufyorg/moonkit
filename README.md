@@ -72,7 +72,9 @@ data class Entity(
     var list: MutableList<String?> = mutableListOf()
 ) : Document
 
-val EntitySchema = DocumentSchema(Entity::class) {
+val EntitySchema = SchemaType {
+    this extends DocumentSchema(Entity::class)
+
     field(Entity::value) {
         this extends StringSchema()
 
