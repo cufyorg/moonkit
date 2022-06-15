@@ -45,21 +45,21 @@ fun <D, O> BooleanSchema() = SchemaType<D, O, Boolean> {
 }
 
 /**
- * Obtain Long (Int64) schema.
+ * Obtain Int64 (Long) schema.
  *
  * @since 1.0.0
  */
-fun <D, O> LongSchema() = SchemaType<D, O, Long> {
+fun <D, O> Int64Schema() = SchemaType<D, O, Long> {
     constructor { (it as? BsonInt64)?.value }
     formatter { it?.let { BsonInt64(it) } }
 }
 
 /**
- * Obtain Int (Int32) schema.
+ * Obtain Int32 (Int) schema.
  *
  * @since 1.0.0
  */
-fun <D, O> IntSchema() = SchemaType<D, O, Int> {
+fun <D, O> Int32Schema() = SchemaType<D, O, Int> {
     constructor { (it as? BsonInt32)?.value }
     formatter { it?.let { BsonInt32(it) } }
 }
