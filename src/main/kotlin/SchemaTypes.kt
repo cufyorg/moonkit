@@ -136,15 +136,11 @@ fun <T> StringIdSchema() = SchemaType<_, _, Id<T>> {
  *
  * @since 1.0.0
  */
-fun <D, O, T : Any> DocumentSchema(
-    klass: KClass<in T>,
-    builder: Schema<D, O, T>.() -> Unit = {}
-): Schema<D, O, T> {
-    val schema = Schema<D, O, T>()
-    schema.constructor { _getInstance(klass) }
-    schema.formatter { BsonDocument() }
-    schema.apply(builder)
-    return schema
+fun <T : Any> DocumentSchema(
+    klass: KClass<out T>,
+) = SchemaType {
+    constructor { _getInstance(klass) }
+    formatter { BsonDocument() }
 }
 
 /**
@@ -162,15 +158,11 @@ fun <D, O, T : Any> DocumentSchema(
  *
  * @since 1.0.0
  */
-fun <D, O, T : Any> ObjectSchema(
-    klass: KClass<T>,
-    builder: Schema<D, O, T>.() -> Unit = {}
-): Schema<D, O, T> {
-    val schema = Schema<D, O, T>()
-    schema.constructor { (it as? BsonDocument)?.let { _getInstance(klass) } }
-    schema.formatter { it?.let { BsonDocument() } }
-    schema.apply(builder)
-    return schema
+fun <T : Any> ObjectSchema(
+    klass: KClass<out T>,
+) = SchemaType {
+    constructor { (it as? BsonDocument)?.let { _getInstance(klass) } }
+    formatter { it?.let { BsonDocument() } }
 }
 
 /**
@@ -178,25 +170,21 @@ fun <D, O, T : Any> ObjectSchema(
  *
  * @since 1.0.0
  */
-fun <D, O, T : Enum<T>> EnumSchema(
+fun <T : Enum<T>> EnumSchema(
     klass: KClass<T>,
-    builder: Schema<D, O, T>.() -> Unit = {}
-): Schema<D, O, T> {
-    val schema = Schema<D, O, T>()
-    schema.constructor {
+) = SchemaType {
+    constructor {
         it?.let { it as? BsonString }?.value
             ?.let { _getEnum(klass, it) }
     }
-    schema.formatter {
-        it?.let { BsonString(it.name) }
+    formatter {
+        it?.let { BsonString((it as T).name) }
     }
-    schema.apply(builder)
-    return schema
 }
 
 // internal
 
-internal fun <T : Any> _getInstance(klass: KClass<in T>): T {
+internal fun <T : Any> _getInstance(klass: KClass<out T>): T {
     @Suppress("UNCHECKED_CAST")
     return Json.decodeFromString(
         Json.serializersModule.serializer(klass.createType()),
