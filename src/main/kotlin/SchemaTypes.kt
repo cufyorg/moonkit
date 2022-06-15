@@ -82,7 +82,15 @@ fun <T> ArraySchema() = SchemaType<_, _, MutableList<T>> {
 }
 
 /**
- * Obtain Id (ObjectId) schema.
+ * Obtain an Id schema.
+ *
+ * @since 1.0.0
+ */
+fun <T> IdSchema() =
+    ObjectIdSchema<T>() + StringIdSchema()
+
+/**
+ * Obtain an ObjectId (Id) schema.
  *
  * @since 1.0.0
  */
@@ -98,7 +106,7 @@ fun <T> ObjectIdSchema() = SchemaType<_, _, Id<T>> {
 }
 
 /**
- * Obtain a dynamic Id (ObjectId|String) schema.
+ * Obtain a string (Id) schema.
  *
  * @since 1.0.0
  */
