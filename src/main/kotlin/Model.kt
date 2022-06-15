@@ -49,7 +49,7 @@ open class Model<T : Any>(
      *
      * @since 1.0.0
      */
-    val schema: Schema<T, Unit, T>,
+    val schema: Schema<in T, in Unit, T>,
     /**
      * The name of the collection backing this model.
      *
@@ -171,7 +171,8 @@ open class Model<T : Any>(
      * @since 1.0.0
      */
     suspend fun validate(value: T) {
-        val errors = schema.validator(SchemaScope(
+        val validator = schema.validator.safeCast()
+        val errors = validator(SchemaScope(
             name = name,
             path = name,
             model = this,
@@ -243,7 +244,8 @@ open class Model<T : Any>(
     /* Internal */
 
     private suspend fun format(value: T): BsonDocument {
-        val document = schema.formatter(SchemaScope(
+        val formatter = schema.formatter.safeCast()
+        val document = formatter(SchemaScope(
             name = name,
             path = name,
             model = this,
@@ -255,7 +257,8 @@ open class Model<T : Any>(
     }
 
     private suspend fun construct(bson: BsonDocument?): T {
-        val value = schema.constructor(SchemaScope(
+        val constructor = schema.constructor.safeCast()
+        val value = constructor(SchemaScope(
             name = name,
             path = name,
             model = this,

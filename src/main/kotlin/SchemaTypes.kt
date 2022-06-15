@@ -157,11 +157,11 @@ fun <D, O, T> SchemaInterface(
  *
  * @since 1.0.0
  */
-fun <T : Any> DocumentSchema(
+fun <D, O, T : Any> DocumentSchema(
     klass: KClass<in T>,
-    builder: Schema<T, Unit, T>.() -> Unit
-): Schema<T, Unit, T> {
-    val schema = Schema<T, Unit, T>()
+    builder: Schema<D, O, T>.() -> Unit
+): Schema<D, O, T> {
+    val schema = Schema<D, O, T>()
     schema.constructor { _getInstance(klass) }
     schema.formatter { BsonDocument() }
     schema.apply(builder)
