@@ -457,6 +457,32 @@ fun <D, O, T> Schema<D, O, T>.validator(
 // Infix
 
 /**
+ * Return a new schema from combining the receiver
+ * schema with the given [other] schema.
+ *
+ * @since 1.0.0
+ */
+operator fun <D, O, T> Schema<in D, in O, T>.plus(
+    other: Schema<in D, in O, T>
+): Schema<D, O, T> {
+    val receiver = this
+    val schema = Schema<D, O, T>()
+    schema.constructor = Constructor { bson, fallback ->
+        receiver.constructor.safeCast()(this, bson, fallback)
+            ?: other.constructor.safeCast()(this, bson, fallback)
+    }
+    schema.formatter = Formatter { value, fallback ->
+        receiver.formatter.safeCast()(this, value, fallback)
+            ?: other.formatter.safeCast()(this, value, fallback)
+    }
+    schema.validator = Validator { value, fallback ->
+        receiver.validator.safeCast()(this, value, fallback) +
+                other.validator.safeCast()(this, value, fallback)
+    }
+    return schema
+}
+
+/**
  * Construct a new constructor that executes
  * this constructor with the given [constructor]
  * as its fallback.
