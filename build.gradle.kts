@@ -11,12 +11,15 @@ version = "1.0.0-alpha.0"
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+
+    implementation("org.cufy:weakness:1.0.0-rc.0")
 
     implementation("org.litote.kmongo:kmongo:4.6.0")
     implementation("org.litote.kmongo:kmongo-coroutine:4.6.0")

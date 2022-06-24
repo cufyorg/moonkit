@@ -17,7 +17,7 @@ package org.cufy.mangaka.extension
 
 import org.cufy.mangaka.Schema
 import org.cufy.mangaka.SchemaScope
-import org.cufy.mangaka.internal.MetaData
+import org.cufy.mangaka.isNew
 
 /**
  * Treat the value as immutable if the given
@@ -45,8 +45,5 @@ internal fun _isNew(document: Any?): Boolean {
     if (document == null)
         return true
 
-    val metadata = MetaData.get(document)
-        ?: return false
-
-    return metadata.isNew
+    return document.isNew
 }

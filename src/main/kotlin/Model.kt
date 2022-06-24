@@ -20,7 +20,9 @@ import com.mongodb.client.result.UpdateResult
 import org.bson.BsonDocument
 import org.bson.BsonObjectId
 import org.bson.conversions.Bson
-import org.cufy.mangaka.internal.*
+import org.cufy.mangaka.internal.constructorFailureError
+import org.cufy.mangaka.internal.formatFailureError
+import org.cufy.mangaka.internal.valueIsDeletedError
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
@@ -91,15 +93,12 @@ open class Model<T : Any>(
         val value = construct(document)
         val valueId = KMongoUtil.getIdValue(value)
         val documentId = document?.get("_id") as? BsonObjectId
-        val metadata = MetaData(
-            id = valueId?.let { Id.normalize(it) }
-                ?: documentId?.let { Id(it.value) }
-                ?: Id(),
-            model = this,
-            isNew = document == null,
-            isDeleted = false
-        )
-        MetaData.set(value, metadata)
+        value._id = valueId?.let { Id.normalize(it) }
+            ?: documentId?.let { Id(it.value) }
+                    ?: Id()
+        value.model = this
+        value.isNew = document == null
+        value.isDeleted = false
         return value
     }
 
@@ -114,15 +113,12 @@ open class Model<T : Any>(
         val value = construct(document)
         val valueId = KMongoUtil.getIdValue(value)
         val documentId = document?.get("_id") as? BsonObjectId
-        val metadata = MetaData(
-            id = valueId?.let { Id.normalize(it) }
-                ?: documentId?.let { Id(it.value) }
-                ?: Id(),
-            model = this,
-            isNew = true,
-            isDeleted = false
-        )
-        MetaData.set(value, metadata)
+        value._id = valueId?.let { Id.normalize(it) }
+            ?: documentId?.let { Id(it.value) }
+                    ?: Id()
+        value.model = this
+        value.isNew = true
+        value.isDeleted = false
         save(value)
         return value
     }
@@ -133,20 +129,18 @@ open class Model<T : Any>(
      * @since 1.0.0
      */
     suspend fun save(value: T): UpdateResult {
-        val metadata = MetaData.get(value)
-            ?: missingMetadataError(value)
-        if (metadata.isDeleted)
+        if (value.isDeleted)
             valueIsDeletedError(value)
         validate(value)
         val document = format(value)
         val result = this.collection.updateOneById(
-            id = metadata.id.normal,
+            id = value._id.normal,
             update = BsonDocument().apply {
                 put("\$set", document)
             },
             options = upsert()
         )
-        metadata.isNew = false
+        value.isNew = false
         return result
     }
 
@@ -156,12 +150,10 @@ open class Model<T : Any>(
      * @since 1.0.0
      */
     suspend fun remove(value: T): DeleteResult {
-        val metadata = MetaData.get(value)
-            ?: missingMetadataError(value)
-        if (metadata.isDeleted)
+        if (value.isDeleted)
             valueIsDeletedError(value)
-        val result = this.collection.deleteOneById(metadata.id.normal)
-        metadata.isDeleted = true
+        val result = this.collection.deleteOneById(value._id.normal)
+        value.isDeleted = true
         return result
     }
 

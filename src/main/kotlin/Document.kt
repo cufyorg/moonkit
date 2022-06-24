@@ -15,8 +15,7 @@
  */
 package org.cufy.mangaka
 
-import org.cufy.mangaka.internal.MetaData
-import org.cufy.mangaka.internal.missingMetadataError
+import org.cufy.weakness.WeakProperty
 
 /**
  * A marker/utility interface to add to model
@@ -33,30 +32,18 @@ import org.cufy.mangaka.internal.missingMetadataError
 interface Document
 
 /**
- * Return true if this document is created by a model.
- *
- * @since 1.0.0
- */
-val <T : Document> T._initialized: Boolean
-    get() = MetaData.get(this) != null
-
-/**
  * Return the id of the document.
  *
  * @since 1.0.0
  */
-val <T : Document> T._id: Id<T>
-    get() = MetaData.get(this)?.id
-        ?: missingMetadataError(this)
+var <T : Document> T._id: Id<T> by WeakProperty()
 
 /**
  * Return the model created the document.
  *
  * @since 1.0.0
  */
-val <T : Document> T.model: Model<T>
-    get() = MetaData.get(this)?.model
-        ?: missingMetadataError(this)
+var <T : Document> T.model: Model<T> by WeakProperty()
 
 /**
  * Return true if the document is flagged not
@@ -64,9 +51,7 @@ val <T : Document> T.model: Model<T>
  *
  * @since 1.0.0
  */
-val <T : Document> T.isNew: Boolean
-    get() = MetaData.get(this)?.isNew
-        ?: missingMetadataError(this)
+var <T : Document> T.isNew: Boolean by WeakProperty()
 
 /**
  * Return true if the document is flagged deleted
@@ -74,9 +59,29 @@ val <T : Document> T.isNew: Boolean
  *
  * @since 1.0.0
  */
-val <T : Document> T.isDeleted: Boolean
-    get() = MetaData.get(this)?.isDeleted
-        ?: missingMetadataError(this)
+var <T : Document> T.isDeleted: Boolean by WeakProperty()
+
+/**
+ * Return the id of the document.
+ */
+internal var <T : Any> T._id: Id<T> by WeakProperty()
+
+/**
+ * Return the model created the document.
+ */
+internal var <T : Any> T.model: Model<T> by WeakProperty()
+
+/**
+ * Return true if the document is flagged not
+ * present in the database.
+ */
+internal var <T : Any> T.isNew: Boolean by WeakProperty()
+
+/**
+ * Return true if the document is flagged deleted
+ * from the database.
+ */
+internal var <T : Any> T.isDeleted: Boolean by WeakProperty()
 
 /**
  * Saves this document by inserting a new document

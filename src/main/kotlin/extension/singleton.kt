@@ -20,7 +20,7 @@ import com.mongodb.client.model.Filters.nor
 import org.cufy.mangaka.Model
 import org.cufy.mangaka.Schema
 import org.cufy.mangaka.SchemaScope
-import org.cufy.mangaka.internal.MetaData
+import org.cufy.mangaka._id
 
 /**
  * Insures this path is unique.
@@ -58,9 +58,8 @@ suspend fun _singleton(
     document: Any?,
     value: Any?
 ): Boolean {
-    val metadata = MetaData.get(document)
     return !model.exists(
-        nor(eq("_id", metadata?.id?.normal)),
+        nor(eq("_id", document?._id?.normal)),
         eq(path.split('.', limit = 2)[1], value)
     )
 }
