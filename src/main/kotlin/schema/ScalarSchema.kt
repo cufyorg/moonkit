@@ -53,6 +53,27 @@ open class ScalarSchemaBuilder<T : Any> {
      * @since 1.0.0
      */
     lateinit var deserializer: suspend (SchemaScope<*, T>, BsonValue) -> T
+
+    /**
+     * Build the schema.
+     *
+     * @since 1.0.0
+     */
+    fun build(): ScalarSchema<T> {
+        val _serializer = this.serializer
+        val _deserializer = this.deserializer
+        return object : ScalarSchema<T> {
+            override suspend fun serialize(
+                scope: SchemaScope<*, T>,
+                value: T
+            ) = _serializer(scope, value)
+
+            override suspend fun deserialize(
+                scope: SchemaScope<*, T>,
+                bson: BsonValue
+            ) = _deserializer(scope, bson)
+        }
+    }
 }
 
 /**
@@ -64,23 +85,11 @@ open class ScalarSchemaBuilder<T : Any> {
  * @since 1.0.0
  */
 fun <T : Any> ScalarSchema(
-    block: ScalarSchemaBuilder<T>.() -> Unit
+    block: ScalarSchemaBuilder<T>.() -> Unit = {}
 ): ScalarSchema<T> {
     val builder = ScalarSchemaBuilder<T>()
     builder.apply(block)
-    val _serializer = builder.serializer
-    val _deserializer = builder.deserializer
-    return object : ScalarSchema<T> {
-        override suspend fun serialize(
-            scope: SchemaScope<*, T>,
-            value: T
-        ) = _serializer(scope, value)
-
-        override suspend fun deserialize(
-            scope: SchemaScope<*, T>,
-            bson: BsonValue
-        ) = _deserializer(scope, bson)
-    }
+    return builder.build()
 }
 
 /**

@@ -186,6 +186,65 @@ open class FieldDefinitionBuilder<O : Any, T> {
         suspend (SchemaScope<O, T>, O, T) -> List<Throwable>,
         SchemaScope<O, T>, O, T
     ) -> List<Throwable> = { p, s, i, v -> p(s, i, v) }
+
+    /**
+     * Build the definition.
+     *
+     * @since 1.0.0
+     */
+    fun build(): FieldDefinition<O, T> {
+        val _name = this.name
+        val _schema = this.schema
+        val _getter = this.getter
+        val _setter = this.setter
+        val _customSerializer = this.customSerializer
+        val _customDeserializer = this.customDeserializer
+        val _customValidator = this.customValidator
+        return object : FieldDefinition<O, T> {
+            override val name = _name
+
+            override val schema = _schema
+
+            override suspend fun get(
+                scope: SchemaScope<O, T>,
+                instance: O
+            ) = _getter(scope, instance)
+
+            override suspend fun set(
+                scope: SchemaScope<O, T>,
+                instance: O,
+                value: T
+            ) = _setter(scope, instance, value)
+
+            override suspend fun serialize(
+                scope: SchemaScope<O, T>,
+                document: BsonDocument,
+                instance: O,
+                value: T
+            ) = _customSerializer(
+                { s, d, i, v -> super.serialize(s, d, i, v) },
+                scope, document, instance, value
+            )
+
+            override suspend fun deserialize(
+                scope: SchemaScope<O, T>,
+                document: BsonDocument,
+                instance: O
+            ) = _customDeserializer(
+                { s, d, i -> super.deserialize(s, d, i) },
+                scope, document, instance
+            )
+
+            override suspend fun validate(
+                scope: SchemaScope<O, T>,
+                instance: O,
+                value: T
+            ) = _customValidator(
+                { s, i, v -> super.validate(s, i, v) },
+                scope, instance, value
+            )
+        }
+    }
 }
 
 /**
@@ -201,7 +260,7 @@ open class FieldDefinitionBuilder<O : Any, T> {
 fun <O : Any, T> FieldDefinition(
     property: KMutableProperty1<in O, T>,
     schema: Schema<out T>? = null,
-    block: FieldDefinitionBuilder<O, T>.() -> Unit
+    block: FieldDefinitionBuilder<O, T>.() -> Unit = {}
 ): FieldDefinition<O, T> {
     return FieldDefinition(property.name, schema) {
         get { property.get(self) }
@@ -223,7 +282,7 @@ fun <O : Any, T> FieldDefinition(
 fun <O : Any, T> FieldDefinition(
     name: String? = null,
     schema: Schema<out T>? = null,
-    block: FieldDefinitionBuilder<O, T>.() -> Unit
+    block: FieldDefinitionBuilder<O, T>.() -> Unit = {}
 ): FieldDefinition<O, T> {
     val builder = FieldDefinitionBuilder<O, T>()
     name?.let { builder.name = it }
@@ -232,57 +291,7 @@ fun <O : Any, T> FieldDefinition(
         builder.schema = it as Schema<T>
     }
     builder.apply(block)
-    val _name = builder.name
-    val _schema = builder.schema
-    val _getter = builder.getter
-    val _setter = builder.setter
-    val _customSerializer = builder.customSerializer
-    val _customDeserializer = builder.customDeserializer
-    val _customValidator = builder.customValidator
-    return object : FieldDefinition<O, T> {
-        override val name = _name
-
-        override val schema = _schema
-
-        override suspend fun get(
-            scope: SchemaScope<O, T>,
-            instance: O
-        ) = _getter(scope, instance)
-
-        override suspend fun set(
-            scope: SchemaScope<O, T>,
-            instance: O,
-            value: T
-        ) = _setter(scope, instance, value)
-
-        override suspend fun serialize(
-            scope: SchemaScope<O, T>,
-            document: BsonDocument,
-            instance: O,
-            value: T
-        ) = _customSerializer(
-            { s, d, i, v -> super.serialize(s, d, i, v) },
-            scope, document, instance, value
-        )
-
-        override suspend fun deserialize(
-            scope: SchemaScope<O, T>,
-            document: BsonDocument,
-            instance: O
-        ) = _customDeserializer(
-            { s, d, i -> super.deserialize(s, d, i) },
-            scope, document, instance
-        )
-
-        override suspend fun validate(
-            scope: SchemaScope<O, T>,
-            instance: O,
-            value: T
-        ) = _customValidator(
-            { s, i, v -> super.validate(s, i, v) },
-            scope, instance, value
-        )
-    }
+    return builder.build()
 }
 
 /**

@@ -96,6 +96,45 @@ open class WrapperSchemaBuilder<T> {
         suspend (SchemaScope<*, T>, T) -> List<Throwable>,
         SchemaScope<*, T>, T
     ) -> List<Throwable> = { p, e, v -> p(e, v) }
+
+    /**
+     * Build the schema.
+     *
+     * @since 1.0.0
+     */
+    fun build(): WrapperSchema<T> {
+        val _schema = this.schema
+        val _customSerializer = this.customSerializer
+        val _customDeserializer = this.customDeserializer
+        val _customValidator = this.customValidator
+        return object : WrapperSchema<T> {
+            override val schema: Schema<T> = _schema
+
+            override suspend fun serialize(
+                scope: SchemaScope<*, T>,
+                value: T
+            ) = _customSerializer(
+                { s, v -> super.serialize(s, v) },
+                scope, value
+            )
+
+            override suspend fun deserialize(
+                scope: SchemaScope<*, T>,
+                bson: BsonValue
+            ) = _customDeserializer(
+                { s, b -> super.deserialize(s, b) },
+                scope, bson
+            )
+
+            override suspend fun validate(
+                scope: SchemaScope<*, T>,
+                value: T
+            ) = _customValidator(
+                { s, v -> super.validate(s, v) },
+                scope, value
+            )
+        }
+    }
 }
 
 /**
@@ -109,7 +148,7 @@ open class WrapperSchemaBuilder<T> {
  */
 fun <T> WrapperSchema(
     schema: Schema<out T>? = null,
-    block: WrapperSchemaBuilder<T>.() -> Unit
+    block: WrapperSchemaBuilder<T>.() -> Unit = {}
 ): WrapperSchema<T> {
     val builder = WrapperSchemaBuilder<T>()
     schema?.let {
@@ -117,37 +156,7 @@ fun <T> WrapperSchema(
         builder.schema = it as Schema<T>
     }
     builder.apply(block)
-    val _schema = builder.schema
-    val _customSerializer = builder.customSerializer
-    val _customDeserializer = builder.customDeserializer
-    val _customValidator = builder.customValidator
-    return object : WrapperSchema<T> {
-        override val schema: Schema<T> = _schema
-
-        override suspend fun serialize(
-            scope: SchemaScope<*, T>,
-            value: T
-        ) = _customSerializer(
-            { s, v -> super.serialize(s, v) },
-            scope, value
-        )
-
-        override suspend fun deserialize(
-            scope: SchemaScope<*, T>,
-            bson: BsonValue
-        ) = _customDeserializer(
-            { s, b -> super.deserialize(s, b) },
-            scope, bson
-        )
-
-        override suspend fun validate(
-            scope: SchemaScope<*, T>,
-            value: T
-        ) = _customValidator(
-            { s, v -> super.validate(s, v) },
-            scope, value
-        )
-    }
+    return builder.build()
 }
 
 /**

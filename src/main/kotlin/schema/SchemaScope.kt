@@ -143,6 +143,25 @@ open class SchemaScopeBuilder<O, T> {
      * @since 1.0.0
      */
     lateinit var model: Model<*>
+
+    /**
+     * Build the scope.
+     *
+     * @since 1.0.0
+     */
+    fun build(): SchemaScope<O, T> {
+        @Suppress("UNCHECKED_CAST")
+        return SchemaScope(
+            parent = this.parent,
+            name = this.name,
+            self = this.self as O,
+            schema = this.schema,
+            model = this.model,
+            document = this.document,
+            skip = this.skip.toList(),
+            attributes = this.attributes.toMap()
+        )
+    }
 }
 
 /**
@@ -154,7 +173,7 @@ open class SchemaScopeBuilder<O, T> {
  */
 fun <O, T> SchemaScope(
     parent: SchemaScope<*, O>? = null,
-    block: SchemaScopeBuilder<O, T>.() -> Unit
+    block: SchemaScopeBuilder<O, T>.() -> Unit = {}
 ): SchemaScope<O, T> {
     val builder = SchemaScopeBuilder<O, T>()
     parent?.let {
@@ -165,15 +184,5 @@ fun <O, T> SchemaScope(
         builder.attributes += it.attributes
     }
     builder.apply(block)
-    @Suppress("UNCHECKED_CAST")
-    return SchemaScope(
-        parent = builder.parent,
-        name = builder.name,
-        self = builder.self as O,
-        schema = builder.schema,
-        model = builder.model,
-        document = builder.document,
-        skip = builder.skip.toList(),
-        attributes = builder.attributes.toMap()
-    )
+    return builder.build()
 }

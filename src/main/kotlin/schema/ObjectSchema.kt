@@ -164,6 +164,49 @@ open class ObjectSchemaBuilder<T : Any> {
         suspend (SchemaScope<*, T>, T) -> List<Throwable>,
         SchemaScope<*, T>, T
     ) -> List<Throwable> = { p, s, v -> p(s, v) }
+
+    /**
+     * Build the schema.
+     *
+     * @since 1.0.0
+     */
+    fun build(): ObjectSchema<T> {
+        val _fields = this.fields
+        val _constructor = this.constructor
+        val _customSerializer = this.customSerializer
+        val _customDeserializer = this.customDeserializer
+        val _customValidator = this.customValidator
+        return object : ObjectSchema<T> {
+            override val fields = _fields
+
+            override suspend fun construct() =
+                _constructor()
+
+            override suspend fun serialize(
+                scope: SchemaScope<*, T>,
+                value: T
+            ) = _customSerializer(
+                { s, v -> super.serialize(s, v) },
+                scope, value
+            )
+
+            override suspend fun deserialize(
+                scope: SchemaScope<*, T>,
+                bson: BsonValue
+            ) = _customDeserializer(
+                { s, b -> super.deserialize(s, b) },
+                scope, bson
+            )
+
+            override suspend fun validate(
+                scope: SchemaScope<*, T>,
+                value: T
+            ) = _customValidator(
+                { s, v -> super.validate(s, v) },
+                scope, value
+            )
+        }
+    }
 }
 
 /**
@@ -177,46 +220,12 @@ open class ObjectSchemaBuilder<T : Any> {
  */
 fun <T : Any> ObjectSchema(
     constructor: (suspend () -> T)? = null,
-    block: ObjectSchemaBuilder<T>.() -> Unit
+    block: ObjectSchemaBuilder<T>.() -> Unit = {}
 ): ObjectSchema<T> {
     val builder = ObjectSchemaBuilder<T>()
     constructor?.let { builder.constructor = it }
     builder.apply(block)
-    val _fields = builder.fields
-    val _constructor = builder.constructor
-    val _customSerializer = builder.customSerializer
-    val _customDeserializer = builder.customDeserializer
-    val _customValidator = builder.customValidator
-    return object : ObjectSchema<T> {
-        override val fields = _fields
-
-        override suspend fun construct() =
-            _constructor()
-
-        override suspend fun serialize(
-            scope: SchemaScope<*, T>,
-            value: T
-        ) = _customSerializer(
-            { s, v -> super.serialize(s, v) },
-            scope, value
-        )
-
-        override suspend fun deserialize(
-            scope: SchemaScope<*, T>,
-            bson: BsonValue
-        ) = _customDeserializer(
-            { s, b -> super.deserialize(s, b) },
-            scope, bson
-        )
-
-        override suspend fun validate(
-            scope: SchemaScope<*, T>,
-            value: T
-        ) = _customValidator(
-            { s, v -> super.validate(s, v) },
-            scope, value
-        )
-    }
+    return builder.build()
 }
 
 /**
@@ -230,7 +239,7 @@ fun <T : Any> ObjectSchema(
 fun <T : Any, M> ObjectSchemaBuilder<T>.field(
     property: KMutableProperty1<in T, M>,
     schema: Schema<out M>? = null,
-    block: FieldDefinitionBuilder<T, M>.() -> Unit
+    block: FieldDefinitionBuilder<T, M>.() -> Unit = {}
 ) {
     @Suppress("UNCHECKED_CAST")
     this.fields.add(FieldDefinition(
@@ -251,7 +260,7 @@ fun <T : Any, M> ObjectSchemaBuilder<T>.field(
 fun <T : Any, M> ObjectSchemaBuilder<T>.field(
     name: String? = null,
     schema: Schema<out M>? = null,
-    block: FieldDefinitionBuilder<T, M>.() -> Unit
+    block: FieldDefinitionBuilder<T, M>.() -> Unit = {}
 ) {
     @Suppress("UNCHECKED_CAST")
     this.fields.add(FieldDefinition(
