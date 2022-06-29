@@ -34,11 +34,11 @@ import org.cufy.mangaka.schema.SchemaScope
  * @param block the validation block.
  * @since 1.0.0
  */
-fun <O : Any, T> FieldDefinitionBuilder<O, Id<T>>.exists(
-    error: suspend SchemaScope<O, Id<T>>.(Id<T>) -> String = {
-        "Document not found with id '${it.value}'"
+fun <O : Any, T : Id<*>?> FieldDefinitionBuilder<O, T>.exists(
+    error: suspend SchemaScope<O, T>.(T) -> String = {
+        "Document not found with id '${it?.value}'"
     },
-    block: suspend SchemaScope<O, Id<T>>.(Id<T>) -> Model<T & Any>
+    block: suspend SchemaScope<O, T>.(T) -> Model<*>
 ) {
     insure(error) {
         val filter = document("_id" by it.bson)
@@ -58,11 +58,11 @@ fun <O : Any, T> FieldDefinitionBuilder<O, Id<T>>.exists(
  * @param block the validation block.
  * @since 1.0.0
  */
-fun <O : Any, T> FieldDefinitionBuilder<O, Id<T>>.existsAt(
-    error: suspend SchemaScope<O, Id<T>>.(Id<T>) -> String = {
-        "Document not found with id '${it.value}'"
+fun <O : Any, T : Id<*>?> FieldDefinitionBuilder<O, T>.existsAt(
+    error: suspend SchemaScope<O, T>.(T) -> String = {
+        "Document not found with id '${it?.value}'"
     },
-    block: suspend SchemaScope<O, Id<T>>.(Id<T>) -> String
+    block: suspend SchemaScope<O, T>.(T) -> String
 ) {
     insure(error) {
         val filter = document("_id" by it.bson)
