@@ -13,6 +13,24 @@ library left to have an alternative in kotlin!
 
 So, I made mongoose in Kotlin 🤤
 
+### Install
+
+The main way of installing this library is
+using `jitpack.io`
+
+```kts
+repositories {
+    // ...
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    // Replace TAG with the desired version
+    implementation("org.cufy:mangaka:TAG")
+}
+```
+
 ### Starting the connection
 
 The following is how to do the mangaka connection on the
