@@ -20,12 +20,6 @@ import org.bson.BsonValue
 import org.cufy.mangaka.schema.Schema
 import org.cufy.mangaka.schema.SchemaScope
 
-fun <T> ArraySchema2(
-    schema: Schema<T>
-): Schema<in MutableList<T>> {
-    return ArraySchema(schema)
-}
-
 /**
  * A schema wrapper for arrays.
  *
