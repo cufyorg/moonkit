@@ -13,28 +13,28 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.cufy.mangaka.extension
+package org.cufy.mangaka.schema.extension
 
-import org.cufy.mangaka.Schema
-import org.cufy.mangaka.SchemaScope
-import org.cufy.mangaka.onConstruct
-import org.cufy.mangaka.onFormat
+import org.cufy.mangaka.bson.by
+import org.cufy.mangaka.bson.document
+import org.cufy.mangaka.ensureIndex
+import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.onSerialize
 
 /**
- * Define a default value for this schema.
+ * Insures this path is unique.
  *
- * The default value will be the result of invoking
- * the given [function].
+ * This is not a validator, instead is a
+ * collection modifier.
  *
  * @since 1.0.0
  */
-fun <D, O, T> Schema<D, O, T>.default(
-    function: suspend SchemaScope<D, O, T>.() -> T?
-) {
-    onConstruct { bson, fallback ->
-        fallback(this, bson) ?: function()
-    }
-    onFormat { value, fallback ->
-        fallback(this, value ?: function())
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.unique() {
+    onSerialize { parent, document, instance, value ->
+        this.model.ensureIndex(document(
+            pathname by 1
+        )) { unique(true) }
+
+        parent(this, document, instance, value)
     }
 }

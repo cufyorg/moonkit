@@ -45,7 +45,7 @@ export const EntitySchema = new Schema<Entity>({
     value: {
         type: SchemaTypes.String,
         default: () => "Initialized",
-        validate: value => value === "Invalid",
+        validate: value => value !== "Invalid",
         immutable: value => value === "Immutable"
     },
     friendId: {
@@ -59,46 +59,37 @@ export const EntitySchema = new Schema<Entity>({
     }
 });
 
-export const EntityModel = model("Entity", EntitySchema, "EntityCol");
+export const EntityModel = model("Entity", EntitySchema, "entities");
 ```
 
 Has the following equivalent with mangaka:
 
 ```kotlin
 @Serializable
-data class Entity(
-    var value: String? = null,
-    var friendId: Id<Entity> = Id("62a49540988ff286898c46b5"),
-    var list: MutableList<String?> = mutableListOf()
-) : Document
+class Entity : Document {
+    var value: String? = null
+    lateinit var friendId: Id<Entity>
+    lateinit var list: List<String>
+}
 
-val EntitySchema = SchemaType {
-    this extends DocumentSchema(Entity::class)
-
+val EntitySchema = ObjectSchema(::Entity) {
     field(Entity::value) {
-        this extends StringSchema()
-
+        schema { StringSchema }
         default { "Initialized" }
         validate { it != "Invalid" }
-        immutable { it == "Frozen" }
+        immutable { it == "Immutable" }
     }
     field(Entity::friendId) {
-        this extends ObjectIdSchema()
-
-        exists { this.model }
+        schema { IdSchema() }
+        existsAt { "entities" }
     }
     field(Entity::list) {
-        this extends ArraySchema()
-
-        default { listOf("FirstElement") }
-
-        items {
-            this extends StringSchema()
-        }
+        schema { ArraySchema(StringSchema) }
+        default { mutableListOf("FirstElement") }
     }
 }
 
-val EntityModel = Model("Entity", EntitySchema, "EntityCol")
+val EntityModel = model("Entity", EntitySchema, "entities")
 ```
 
 ### Model Usage
@@ -112,7 +103,7 @@ So, the code appears the same but internal it is not.
 For example, the following code with mangaka:
 
 ```typescript
-async function foo() {
+async function useEntityModel() {
     const entity = new EntityModel()
     await EntityModel.create({
         value: "SomeValue"
@@ -126,14 +117,14 @@ async function foo() {
 Has the following equivalent with mangaka:
 
 ```kotlin
-suspend fun foo() {
+suspend fun useEntityModel() {
     val entity = EntityModel()
-    EntityModel.create(
-        Entity::value eq "SomeValue"
-    )
-    EntityModel.findOne(
-        Entity::value eq "SomeValue"
-    )
+    EntityModel.create(document(
+        Entity::value by "SomeValue"
+    ))
+    EntityModel.findOne(document(
+        Entity::value by "SomeValue"
+    ))
 }
 ```
 
@@ -149,20 +140,20 @@ implemented in mangaka.
 For example, the following with mongoose:
 
 ```typescript
-async function foo(document: Document) {
-    await document.validate()
-    await document.save()
-    await document.remove()
+async function useEntityDocument(entity: Entity) {
+    await entity.validate()
+    await entity.save()
+    await entity.remove()
 }
 ```
 
 Has the following equivalent with mangaka:
 
 ```kotlin
-suspend fun foo(document: Document) {
-    document.validate()
-    document.save()
-    document.remove()
+suspend fun useEntityDocument(entity: Entity) {
+    entity.validate()
+    entity.save()
+    entity.remove()
 }
 ```
 
@@ -182,28 +173,15 @@ val Entity.firstElement: String?
 
 // example member function
 suspend fun Entity.findFriend(): Entity? {
-    return model.findOne(Filters.eq("_id", friendId))
+    return model.findOne(document(
+        "_id" by friendId
+    ))
 }
 
 // example static function
 suspend fun Model<Entity>.findByValue(value: String): Entity? {
-    return findOne(Entity::value eq value)
+    return findOne(document(
+        Entity::value by value
+    ))
 }
 ```
-
-### Extension Order
-
-When applying an extension to a schema. The applying order
-is very important.
-
-The following are examples of the
-importance of applying order:
-
-- The `ignore` (and `immutable`) extension is expected to be
-  before the `required` and `default` extensions. Since the
-  `ignore` extension will emit `null` which the `required`
-  and `default` extensions will receive the `null` and think
-  the value is missing.
-- The `extends` extension is expected to be the first
-  extension applied. Since, the `extends` extension
-  will override ALL the schema functions.

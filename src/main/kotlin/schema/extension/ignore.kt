@@ -13,28 +13,26 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.cufy.mangaka.extension
+package org.cufy.mangaka.schema.extension
 
-import org.cufy.mangaka.Schema
-import org.cufy.mangaka.SchemaScope
-import org.cufy.mangaka.onFormat
+import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.SchemaScope
+import org.cufy.mangaka.schema.onSerialize
 
 /**
  * Ignore formatting the value if the given
- * [function] returned true.
+ * [block] returned true.
  *
- * @param function a function to be invoked when
+ * @param block a function to be invoked when
  *                 formatting to determine if the
  *                 value should be ignored or not.
  * @since 1.0.0
  */
-fun <D, O, T> Schema<D, O, T>.ignore(
-    function: suspend SchemaScope<D, O, T>.(T?) -> Boolean = { true }
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.ignore(
+    block: suspend SchemaScope<O, T>.(T?) -> Boolean = { true }
 ) {
-    onFormat { value, fallback ->
-        when (function(value)) {
-            true -> null
-            false -> fallback(this, value)
-        }
+    onSerialize { parent, document, instance, value ->
+        if (!block(this, value))
+            parent(this, document, instance, value)
     }
 }

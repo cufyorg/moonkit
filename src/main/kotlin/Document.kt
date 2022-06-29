@@ -15,6 +15,11 @@
  */
 package org.cufy.mangaka
 
+import com.mongodb.client.model.DeleteOptions
+import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.result.DeleteResult
+import com.mongodb.client.result.UpdateResult
+import org.cufy.mangaka.schema.SchemaScopeBuilder
 import org.cufy.weakness.WeakProperty
 
 /**
@@ -36,6 +41,7 @@ interface Document
  *
  * @since 1.0.0
  */
+@Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
 var <T : Document> T._id: Id<T> by WeakProperty()
 
 /**
@@ -43,6 +49,7 @@ var <T : Document> T._id: Id<T> by WeakProperty()
  *
  * @since 1.0.0
  */
+@Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
 var <T : Document> T.model: Model<T> by WeakProperty()
 
 /**
@@ -64,11 +71,13 @@ var <T : Document> T.isDeleted: Boolean by WeakProperty()
 /**
  * Return the id of the document.
  */
+@Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
 internal var <T : Any> T._id: Id<T> by WeakProperty()
 
 /**
  * Return the model created the document.
  */
+@Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
 internal var <T : Any> T.model: Model<T> by WeakProperty()
 
 /**
@@ -91,22 +100,40 @@ internal var <T : Any> T.isDeleted: Boolean by WeakProperty()
  * This function will validate the document before
  * executing.
  *
+ * @param options the update options.
+ * @param validate the validation schema scope.
+ *                 Pass `null` to skip validation.
+ * @param block the schema scope builder.
  * @since 1.0.0
  */
-suspend fun Document.save() {
-    this.model.save(this)
+suspend fun <T : Document> T.save(
+    options: UpdateOptions.() -> Unit = {},
+    validate: (SchemaScopeBuilder<*, T>.() -> Unit)? = {},
+    block: SchemaScopeBuilder<*, T>.() -> Unit = {}
+): UpdateResult {
+    return this.model.save(this, options, validate, block)
 }
 
 /**
  * Removes this document from the db.
+ *
+ * @param options the deletion options.
+ * @since 1.0.0
  */
-suspend fun Document.remove() {
-    this.model.remove(this)
+suspend fun <T : Document> T.remove(
+    options: DeleteOptions.() -> Unit = {}
+): DeleteResult {
+    return this.model.remove(this, options)
 }
 
 /**
  * Executes the schema validator for this document.
+ *
+ * @param block the schema scope builder.
+ * @since 1.0.0
  */
-suspend fun Document.validate() {
-    this.model.validate(this)
+suspend fun <T : Document> T.validate(
+    block: SchemaScopeBuilder<*, T>.() -> Unit = {}
+) {
+    this.model.validate(this, block)
 }

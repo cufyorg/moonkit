@@ -13,37 +13,28 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.cufy.mangaka.extension
+package org.cufy.mangaka.schema.extension
 
-import org.cufy.mangaka.Schema
-import org.cufy.mangaka.SchemaScope
 import org.cufy.mangaka.isNew
+import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.SchemaScope
 
 /**
  * Treat the value as immutable if the given
- * [function] returned true.
+ * [block] returned true.
  *
  * This is done by ignoring formatting the value
  * when the document is not new and the given
- * [function] returned true.
+ * [block] returned true.
  *
- * @param function a function to be invoked when
+ * @param block a function to be invoked when
  *                 formatting a value on a not-new
  *                 document to determine if the
  *                 value should be ignored or not.
  * @since 1.0.0
  */
-fun <D, O, T> Schema<D, O, T>.immutable(
-    function: suspend SchemaScope<D, O, T>.(T?) -> Boolean = { true }
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.immutable(
+    block: suspend SchemaScope<O, T>.(T?) -> Boolean = { true }
 ) {
-    ignore { !_isNew(document) && function(it) }
-}
-
-// internal
-
-internal fun _isNew(document: Any?): Boolean {
-    if (document == null)
-        return true
-
-    return document.isNew
+    ignore { document?.isNew == false && block(it) }
 }

@@ -13,28 +13,21 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.cufy.mangaka.extension
+package org.cufy.mangaka.schema.extension
 
-import com.mongodb.client.model.Filters.eq
-import com.mongodb.client.model.IndexOptions
-import org.cufy.mangaka.Schema
-import org.cufy.mangaka.onFormat
+import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.WrapperSchema
+import org.cufy.mangaka.schema.WrapperSchemaBuilder
 
 /**
- * Insures this path is unique.
+ * Wrap the current schema with a [WrapperSchema]
+ * built with the given [block].
  *
- * This is not a validator, instead is a
- * collection modifier.
- *
+ * @param block the wrapper builder block.
  * @since 1.0.0
  */
-fun <D, O, T> Schema<D, O, T>.unique() {
-    onFormat { value, fallback ->
-        model.collection.ensureIndex(
-            eq(path.split('.', limit = 2)[1], 1),
-            IndexOptions()
-                .unique(true)
-        )
-        fallback(this, value)
-    }
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.intercept(
+    block: WrapperSchemaBuilder<T>.() -> Unit
+) {
+    schema.let { schema = WrapperSchema(it, block) }
 }
