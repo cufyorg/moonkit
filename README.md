@@ -1,3 +1,7 @@
+# Mangaka [![](https://jitpack.io/v/org.cufy/mangaka.svg)](https://jitpack.io/#org.cufy/mangaka)
+
+A mongoose equivalent for kotlin.
+
 ### Introduction
 
 Node.js is the best when it comes to community support and
