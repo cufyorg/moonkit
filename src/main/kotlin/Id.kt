@@ -79,14 +79,16 @@ fun <T> Id(value: Any): Id<T> {
  * @since 1.0.0
  */
 @Serializable(IdSerializer::class)
-class Id<T>(
+data class Id<T>(
     /**
      * The string representation of the id.
      *
      * @since 1.0.0
      */
     val value: String
-) : CharSequence by value
+) : CharSequence by value {
+    override fun toString() = value
+}
 
 /**
  * Return the best fitting native wrapper for
