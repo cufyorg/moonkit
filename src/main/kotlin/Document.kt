@@ -20,7 +20,7 @@ import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.result.DeleteResult
 import com.mongodb.client.result.UpdateResult
 import org.cufy.mangaka.schema.SchemaScopeBuilder
-import org.cufy.weakness.WeakProperty
+import org.cufy.weakness.weak
 
 /**
  * A marker/utility interface to add to model
@@ -42,7 +42,7 @@ interface Document
  * @since 1.0.0
  */
 @Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
-var <T : Document> T._id: Id<T> by WeakProperty()
+var <T : Document> T._id: Id<T> by weak()
 
 /**
  * Return the model created the document.
@@ -50,7 +50,7 @@ var <T : Document> T._id: Id<T> by WeakProperty()
  * @since 1.0.0
  */
 @Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
-var <T : Document> T.model: Model<T> by WeakProperty()
+var <T : Document> T.model: Model<T> by weak()
 
 /**
  * Return true if the document is flagged not
@@ -58,7 +58,7 @@ var <T : Document> T.model: Model<T> by WeakProperty()
  *
  * @since 1.0.0
  */
-var <T : Document> T.isNew: Boolean by WeakProperty()
+var <T : Document> T.isNew: Boolean by weak()
 
 /**
  * Return true if the document is flagged deleted
@@ -66,31 +66,31 @@ var <T : Document> T.isNew: Boolean by WeakProperty()
  *
  * @since 1.0.0
  */
-var <T : Document> T.isDeleted: Boolean by WeakProperty()
+var <T : Document> T.isDeleted: Boolean by weak()
 
 /**
  * Return the id of the document.
  */
 @Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
-internal var <T : Any> T._id: Id<T> by WeakProperty()
+internal var <T : Any> T._id: Id<T> by weak()
 
 /**
  * Return the model created the document.
  */
 @Suppress("DELEGATE_USES_EXTENSION_PROPERTY_TYPE_PARAMETER_WARNING")
-internal var <T : Any> T.model: Model<T> by WeakProperty()
+internal var <T : Any> T.model: Model<T> by weak()
 
 /**
  * Return true if the document is flagged not
  * present in the database.
  */
-internal var <T : Any> T.isNew: Boolean by WeakProperty()
+internal var <T : Any> T.isNew: Boolean by weak()
 
 /**
  * Return true if the document is flagged deleted
  * from the database.
  */
-internal var <T : Any> T.isDeleted: Boolean by WeakProperty()
+internal var <T : Any> T.isDeleted: Boolean by weak()
 
 /**
  * Saves this document by inserting a new document
