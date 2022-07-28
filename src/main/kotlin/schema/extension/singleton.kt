@@ -22,13 +22,15 @@ import org.cufy.mangaka.bson.by
 import org.cufy.mangaka.bson.document
 import org.cufy.mangaka.exists
 import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.ObjectSchemaBuilder
 import org.cufy.mangaka.schema.SchemaScope
 
 /**
  * Insures this path is unique.
  *
  * @param error the error message factory.
- * @param block the validation block.
+ * @param block a function that returns `true` to
+ *              activate this validator.
  * @since 1.0.0
  */
 fun <O : Any, T> FieldDefinitionBuilder<O, T>.singleton(
@@ -38,13 +40,42 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.singleton(
     block: suspend SchemaScope<O, T>.(T) -> Boolean = { true }
 ) {
     validate(error) {
-        val filter = document(
+        if (!block(it))
+            return@validate true
+
+        !model.exists(document(
+            pathname by it,
             "_id" by document(
                 `$ne` by document?._id?.bson
-            ),
-            pathname by it
-        )
+            )
+        ))
+    }
+}
 
-        !block(it) || !model.exists(filter)
+/**
+ * Insures the object fields are unique.
+ *
+ * @param error the error message factory.
+ * @param block a function that returns the names
+ *              of the fields to be unique.
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.singleton(
+    error: suspend SchemaScope<*, T>.(T) -> String = {
+        "Duplicate object values"
+    },
+    block: suspend SchemaScope<*, T>.(T) -> List<String>?
+) {
+    validate(error) {
+        val fields = block(it)
+            ?: return@validate true
+
+        !model.exists(document(
+            fields.map { name ->
+                (names + name).drop(1).joinToString(".") by 1
+            } + ("_id" by document(
+                `$ne` by document?._id?.bson
+            ))
+        ))
     }
 }
