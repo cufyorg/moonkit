@@ -19,6 +19,7 @@ import org.cufy.mangaka.bson.by
 import org.cufy.mangaka.bson.document
 import org.cufy.mangaka.ensureIndex
 import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.ObjectSchemaBuilder
 import org.cufy.mangaka.schema.onSerialize
 
 /**
@@ -30,11 +31,43 @@ import org.cufy.mangaka.schema.onSerialize
  * @since 1.0.0
  */
 fun <O : Any, T> FieldDefinitionBuilder<O, T>.unique() {
-    onSerialize { parent, document, instance, value ->
+    onSerialize { _, _, _ ->
         this.model.ensureIndex(document(
             pathname by 1
         )) { unique(true) }
+    }
+}
 
-        parent(this, document, instance, value)
+/**
+ * Insures the paths of the given [fields] are unique.
+ *
+ * This is not a validator, instead is a
+ * collection modifier.
+ *
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.unique(
+    vararg fields: String
+) {
+    unique(fields.asList())
+}
+
+/**
+ * Insures the paths of the given [fields] are unique.
+ *
+ * This is not a validator, instead is a
+ * collection modifier.
+ *
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.unique(
+    fields: List<String>
+) {
+    onSerialize { _ ->
+        this.model.ensureIndex(document(
+            fields.map { name ->
+                (names + name).drop(1).joinToString(".") by 1
+            }
+        )) { unique(true) }
     }
 }
