@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "org.cufy.mangaka"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
