@@ -29,7 +29,7 @@ import org.cufy.mangaka.schema.SchemaScope
  * @param error the error message factory.
  * @since 1.1.0
  */
-fun <O : Any, T> FieldDefinitionBuilder<O, T>.uniqueSingleton(
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.uniqueton(
     error: suspend SchemaScope<O, T>.(T) -> String = {
         "Duplicate value '$it'"
     }
@@ -47,13 +47,13 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.uniqueSingleton(
  *
  * @since 1.1.0
  */
-fun <T : Any> ObjectSchemaBuilder<T>.uniqueSingleton(
+fun <T : Any> ObjectSchemaBuilder<T>.uniqueton(
     error: suspend SchemaScope<*, T>.(T) -> String = {
         "Duplicate value '$it'"
     },
     vararg fields: String
 ) {
-    uniqueSingleton(error, fields.asList())
+    uniqueton(error, fields.asList())
 }
 
 /**
@@ -65,7 +65,7 @@ fun <T : Any> ObjectSchemaBuilder<T>.uniqueSingleton(
  *
  * @since 1.1.0
  */
-fun <T : Any> ObjectSchemaBuilder<T>.uniqueSingleton(
+fun <T : Any> ObjectSchemaBuilder<T>.uniqueton(
     error: suspend SchemaScope<*, T>.(T) -> String = {
         "Duplicate value '$it'"
     },
