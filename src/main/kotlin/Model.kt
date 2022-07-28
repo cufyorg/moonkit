@@ -24,6 +24,7 @@ import org.bson.BsonDocument
 import org.bson.BsonObjectId
 import org.bson.BsonValue
 import org.bson.conversions.Bson
+import org.cufy.mangaka.bson.`$in`
 import org.cufy.mangaka.bson.`$set`
 import org.cufy.mangaka.bson.by
 import org.cufy.mangaka.bson.document
@@ -270,6 +271,42 @@ suspend fun <T : Any> Model<T>.findOneById(
 }
 
 /**
+ * Find a document with any of the given [ids]
+ * and convert it to an instance of type [T].
+ *
+ * @param ids the ids of the document.
+ * @param block the schema scope builder.
+ * @return the value. Or `null` if not found.
+ * @since 1.1.0
+ */
+suspend fun <T : Any> Model<T>.findOneById(
+    vararg ids: Id<T>,
+    block: SchemaScopeBuilder<*, T>.() -> Unit = {}
+): T? {
+    return findOneById(ids.asList(), block)
+}
+
+/**
+ * Find a document with any of the given [ids]
+ * and convert it to an instance of type [T].
+ *
+ * @param ids the ids of the document.
+ * @param block the schema scope builder.
+ * @return the value. Or `null` if not found.
+ * @since 1.1.0
+ */
+suspend fun <T : Any> Model<T>.findOneById(
+    ids: List<Id<T>>,
+    block: SchemaScopeBuilder<*, T>.() -> Unit = {}
+): T? {
+    return findOne(document(
+        "_id" by document(
+            `$in` by ids.map { it.bson }
+        )
+    ), block)
+}
+
+/**
  * Find a document matching the given [filter]
  * and convert it to an instance of type [T].
  *
@@ -285,6 +322,42 @@ suspend fun <T : Any> Model<T>.findOne(
     val result = this.collection.findOne(filter)
     result ?: return null
     return this(result, block)
+}
+
+/**
+ * Find documents with any of the given [ids]
+ * and convert them to instances of type [T].
+ *
+ * @param ids the ids of the documents.
+ * @param block the schema scope builder.
+ * @return the values.
+ * @since 1.1.0
+ */
+suspend fun <T : Any> Model<T>.findById(
+    vararg ids: Id<T>,
+    block: SchemaScopeBuilder<*, T>.() -> Unit = {}
+): List<T> {
+    return findById(ids.asList(), block)
+}
+
+/**
+ * Find documents with any of the given [ids]
+ * and convert them to instances of type [T].
+ *
+ * @param ids the ids of the documents.
+ * @param block the schema scope builder.
+ * @return the values.
+ * @since 1.1.0
+ */
+suspend fun <T : Any> Model<T>.findById(
+    ids: List<Id<T>>,
+    block: SchemaScopeBuilder<*, T>.() -> Unit = {}
+): List<T> {
+    return find(document(
+        "_id" by document(
+            `$in` by ids.map { it.bson }
+        )
+    ), block)
 }
 
 /**
