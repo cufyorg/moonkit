@@ -64,11 +64,31 @@ fun document(vararg elements: BsonElement): BsonDocument {
 }
 
 /**
- * Create a [BsonDocument] with the given [items].
+ * Create a [BsonDocument] with the given [elements].
+ *
+ * @since 1.1.0
+ */
+@BsonBuilderDsl
+fun document(elements: List<BsonElement>): BsonDocument {
+    return BsonDocument(elements)
+}
+
+/**
+ * Create a [BsonArray] with the given [items].
  *
  * @since 1.0.0
  */
 @BsonBuilderDsl
 fun array(vararg items: BsonValue): BsonArray {
     return BsonArray(items.toList())
+}
+
+/**
+ * Create a [BsonArray] with the given [items].
+ *
+ * @since 1.1.0
+ */
+@BsonBuilderDsl
+fun array(items: List<BsonValue>): BsonArray {
+    return BsonArray(items)
 }
