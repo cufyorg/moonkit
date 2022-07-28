@@ -22,6 +22,7 @@ import org.cufy.mangaka.bson.by
 import org.cufy.mangaka.bson.document
 import org.cufy.mangaka.exists
 import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.ObjectSchema
 import org.cufy.mangaka.schema.ObjectSchemaBuilder
 import org.cufy.mangaka.schema.SchemaScope
 
@@ -39,16 +40,20 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.singleton(
     },
     block: suspend SchemaScope<O, T>.(T) -> Boolean = { true }
 ) {
-    validate(error) {
-        if (!block(it))
+    validate(error) { value ->
+        if (!block(value))
             return@validate true
 
-        !model.exists(document(
-            pathname by it,
-            "_id" by document(
-                `$ne` by document?._id?.bson
-            )
-        ))
+        val filter = document()
+
+        filter["_id"] = document(
+            `$ne` by document?._id?.bson
+        )
+
+        filter[pathname] =
+            this.schema.serialize(this, value)
+
+        !model.exists(filter)
     }
 }
 
@@ -66,16 +71,30 @@ fun <T : Any> ObjectSchemaBuilder<T>.singleton(
     },
     block: suspend SchemaScope<*, T>.(T) -> List<String>?
 ) {
-    validate(error) {
-        val fields = block(it)
+    validate(error) { instance ->
+        val fieldNames = block(instance)
             ?: return@validate true
 
-        !model.exists(document(
-            fields.map { name ->
-                (names + name).drop(1).joinToString(".") by 1
-            } + ("_id" by document(
-                `$ne` by document?._id?.bson
-            ))
-        ))
+        val filter = document()
+
+        filter["_id"] = document(
+            `$ne` by document?._id?.bson
+        )
+
+        for (fieldName in fieldNames) {
+            val field = (this.schema as ObjectSchema<T>).fields.first { it.name == fieldName }
+            val scope = SchemaScope<T, Any?>(this) {
+                self = instance
+                name = field.name
+                schema = field.schema
+            }
+
+            val value = field.get(scope, instance)
+
+            filter[scope.pathname] =
+                scope.schema.serialize(scope, value)
+        }
+
+        !this.model.exists(filter)
     }
 }
