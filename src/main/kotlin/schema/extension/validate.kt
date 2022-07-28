@@ -17,6 +17,7 @@ package org.cufy.mangaka.schema.extension
 
 import org.cufy.mangaka.MangakaInvalidation
 import org.cufy.mangaka.schema.FieldDefinitionBuilder
+import org.cufy.mangaka.schema.ObjectSchemaBuilder
 import org.cufy.mangaka.schema.SchemaScope
 import org.cufy.mangaka.schema.onValidate
 
@@ -38,6 +39,33 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.validate(
 
     onValidate { parent, instance, value ->
         parent(this, instance, value) + when {
+            block(this, value) -> emptyList()
+            else -> {
+                val message = "Validation failed for path $path: ${error(this, value)}"
+                listOf(MangakaInvalidation(message, cause))
+            }
+        }
+    }
+}
+
+/**
+ * Indicate a validation error when the given [block]
+ * returns false while validating.
+ *
+ * @param error the error message factory.
+ * @param block the validation block.
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.validate(
+    error: suspend SchemaScope<*, T>.(T) -> String = {
+        "Object validation failed"
+    },
+    block: suspend SchemaScope<*, T>.(T) -> Boolean
+) {
+    val cause = MangakaInvalidation()
+
+    onValidate { parent, value ->
+        parent(this, value) + when {
             block(this, value) -> emptyList()
             else -> {
                 val message = "Validation failed for path $path: ${error(this, value)}"
