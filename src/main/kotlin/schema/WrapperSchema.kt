@@ -172,6 +172,20 @@ fun <T> WrapperSchemaBuilder<T>.schema(
 }
 
 /**
+ * Prepend the custom serializer with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <T> WrapperSchemaBuilder<T>.onSerialize(
+    block: suspend SchemaScope<*, T>.(T) -> Unit
+) {
+    onSerialize { parent, value ->
+        block(this, value)
+        parent(this, value)
+    }
+}
+
+/**
  * Wrap the custom serializer with the given [block].
  *
  * @since 1.0.0
@@ -194,6 +208,20 @@ fun <T> WrapperSchemaBuilder<T>.onSerialize(
 }
 
 /**
+ * Prepend the custom deserializer with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <T> WrapperSchemaBuilder<T>.onDeserialize(
+    block: suspend SchemaScope<*, T>.(BsonValue) -> Unit
+) {
+    onDeserialize { parent, bson ->
+        block(this, bson)
+        parent(this, bson)
+    }
+}
+
+/**
  * Wrap the custom deserializer with the given [block].
  *
  * @since 1.0.0
@@ -212,6 +240,20 @@ fun <T> WrapperSchemaBuilder<T>.onDeserialize(
                 bson
             )
         }
+    }
+}
+
+/**
+ * Prepend the custom validator with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <T> WrapperSchemaBuilder<T>.onValidate(
+    block: suspend SchemaScope<*, T>.(T) -> Unit
+) {
+    onValidate { parent, value ->
+        block(this, value)
+        parent(this, value)
     }
 }
 

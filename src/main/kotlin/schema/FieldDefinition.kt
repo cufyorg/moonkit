@@ -329,6 +329,20 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.get(
 }
 
 /**
+ * Prepend the custom serializer with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.onSerialize(
+    block: suspend SchemaScope<O, T>.(BsonDocument, O, T) -> Unit
+) {
+    onSerialize { parent, document, instance, value ->
+        block(this, document, instance, value)
+        parent(this, document, instance, value)
+    }
+}
+
+/**
  * Wrap the custom serializer with the given [block].
  *
  * @since 1.0.0
@@ -351,6 +365,20 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.onSerialize(
 }
 
 /**
+ * Prepend the custom deserializer with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.onDeserialize(
+    block: suspend SchemaScope<O, T>.(BsonDocument, O) -> Unit
+) {
+    onDeserialize { parent, document, instance ->
+        block(this, document, instance)
+        parent(this, document, instance)
+    }
+}
+
+/**
  * Wrap the custom deserializer with the given [block].
  *
  * @since 1.0.0
@@ -369,6 +397,20 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.onDeserialize(
                 document, instance
             )
         }
+    }
+}
+
+/**
+ * Prepend the custom validator with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.onValidate(
+    block: suspend SchemaScope<O, T>.(O, T) -> Unit
+) {
+    onValidate { parent, instance, value ->
+        block(this, instance, value)
+        parent(this, instance, value)
     }
 }
 

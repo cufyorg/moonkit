@@ -282,6 +282,20 @@ fun <T : Any> ObjectSchemaBuilder<T>.construct(
 }
 
 /**
+ * Prepend the custom serializer with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.onSerialize(
+    block: suspend SchemaScope<*, T>.(T) -> Unit
+) {
+    onSerialize { parent, value ->
+        block(this, value)
+        parent(this, value)
+    }
+}
+
+/**
  * Wrap the custom serializer with the given [block].
  *
  * @since 1.0.0
@@ -304,6 +318,20 @@ fun <T : Any> ObjectSchemaBuilder<T>.onSerialize(
 }
 
 /**
+ * Prepend the custom deserializer with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.onDeserialize(
+    block: suspend SchemaScope<*, T>.(BsonValue) -> Unit
+) {
+    onDeserialize { parent, bson ->
+        block(this, bson)
+        parent(this, bson)
+    }
+}
+
+/**
  * Wrap the custom deserializer with the given [block].
  *
  * @since 1.0.0
@@ -322,6 +350,20 @@ fun <T : Any> ObjectSchemaBuilder<T>.onDeserialize(
                 bson
             )
         }
+    }
+}
+
+/**
+ * Prepend the custom validator with the given [block].
+ *
+ * @since 1.1.0
+ */
+fun <T : Any> ObjectSchemaBuilder<T>.onValidate(
+    block: suspend SchemaScope<*, T>.(T) -> Unit
+) {
+    onValidate { parent, value ->
+        block(this, value)
+        parent(this, value)
     }
 }
 
