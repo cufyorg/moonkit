@@ -16,11 +16,13 @@
 package org.cufy.mangaka.schema.types
 
 import org.bson.*
+import org.bson.types.Decimal128
 import org.bson.types.ObjectId
 import org.cufy.mangaka.Id
 import org.cufy.mangaka.schema.ScalarSchema
 import org.cufy.mangaka.schema.deserialize
 import org.cufy.mangaka.schema.serialize
+import java.math.BigDecimal
 
 /**
  * The schema for [String] and [BsonString].
@@ -93,6 +95,36 @@ val DoubleSchema = ScalarSchema {
         when (it) {
             is BsonDouble -> it.value
             else -> 0.0
+        }
+    }
+}
+
+/**
+ * A schema for [Decimal128] and [BsonDecimal128].
+ *
+ * @since 1.1.0
+ */
+val Decimal128Schema = ScalarSchema {
+    serialize { BsonDecimal128(it) }
+    deserialize {
+        when (it) {
+            is BsonDecimal128 -> it.value
+            else -> Decimal128.POSITIVE_ZERO
+        }
+    }
+}
+
+/**
+ * A schema for [BigDecimal] and [BsonDecimal128].
+ *
+ * @since 1.1.0
+ */
+val BigDecimalSchema = ScalarSchema<BigDecimal> {
+    serialize { BsonDecimal128(Decimal128(it)) }
+    deserialize {
+        when (it) {
+            is BsonDecimal128 -> it.value.bigDecimalValue()
+            else -> BigDecimal.ZERO
         }
     }
 }
