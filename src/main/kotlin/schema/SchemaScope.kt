@@ -59,6 +59,10 @@ class SchemaScope<O, T> constructor(
      */
     val skip: List<String>,
     /**
+     * Fields filter.
+     */
+    val filter: (String) -> Boolean,
+    /**
      * Extra attributes.
      */
     val attributes: Map<String, Any> = emptyMap()
@@ -121,6 +125,11 @@ open class SchemaScopeBuilder<O, T> {
     val skip: MutableList<String> = mutableListOf()
 
     /**
+     * Fields filter.
+     */
+    var filter: (String) -> Boolean = { true }
+
+    /**
      * Extra attributes.
      */
     val attributes: MutableMap<String, Any> = mutableMapOf()
@@ -159,6 +168,7 @@ open class SchemaScopeBuilder<O, T> {
             model = this.model,
             document = this.document,
             skip = this.skip.toList(),
+            filter = this.filter,
             attributes = this.attributes.toMap()
         )
     }
@@ -181,8 +191,25 @@ fun <O, T> SchemaScope(
         builder.model = it.model
         builder.document = it.document
         builder.skip += it.skip
+        builder.filter = it.filter
         builder.attributes += it.attributes
     }
     builder.apply(block)
     return builder.build()
+}
+
+/**
+ * Add a fields filter.
+ *
+ * @param block the filter.
+ * @since 1.1.0
+ */
+fun SchemaScopeBuilder<*, *>.filter(
+    block: (String) -> Boolean
+) {
+    this.filter.let {
+        this.filter = {
+            it(it) && block(it)
+        }
+    }
 }
