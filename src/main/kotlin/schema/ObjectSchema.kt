@@ -55,7 +55,7 @@ interface ObjectSchema<T : Any> : Schema<T> {
                 }
             }
             .filter { (field, fieldScope) ->
-                fieldScope.filterBlock(fieldScope.pathname) &&
+                fieldScope.filter(fieldScope.pathname) &&
                 fieldScope.pathname !in scope.skip
             }
             .forEach { (field, fieldScope) ->
@@ -81,7 +81,7 @@ interface ObjectSchema<T : Any> : Schema<T> {
                 }
             }
             .filter { (field, fieldScope) ->
-                fieldScope.filterBlock(fieldScope.pathname) &&
+                fieldScope.filter(fieldScope.pathname) &&
                 fieldScope.pathname !in scope.skip
             }
             .forEach { (field, fieldScope) ->
@@ -106,7 +106,7 @@ interface ObjectSchema<T : Any> : Schema<T> {
                 }
             }
             .filter { (field, fieldScope) ->
-                fieldScope.filterBlock(fieldScope.pathname) &&
+                fieldScope.filter(fieldScope.pathname) &&
                 fieldScope.pathname !in scope.skip
             }
             .flatMap { (field, fieldScope) ->

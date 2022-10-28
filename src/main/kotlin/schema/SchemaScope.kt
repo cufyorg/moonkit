@@ -61,7 +61,7 @@ class SchemaScope<O, T> constructor(
     /**
      * Fields filter.
      */
-    val filterBlock: (String) -> Boolean,
+    val filter: (String) -> Boolean,
     /**
      * Extra attributes.
      */
@@ -127,7 +127,7 @@ open class SchemaScopeBuilder<O, T> {
     /**
      * Fields filter.
      */
-    var filter: (String) -> Boolean = { true }
+    var filterBlock: (String) -> Boolean = { true }
 
     /**
      * Extra attributes.
@@ -168,7 +168,7 @@ open class SchemaScopeBuilder<O, T> {
             model = this.model,
             document = this.document,
             skip = this.skip.toList(),
-            filterBlock = this.filter,
+            filter = this.filterBlock,
             attributes = this.attributes.toMap()
         )
     }
@@ -191,7 +191,7 @@ fun <O, T> SchemaScope(
         builder.model = it.model
         builder.document = it.document
         builder.skip += it.skip
-        builder.filter = it.filterBlock
+        builder.filterBlock = it.filter
         builder.attributes += it.attributes
     }
     builder.apply(block)
@@ -207,8 +207,8 @@ fun <O, T> SchemaScope(
 fun SchemaScopeBuilder<*, *>.filter(
     block: (String) -> Boolean
 ) {
-    this.filter.let {
-        this.filter = {
+    this.filterBlock.let {
+        this.filterBlock = {
             it(it) && block(it)
         }
     }
