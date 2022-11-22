@@ -32,10 +32,11 @@ import org.cufy.mangaka.schema.SchemaScope
 fun <O : Any, T> FieldDefinitionBuilder<O, T>.uniqueton(
     error: suspend SchemaScope<O, T>.(T) -> String = {
         "Duplicate value '$it'"
-    }
+    },
+    skipNull: Boolean = false,
 ) {
-    unique()
-    singleton(error)
+    unique(skipNull = skipNull)
+    singleton(error, skipNull = skipNull)
 }
 
 /**
@@ -51,9 +52,10 @@ fun <T : Any> ObjectSchemaBuilder<T>.uniqueton(
     error: suspend SchemaScope<*, T>.(T) -> String = {
         "Duplicate value '$it'"
     },
-    vararg fields: String
+    vararg fields: String,
+    skipNull: Boolean = false
 ) {
-    uniqueton(error, fields.asList())
+    uniqueton(error, fields.asList(), skipNull = skipNull)
 }
 
 /**
@@ -69,8 +71,9 @@ fun <T : Any> ObjectSchemaBuilder<T>.uniqueton(
     error: suspend SchemaScope<*, T>.(T) -> String = {
         "Duplicate value '$it'"
     },
-    fields: List<String>
+    fields: List<String>,
+    skipNull: Boolean = false
 ) {
-    unique(fields)
-    singleton(error) { fields }
+    unique(fields, skipNull = skipNull)
+    singleton(error, skipNull = skipNull) { fields }
 }
