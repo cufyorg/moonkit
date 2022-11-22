@@ -15,12 +15,11 @@
  */
 package org.cufy.mangaka.schema.extension
 
+import org.cufy.mangaka.bson.`$exists`
 import org.cufy.mangaka.bson.by
 import org.cufy.mangaka.bson.document
-import org.cufy.mangaka.ensureIndex
 import org.cufy.mangaka.schema.FieldDefinitionBuilder
 import org.cufy.mangaka.schema.ObjectSchemaBuilder
-import org.cufy.mangaka.schema.onSerialize
 
 /**
  * Insures this path is unique.
@@ -30,11 +29,17 @@ import org.cufy.mangaka.schema.onSerialize
  *
  * @since 1.0.0
  */
-fun <O : Any, T> FieldDefinitionBuilder<O, T>.unique() {
-    onSerialize { _, _, _ ->
-        this.model.ensureIndex(document(
-            pathname by 1
-        )) { unique(true) }
+fun <O : Any, T> FieldDefinitionBuilder<O, T>.unique(
+    skipNull: Boolean = false
+) {
+    index { pathname ->
+        unique(true)
+
+        if (skipNull) {
+            partialFilterExpression(document(
+                pathname by document(`$exists` by true)
+            ))
+        }
     }
 }
 
@@ -47,9 +52,10 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.unique() {
  * @since 1.1.0
  */
 fun <T : Any> ObjectSchemaBuilder<T>.unique(
-    vararg fields: String
+    vararg fields: String,
+    skipNull: Boolean = false
 ) {
-    unique(fields.asList())
+    unique(fields.asList(), skipNull)
 }
 
 /**
@@ -61,13 +67,16 @@ fun <T : Any> ObjectSchemaBuilder<T>.unique(
  * @since 1.1.0
  */
 fun <T : Any> ObjectSchemaBuilder<T>.unique(
-    fields: List<String>
+    fields: List<String>,
+    skipNull: Boolean = false
 ) {
-    onSerialize { _ ->
-        this.model.ensureIndex(document(
-            fields.map { name ->
-                (names + name).drop(1).joinToString(".") by 1
-            }
-        )) { unique(true) }
+    index(fields) { pathnames ->
+        unique(true)
+
+        if (skipNull) {
+            partialFilterExpression(document(
+                pathnames.map { it by document(`$exists` by true) }
+            ))
+        }
     }
 }
