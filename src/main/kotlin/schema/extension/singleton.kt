@@ -30,6 +30,7 @@ import org.cufy.mangaka.schema.SchemaScope
  * Insures this path is unique.
  *
  * @param error the error message factory.
+ * @param skipNull skip checking when the value is null.
  * @param block a function that returns `true` to
  *              activate this validator.
  * @since 1.0.0
@@ -38,9 +39,13 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.singleton(
     error: suspend SchemaScope<O, T>.(T) -> String = {
         "Duplicate value '$it'"
     },
+    skipNull: Boolean = false,
     block: suspend SchemaScope<O, T>.(T) -> Boolean = { true }
 ) {
     validate(error) { value ->
+        if (skipNull && value == null)
+            return@validate true
+
         if (!block(value))
             return@validate true
 
@@ -61,6 +66,7 @@ fun <O : Any, T> FieldDefinitionBuilder<O, T>.singleton(
  * Insures the object fields are unique.
  *
  * @param error the error message factory.
+ * @param skipNull skip checking when any of the fields is null.
  * @param block a function that returns the names
  *              of the fields to be unique.
  * @since 1.1.0
@@ -69,6 +75,7 @@ fun <T : Any> ObjectSchemaBuilder<T>.singleton(
     error: suspend SchemaScope<*, T>.(T) -> String = {
         "Duplicate object values"
     },
+    skipNull: Boolean = false,
     block: suspend SchemaScope<*, T>.(T) -> List<String>?
 ) {
     validate(error) { instance ->
@@ -90,6 +97,9 @@ fun <T : Any> ObjectSchemaBuilder<T>.singleton(
             }
 
             val value = field.get(scope, instance)
+
+            if (skipNull && value == null)
+                return@validate true
 
             filter[scope.pathname] =
                 scope.schema.serialize(scope, value)
