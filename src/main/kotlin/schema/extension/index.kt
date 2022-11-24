@@ -47,7 +47,11 @@ fun ObjectSchemaBuilder<*>.index(
     options: IndexOptions.(pathnames: List<String>) -> Unit = {}
 ) {
     init { pathname ->
-        val pathnames = fields.map { name -> "$pathname.$name" }
+        val pathnames = fields.map { name ->
+            listOf(pathname, name)
+                .filter { it.isNotBlank() }
+                .joinToString(".")
+        }
 
         ensureIndex(document(pathnames.map { it by 1 })) {
             options(pathnames)
