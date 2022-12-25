@@ -484,9 +484,12 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.discardIf(
  * Discard the encoded value of the field when the
  * root instance is not new.
  *
+ * @param block a block to make this field immutable conditionally.
  * @since 2.0.0
  */
-fun <T : Any, M> FieldDefinitionBuilder<T, M>.immutable() {
+fun <T : Any, M> FieldDefinitionBuilder<T, M>.immutable(
+    block: ReturnFieldDefinitionCodecBlock<T, M, Boolean> = { true }
+) {
     val isMutableFieldName = "_mutable_" + UUID.randomUUID().toString()
 
     normalization {
@@ -495,6 +498,11 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.immutable() {
     }
 
     discardIf {
+        val shouldBeImmutable = block()
+
+        if (!shouldBeImmutable)
+            return@discardIf false
+
         val isMutable: Any? = Document[instance, isMutableFieldName]
 
         isMutable != true
