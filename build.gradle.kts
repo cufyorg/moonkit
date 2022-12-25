@@ -26,9 +26,6 @@ dependencies {
     implementation(Dependencies.MongoDB.driver_sync)
     implementation(Dependencies.MongoDB.driver_reactivestreams)
 
-    implementation(Dependencies.kmongo)
-    implementation(Dependencies.kmongo_coroutine)
-
     implementation(Dependencies.weakness)
 
     testImplementation(kotlin("test"))

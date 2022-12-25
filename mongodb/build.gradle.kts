@@ -13,14 +13,11 @@ dependencies {
 
     implementation(kotlin("stdlib"))
 
-    implementation(Dependencies.Kotlin.serialization)
     implementation(Dependencies.Kotlin.coroutines_core)
+    implementation(Dependencies.Kotlin.coroutines_reactive)
 
     implementation(Dependencies.MongoDB.driver_sync)
     implementation(Dependencies.MongoDB.driver_reactivestreams)
-
-    implementation(Dependencies.kmongo)
-    implementation(Dependencies.kmongo_coroutine)
 
     testImplementation(kotlin("test"))
 }

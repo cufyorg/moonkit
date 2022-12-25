@@ -12,7 +12,6 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation(Dependencies.Kotlin.serialization)
-    implementation(Dependencies.Kotlin.coroutines_core)
 
     implementation(Dependencies.MongoDB.driver_sync)
     implementation(Dependencies.MongoDB.driver_reactivestreams)
