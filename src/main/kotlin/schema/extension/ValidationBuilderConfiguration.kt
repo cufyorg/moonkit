@@ -218,9 +218,9 @@ fun <T : Any, M : Id<*>?> FieldDefinitionBuilder<T, M>.existsAt(
     insure {
         val collectionName = block(it)
 
-        val monkt = model.monkt
+        val monkt = model.getMonkt()
 
-        val collection = monkt.database.getCollection(collectionName)
+        val collection = monkt.getDatabase().getCollection(collectionName)
 
         // TODO use signals (or remove the whole thing)
         val count = collection.countDocumentsSuspend({ "_id" by it })

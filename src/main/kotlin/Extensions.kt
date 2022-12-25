@@ -46,14 +46,14 @@ suspend fun Monkt.initImpl(
     val indexesTweak = tweak.indexesTweak
     val indexOptions = tweak.indexOptions
 
-    models.forEach { it.monkt = this@initImpl }
+    models.forEach { it.deferredMonkt.complete(this) }
 
     performStaticInitialization(models, initializationTweak)
 
     val modelIndexesTable = performIndexes(models, indexesTweak)
 
     modelIndexesTable.forEach { (model, indexes) ->
-        model.collection.createIndexesSuspend(indexes, session, indexOptions)
+        model.getCollection().createIndexesSuspend(indexes, session, indexOptions)
     }
 }
 
@@ -112,8 +112,8 @@ suspend fun <T : Any> Model<T>.decodeImpl(
         Document.setDeleted(it, isDeleted)
     }
 
-    monkt.performInitialization(instances, initializationTweak)
-    monkt.performMigration(instances, migrationTweak)
+    getMonkt().performInitialization(instances, initializationTweak)
+    getMonkt().performMigration(instances, migrationTweak)
 
     return instances
 }
@@ -290,7 +290,7 @@ suspend fun <T : Any> Model<T>.encode(
     instances: List<T>,
     block: EncodeTweak.() -> Unit = {}
 ): List<BsonDocument> {
-    return monkt.encode(instances, block)
+    return getMonkt().encode(instances, block)
 }
 
 /**
@@ -309,7 +309,7 @@ suspend fun <T : Any> Model<T>.encode(
     vararg instances: T,
     block: EncodeTweak.() -> Unit = {}
 ): List<BsonDocument> {
-    return monkt.encode(instances.asList(), block)
+    return getMonkt().encode(instances.asList(), block)
 }
 
 /**
@@ -379,7 +379,7 @@ suspend fun <T : Any> Model<T>.findImpl(
     val publisherBlock = tweak.publisherBlock
     val decodeTweak = tweak.decodeTweak
 
-    val documents = collection.findSuspend(filter, session, publisherBlock)
+    val documents = getCollection().findSuspend(filter, session, publisherBlock)
 
     return decodeImpl(documents, decodeTweak)
 }
@@ -494,7 +494,7 @@ suspend fun <T : Any> Model<T>.findOneImpl(
     val publisherBlock = tweak.publisherBlock
     val decodeTweak = tweak.decodeTweak
 
-    val document = collection.findOneSuspend(filter, session, publisherBlock)
+    val document = getCollection().findOneSuspend(filter, session, publisherBlock)
 
     document ?: return null
 
@@ -640,7 +640,7 @@ suspend fun <T : Any> Monkt.saveImpl(
             UpdateOneModel<BsonDocument>(filter, update, updateOptions)
         }
 
-        model.collection.bulkWriteSuspend(
+        model.getCollection().bulkWriteSuspend(
             updateWrites + writes,
             session,
             bulkWriteOptions
@@ -728,7 +728,7 @@ suspend fun <T : Any> Model<T>.save(
     session: ClientSession? = null,
     block: SaveTweak.() -> Unit = {}
 ) {
-    monkt.save(instances, session, block)
+    getMonkt().save(instances, session, block)
 }
 
 /**
@@ -753,7 +753,7 @@ suspend fun <T : Any> Model<T>.save(
     session: ClientSession? = null,
     block: SaveTweak.() -> Unit = {}
 ) {
-    monkt.save(instances.asList(), session, block)
+    getMonkt().save(instances.asList(), session, block)
 }
 
 /**
@@ -832,7 +832,7 @@ suspend fun <T : Any> Model<T>.createImpl(
     val saveTweak = tweak.saveTweak
 
     val instances = decodeImpl(documents, decodeTweak)
-    monkt.saveImpl(instances, session, saveTweak)
+    getMonkt().saveImpl(instances, session, saveTweak)
     return instances
 }
 
@@ -972,7 +972,7 @@ suspend fun <T : Any> Monkt.deleteImpl(
     modelIdMap.forEach { (model, ids) ->
         val filter = document { "_id" by { `$in` by ids } }
 
-        model.collection.deleteManySuspend(filter, session, deleteOptions)
+        model.getCollection().deleteManySuspend(filter, session, deleteOptions)
     }
 
     toDelete.forEach {
@@ -1053,7 +1053,7 @@ suspend fun <T : Any> Model<T>.delete(
     session: ClientSession? = null,
     block: DeleteTweak.() -> Unit = {}
 ) {
-    monkt.delete(instances, session, block)
+    getMonkt().delete(instances, session, block)
 }
 
 /**
@@ -1077,7 +1077,7 @@ suspend fun <T : Any> Model<T>.delete(
     session: ClientSession? = null,
     block: DeleteTweak.() -> Unit = {}
 ) {
-    monkt.delete(instances.asList(), session, block)
+    getMonkt().delete(instances.asList(), session, block)
 }
 
 /**
@@ -1166,7 +1166,7 @@ suspend fun <T : Any> Model<T>.deleteOneImpl(
 
     instance ?: return null
 
-    monkt.deleteImpl(listOf(instance), session, deleteTweak)
+    getMonkt().deleteImpl(listOf(instance), session, deleteTweak)
 
     return instance
 }
@@ -1335,7 +1335,7 @@ suspend fun <T : Any> Model<T>.deleteManyImpl(
 
     val instances = findImpl(filter, session, findTweak)
 
-    monkt.deleteImpl(instances, session, deleteTweak)
+    getMonkt().deleteImpl(instances, session, deleteTweak)
 
     return instances
 }
@@ -1526,7 +1526,7 @@ suspend fun <T : Any> Model<T>.validateSafe(
     instances: List<T>,
     block: ValidationTweak.() -> Unit = {}
 ): List<Throwable> {
-    return monkt.validateSafe(instances, block)
+    return getMonkt().validateSafe(instances, block)
 }
 
 /**
@@ -1542,7 +1542,7 @@ suspend fun <T : Any> Model<T>.validateSafe(
     vararg instances: T,
     block: ValidationTweak.() -> Unit = {}
 ): List<Throwable> {
-    return monkt.validateSafe(instances.asList(), block)
+    return getMonkt().validateSafe(instances.asList(), block)
 }
 
 /**
@@ -1647,7 +1647,7 @@ suspend fun <T : Any> Model<T>.validate(
     instances: List<T>,
     block: ValidationTweak.() -> Unit = {}
 ) {
-    monkt.validate(instances, block)
+    getMonkt().validate(instances, block)
 }
 
 /**
@@ -1662,7 +1662,7 @@ suspend fun <T : Any> Model<T>.validate(
     vararg instances: T,
     block: ValidationTweak.() -> Unit = {}
 ) {
-    monkt.validate(instances.asList(), block)
+    getMonkt().validate(instances.asList(), block)
 }
 
 /**
@@ -1757,7 +1757,7 @@ suspend fun <T : Any> Model<T>.normalize(
     instances: List<T>,
     block: NormalizationTweak.() -> Unit = {}
 ) {
-    monkt.normalize(instances, block)
+    getMonkt().normalize(instances, block)
 }
 
 /**
@@ -1772,7 +1772,7 @@ suspend fun <T : Any> Model<T>.normalize(
     vararg instances: T,
     block: NormalizationTweak.() -> Unit = {}
 ) {
-    monkt.normalize(instances.asList(), block)
+    getMonkt().normalize(instances.asList(), block)
 }
 
 /**
@@ -1822,7 +1822,7 @@ suspend fun <T : Document> T.normalize(
 suspend fun <T : Any> Model<T>.estimatedCount(
     block: EstimatedDocumentCountOptionsScope.() -> Unit = {}
 ): Long {
-    return collection.estimatedDocumentCountSuspend(block)
+    return getCollection().estimatedDocumentCountSuspend(block)
 }
 
 /* ============= ----- count  ----- ============= */
@@ -1846,7 +1846,7 @@ suspend fun <T : Any> Model<T>.count(
     session: ClientSession? = null,
     block: CountOptionsScope.() -> Unit = {}
 ): Long {
-    return collection.countDocumentsSuspend(filter, session, block)
+    return getCollection().countDocumentsSuspend(filter, session, block)
 }
 
 /**
@@ -1868,7 +1868,7 @@ suspend fun <T : Any> Model<T>.count(
     session: ClientSession? = null,
     block: CountOptionsScope.() -> Unit = {}
 ): Long {
-    return collection.countDocumentsSuspend(filter, session, block)
+    return getCollection().countDocumentsSuspend(filter, session, block)
 }
 
 /**
@@ -1926,7 +1926,7 @@ suspend fun <T : Any> Model<T>.aggregate(
     session: ClientSession? = null,
     block: AggregatePublisherScope.() -> Unit = {}
 ): List<BsonDocument> {
-    return collection.aggregateSuspend(pipeline, session, block)
+    return getCollection().aggregateSuspend(pipeline, session, block)
 }
 
 /**
@@ -1944,7 +1944,7 @@ suspend fun <T : Any> Model<T>.aggregate(
     session: ClientSession? = null,
     block: AggregatePublisherScope.() -> Unit = {}
 ): List<BsonDocument> {
-    return collection.aggregateSuspend(*pipeline, session = session, block = block)
+    return getCollection().aggregateSuspend(*pipeline, session = session, block = block)
 }
 
 /* ============= -- ensureIndex  -- ============= */
@@ -1966,7 +1966,7 @@ suspend fun <T : Any> Model<T>.ensureIndex(
     session: ClientSession? = null,
     block: IndexOptionsScope.() -> Unit = {}
 ): String {
-    return collection.ensureIndexSuspend(key, session, block)
+    return getCollection().ensureIndexSuspend(key, session, block)
 }
 
 /**
@@ -1986,5 +1986,5 @@ suspend fun <T : Any> Model<T>.ensureIndex(
     session: ClientSession? = null,
     block: IndexOptionsScope.() -> Unit = {}
 ): String {
-    return collection.ensureIndexSuspend(key, session, block)
+    return getCollection().ensureIndexSuspend(key, session, block)
 }

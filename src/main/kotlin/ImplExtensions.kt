@@ -178,14 +178,16 @@ operator fun Monkt.plusAssign(handler: SignalHandler) {
  *
  * @param client the new client.
  * @param database the new database.
+ * @throws IllegalStateException if already connected
  */
 @OptIn(InternalMonktApi::class)
 fun Monkt.connect(client: MonktClient, database: MonktDatabase) {
-    synchronized(this) {
-        shutdown()
-        this.client = client
-        this.database = database
-        this.isConnected = true
+    require(!isConnected) { "Already Connected" }
+    isConnected = true
+    deferredClient.complete(client)
+    deferredDatabase.complete(database)
+    if (isShutdown) {
+        client.use { }
     }
 }
 
@@ -207,12 +209,10 @@ fun Monkt.connect(uri: String, name: String) {
 /**
  * Shutdown the current connection. (If connected)
  */
-@OptIn(InternalMonktApi::class)
+@OptIn(ExperimentalMonktApi::class, InternalMonktApi::class)
 fun Monkt.shutdown() {
-    synchronized(this) {
-        if (isConnected)
-            this.client.use { }
-
-        isConnected = false
+    if (isConnected && !isShutdown) {
+        this.client.use { }
     }
+    isShutdown = true
 }

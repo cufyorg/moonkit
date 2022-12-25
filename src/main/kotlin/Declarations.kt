@@ -15,6 +15,8 @@
  */
 package org.cufy.monkt
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import org.cufy.monkt.schema.*
 import org.cufy.monkt.schema.extension.*
 
@@ -27,17 +29,53 @@ import org.cufy.monkt.schema.extension.*
  */
 open class Monkt {
     /**
+     * The monkt client completable deferred.
+     */
+    @InternalMonktApi
+    val deferredClient = CompletableDeferred<MonktClient>()
+
+    /**
+     * The monkt database completable deferred.
+     */
+    @InternalMonktApi
+    val deferredDatabase = CompletableDeferred<MonktDatabase>()
+
+    /**
      * The client to be used by the models that
      * uses this monkt instance.
      */
-    lateinit var client: MonktClient
-        @InternalMonktApi set
+    @OptIn(InternalMonktApi::class)
+    suspend fun getClient(): MonktClient {
+        return deferredClient.await()
+    }
 
     /**
      * The database to be used by the models that
      * uses this monkt instance.
      */
-    lateinit var database: MonktDatabase
+    @OptIn(InternalMonktApi::class)
+    suspend fun getDatabase(): MonktDatabase {
+        return deferredDatabase.await()
+    }
+
+    /**
+     * The client to be used by the models that
+     * uses this monkt instance.
+     */
+    @ExperimentalMonktApi("Blocking property")
+    val client: MonktClient get() = runBlocking { getClient() }
+
+    /**
+     * The database to be used by the models that
+     * uses this monkt instance.
+     */
+    @ExperimentalMonktApi("Blocking property")
+    val database: MonktDatabase get() = runBlocking { getDatabase() }
+
+    /**
+     * True, if this instance was shutdown.
+     */
+    var isShutdown: Boolean = false
         @InternalMonktApi set
 
     /**
@@ -139,20 +177,45 @@ open class Model<T : Any>(
     ) : this(name, ObjectSchema(constructor, block))
 
     /**
+     * The monkt instance completable deferred.
+     */
+    @InternalMonktApi
+    val deferredMonkt = CompletableDeferred<Monkt>()
+
+    /**
      * The monkt instance.
      *
      * @since 2.0.0
      */
-    lateinit var monkt: Monkt
-        @InternalMonktApi set
+    @OptIn(InternalMonktApi::class)
+    suspend fun getMonkt(): Monkt {
+        return deferredMonkt.await()
+    }
 
     /**
      * The collection backing this model.
      *
      * @since 2.0.0
      */
-    val collection: MonktCollection
-        get() = monkt.database.getCollection(name)
+    suspend fun getCollection(): MonktCollection {
+        return getMonkt().getDatabase().getCollection(name)
+    }
+
+    /**
+     * The monkt instance.
+     *
+     * @since 2.0.0
+     */
+    @ExperimentalMonktApi("Blocking property")
+    val monkt: Monkt get() = runBlocking { getMonkt() }
+
+    /**
+     * The monkt instance.
+     *
+     * @since 2.0.0
+     */
+    @ExperimentalMonktApi("Blocking property")
+    val collection: MonktCollection get() = runBlocking { getCollection() }
 }
 
 /**
