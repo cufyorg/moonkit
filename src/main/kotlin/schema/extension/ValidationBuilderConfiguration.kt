@@ -110,7 +110,7 @@ fun <T : Any, M> WithOptionsBuilder<T, M>.validate(
  * @param block the validation block.
  * @return 2.0.0
  */
-fun <T : Any, M> FieldDefinitionBuilder<T, M?>.insure(
+fun <T : Any, M> FieldDefinitionBuilder<T, M>.insure(
     block: ReturnOptionBlock<T, M & Any, ValidationBuilderConfiguration, Boolean>
 ) {
     validate { value ->
@@ -132,7 +132,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M?>.insure(
  * @param block the validation block.
  * @since 2.0.0
  */
-fun <T : Any, M> FieldDefinitionBuilder<T, M?>.required(
+fun <T : Any, M> FieldDefinitionBuilder<T, M>.required(
     block: ReturnOptionBlock<T, Nothing?, ValidationBuilderConfiguration, Boolean> = { true }
 ) {
     validate { value ->
@@ -189,8 +189,8 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.singleton(
  * @param block the model getter.
  * @since 2.0.0
  */
-fun <T : Any, M : Id<*>> FieldDefinitionBuilder<T, M?>.exists(
-    block: ReturnOptionBlock<T, M, ValidationBuilderConfiguration, Model<*>>
+fun <T : Any, M : Id<*>?> FieldDefinitionBuilder<T, M>.exists(
+    block: ReturnOptionBlock<T, M & Any, ValidationBuilderConfiguration, Model<*>>
 ) {
     insure {
         val model = block(it)
@@ -212,8 +212,8 @@ fun <T : Any, M : Id<*>> FieldDefinitionBuilder<T, M?>.exists(
  * @since 2.0.0
  */
 @Deprecated("Use `exists` instead. This validator is unnecessary")
-fun <T : Any, M : Id<*>> FieldDefinitionBuilder<T, M?>.existsAt(
-    block: ReturnOptionBlock<T, M, ValidationBuilderConfiguration, String>
+fun <T : Any, M : Id<*>?> FieldDefinitionBuilder<T, M>.existsAt(
+    block: ReturnOptionBlock<T, M & Any, ValidationBuilderConfiguration, String>
 ) {
     insure {
         val collectionName = block(it)
