@@ -15,7 +15,7 @@
  */
 @file:Suppress("ObjectPropertyName")
 
-package org.cufy.mangaka.bson
+package org.cufy.monkt
 
 /* ===== Common =============================== */
 
@@ -32,7 +32,7 @@ package org.cufy.mangaka.bson
  *
  * [$elemMatch](https://www.mongodb.com/docs/manual/reference/operator/projection/elemMatch/#mongodb-projection-proj.-elemMatch)
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 // Query and Projection Operators / Query Selectors / Array
 // Query and Projection Operators / Projection Operators
@@ -51,7 +51,7 @@ const val `$elemMatch` = "\$elemMatch"
  *
  * [$](https://www.mongodb.com/docs/manual/reference/operator/update/positional/#mongodb-update-up.-)
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 // Query and Projection Operators / Projection Operators
 // Update Operators / Array / Operators
@@ -70,7 +70,7 @@ const val `$` = "\$"
  *
  * [$slice](https://www.mongodb.com/docs/manual/reference/operator/update/slice/#mongodb-update-up.-slice)
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 // Query and Projection Operators / Projection Operators
 // Update Operators / Array / Modifiers
@@ -94,7 +94,7 @@ const val `$slice` = "\$slice"
  *
  * [$set](https://www.mongodb.com/docs/manual/reference/operator/aggregation/set/#mongodb-pipeline-pipe.-set)
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 // Update Operators / Fields
 // Aggregation Pipeline Stages / Stages
@@ -115,7 +115,7 @@ const val `$set` = "\$set"
  *
  * [$sort](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sort/#mongodb-pipeline-pipe.-sort)
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 // Update Operators / Array / Modifiers
 const val `$sort` = "\$sort"
@@ -134,7 +134,7 @@ const val `$sort` = "\$sort"
  *
  * [$unset](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unset/#mongodb-pipeline-pipe.-unset)
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 // Update Operators / Fields
 // Aggregation Pipeline Stages / Stages
@@ -147,7 +147,7 @@ const val `$unset` = "\$unset"
  * value.
  *
  * [$eq](https://www.mongodb.com/docs/manual/reference/operator/query/eq/#mongodb-query-op.-eq)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$eq` = "\$eq"
 
@@ -156,7 +156,7 @@ const val `$eq` = "\$eq"
  * specified value.
  *
  * [$gt](https://www.mongodb.com/docs/manual/reference/operator/query/gt/#mongodb-query-op.-gt)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$gt` = "\$gt"
 
@@ -165,7 +165,7 @@ const val `$gt` = "\$gt"
  * to a specified value.
  *
  * [$gte](https://www.mongodb.com/docs/manual/reference/operator/query/gte/#mongodb-query-op.-gte)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$gte` = "\$gte"
 
@@ -173,7 +173,7 @@ const val `$gte` = "\$gte"
  * Matches any of the values specified in an array.
  *
  * [$in](https://www.mongodb.com/docs/manual/reference/operator/query/in/#mongodb-query-op.-in)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$in` = "\$in"
 
@@ -182,7 +182,7 @@ const val `$in` = "\$in"
  * value.
  *
  * [$lt](https://www.mongodb.com/docs/manual/reference/operator/query/lt/#mongodb-query-op.-lt)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$lt` = "\$lt"
 
@@ -191,7 +191,7 @@ const val `$lt` = "\$lt"
  * specified value.
  *
  * [$lte](https://www.mongodb.com/docs/manual/reference/operator/query/lte/#mongodb-query-op.-lte)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$lte` = "\$lte"
 
@@ -200,7 +200,7 @@ const val `$lte` = "\$lte"
  * specified value.
  *
  * [$ne](https://www.mongodb.com/docs/manual/reference/operator/query/ne/#mongodb-query-op.-ne)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$ne` = "\$ne"
 
@@ -209,7 +209,7 @@ const val `$ne` = "\$ne"
  * array.
  *
  * [$nin](https://www.mongodb.com/docs/manual/reference/operator/query/nin/#mongodb-query-op.-nin)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$nin` = "\$nin"
 
@@ -221,7 +221,7 @@ const val `$nin` = "\$nin"
  * clauses.
  *
  * [$and](https://www.mongodb.com/docs/manual/reference/operator/query/and/#mongodb-query-op.-and)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$and` = "\$and"
 
@@ -231,7 +231,7 @@ const val `$and` = "\$and"
  * expression.
  *
  * [$not](https://www.mongodb.com/docs/manual/reference/operator/query/not/#mongodb-query-op.-not)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$not` = "\$not"
 
@@ -240,7 +240,7 @@ const val `$not` = "\$not"
  * all documents that fail to match both clauses.
  *
  * [$nor](https://www.mongodb.com/docs/manual/reference/operator/query/nor/#mongodb-query-op.-nor)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$nor` = "\$nor"
 
@@ -249,7 +249,7 @@ const val `$nor` = "\$nor"
  * all documents that match the conditions of either clause.
  *
  * [$or](https://www.mongodb.com/docs/manual/reference/operator/query/or/#mongodb-query-op.-or)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$or` = "\$or"
 
@@ -259,7 +259,7 @@ const val `$or` = "\$or"
  * Matches documents that have the specified field.
  *
  * [$exists](https://www.mongodb.com/docs/manual/reference/operator/query/exists/#mongodb-query-op.-exists)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$exists` = "\$exists"
 
@@ -268,7 +268,7 @@ const val `$exists` = "\$exists"
  * specified type.
  *
  * [$type](https://www.mongodb.com/docs/manual/reference/operator/query/type/#mongodb-query-op.-type)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$type` = "\$type"
 
@@ -279,7 +279,7 @@ const val `$type` = "\$type"
  * the query language.
  *
  * [$expr](https://www.mongodb.com/docs/manual/reference/operator/query/expr/#mongodb-query-op.-expr)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$expr` = "\$expr"
 
@@ -288,7 +288,7 @@ const val `$expr` = "\$expr"
  * Schema.
  *
  * [$jsonSchema](https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#mongodb-query-op.-jsonSchema)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$jsonSchema` = "\$jsonSchema"
 
@@ -298,7 +298,7 @@ const val `$jsonSchema` = "\$jsonSchema"
  * result.
  *
  * [$mod](https://www.mongodb.com/docs/manual/reference/operator/query/mod/#mongodb-query-op.-mod)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$mod` = "\$mod"
 
@@ -307,7 +307,7 @@ const val `$mod` = "\$mod"
  * specified regular expression.
  *
  * [$regex](https://www.mongodb.com/docs/manual/reference/operator/query/regex/#mongodb-query-op.-regex)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$regex` = "\$regex"
 
@@ -315,7 +315,7 @@ const val `$regex` = "\$regex"
  * Performs text search.
  *
  * [$text](https://www.mongodb.com/docs/manual/reference/operator/query/text/#mongodb-query-op.-text)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$text` = "\$text"
 
@@ -324,7 +324,7 @@ const val `$text` = "\$text"
  * expression.
  *
  * [$where](https://www.mongodb.com/docs/manual/reference/operator/query/where/#mongodb-query-op.-where)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$where` = "\$where"
 
@@ -336,7 +336,7 @@ const val `$where` = "\$where"
  * $geoIntersects.
  *
  * [$geoIntersects](https://www.mongodb.com/docs/manual/reference/operator/query/geoIntersects/#mongodb-query-op.-geoIntersects)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$geoIntersects` = "\$geoIntersects"
 
@@ -346,7 +346,7 @@ const val `$geoIntersects` = "\$geoIntersects"
  * $geoWithin.
  *
  * [$geoWithin](https://www.mongodb.com/docs/manual/reference/operator/query/geoWithin/#mongodb-query-op.-geoWithin)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$geoWithin` = "\$geoWithin"
 
@@ -356,7 +356,7 @@ const val `$geoWithin` = "\$geoWithin"
  * 2dsphere and 2d indexes support $near.
  *
  * [$near](https://www.mongodb.com/docs/manual/reference/operator/query/near/#mongodb-query-op.-near)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$near` = "\$near"
 
@@ -366,7 +366,7 @@ const val `$near` = "\$near"
  * The 2dsphere and 2d indexes support $nearSphere.
  *
  * [$nearSphere](https://www.mongodb.com/docs/manual/reference/operator/query/nearSphere/#mongodb-query-op.-nearSphere)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$nearSphere` = "\$nearSphere"
 
@@ -377,7 +377,7 @@ const val `$nearSphere` = "\$nearSphere"
  * specified in the query.
  *
  * [$all](https://www.mongodb.com/docs/manual/reference/operator/query/all/#mongodb-query-op.-all)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$all` = "\$all"
 
@@ -386,7 +386,7 @@ const val `$all` = "\$all"
  * specified size.
  *
  * [$size](https://www.mongodb.com/docs/manual/reference/operator/query/size/#mongodb-query-op.-size)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$size` = "\$size"
 
@@ -397,7 +397,7 @@ const val `$size` = "\$size"
  * of bit positions all have a value of 0.
  *
  * [$bitsAllClear](https://www.mongodb.com/docs/manual/reference/operator/query/bitsAllClear/#mongodb-query-op.-bitsAllClear)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bitsAllClear` = "\$bitsAllClear"
 
@@ -406,7 +406,7 @@ const val `$bitsAllClear` = "\$bitsAllClear"
  * of bit positions all have a value of 1.
  *
  * [$bitsAllSet](https://www.mongodb.com/docs/manual/reference/operator/query/bitsAllSet/#mongodb-query-op.-bitsAllSet)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bitsAllSet` = "\$bitsAllSet"
 
@@ -415,7 +415,7 @@ const val `$bitsAllSet` = "\$bitsAllSet"
  * bit from a set of bit positions has a value of 0.
  *
  * [$bitsAnyClear](https://www.mongodb.com/docs/manual/reference/operator/query/bitsAnyClear/#mongodb-query-op.-bitsAnyClear)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bitsAnyClear` = "\$bitsAnyClear"
 
@@ -424,7 +424,7 @@ const val `$bitsAnyClear` = "\$bitsAnyClear"
  * bit from a set of bit positions has a value of 1.
  *
  * [$bitsAnySet](https://www.mongodb.com/docs/manual/reference/operator/query/bitsAnySet/#mongodb-query-op.-bitsAnySet)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bitsAnySet` = "\$bitsAnySet"
 
@@ -434,7 +434,7 @@ const val `$bitsAnySet` = "\$bitsAnySet"
  * Projects the document's score assigned during $text operation.
  *
  * [$meta](https://www.mongodb.com/docs/manual/reference/operator/aggregation/meta/#mongodb-expression-exp.-meta)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$meta` = "\$meta"
 
@@ -444,7 +444,7 @@ const val `$meta` = "\$meta"
  * Adds a comment to a query predicate.
  *
  * [$comment](https://www.mongodb.com/docs/manual/reference/operator/query/comment/#mongodb-query-op.-comment)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$comment` = "\$comment"
 
@@ -452,7 +452,7 @@ const val `$comment` = "\$comment"
  * Generates a random float between 0 and 1.
  *
  * [$rand](https://www.mongodb.com/docs/manual/reference/operator/query/rand/#mongodb-query-op.-rand)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$rand` = "\$rand"
 
@@ -463,7 +463,7 @@ const val `$rand` = "\$rand"
  * either as a Date or a Timestamp.
  *
  * [$currentDate](https://www.mongodb.com/docs/manual/reference/operator/update/currentDate/#mongodb-update-up.-currentDate)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$currentDate` = "\$currentDate"
 
@@ -472,7 +472,7 @@ const val `$currentDate` = "\$currentDate"
  * specified amount.
  *
  * [$inc](https://www.mongodb.com/docs/manual/reference/operator/update/inc/#mongodb-update-up.-inc)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$inc` = "\$inc"
 
@@ -481,7 +481,7 @@ const val `$inc` = "\$inc"
  * is less than the existing field value.
  *
  * [$min](https://www.mongodb.com/docs/manual/reference/operator/update/min/#mongodb-update-up.-min)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$min` = "\$min"
 
@@ -490,7 +490,7 @@ const val `$min` = "\$min"
  * is greater than the existing field value.
  *
  * [$max](https://www.mongodb.com/docs/manual/reference/operator/update/max/#mongodb-update-up.-max)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$max` = "\$max"
 
@@ -499,7 +499,7 @@ const val `$max` = "\$max"
  * specified amount.
  *
  * [$mul](https://www.mongodb.com/docs/manual/reference/operator/update/mul/#mongodb-update-up.-mul)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$mul` = "\$mul"
 
@@ -507,7 +507,7 @@ const val `$mul` = "\$mul"
  * Renames a field.
  *
  * [$rename](https://www.mongodb.com/docs/manual/reference/operator/update/rename/#mongodb-update-up.-rename)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$rename` = "\$rename"
 
@@ -518,7 +518,7 @@ const val `$rename` = "\$rename"
  * documents.
  *
  * [$setOnInsert](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/#mongodb-update-up.-setOnInsert)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$setOnInsert` = "\$setOnInsert"
 
@@ -530,7 +530,7 @@ const val `$setOnInsert` = "\$setOnInsert"
  * condition.
  *
  * [$&#x5B;&#x5D;](https://www.mongodb.com/docs/manual/reference/operator/update/positional-all/#mongodb-update-up.---)
- * @since 1.0.0
+ * @since 2.0.0
  */
 fun `$`() = "\$[]"
 
@@ -540,7 +540,7 @@ fun `$`() = "\$[]"
  * documents that match the query condition.
  *
  * [$&#x5B;&#x3C;identifier&#x3E;&#x5D;](https://www.mongodb.com/docs/manual/reference/operator/update/positional-filtered/#mongodb-update-up.---identifier--)
- * @since 1.0.0
+ * @since 2.0.0
  */
 fun `$`(identifier: String) = "\$[$identifier]"
 
@@ -549,7 +549,7 @@ fun `$`(identifier: String) = "\$[$identifier]"
  * already exist in the set.
  *
  * [$addToSet](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$addToSet` = "\$addToSet"
 
@@ -557,7 +557,7 @@ const val `$addToSet` = "\$addToSet"
  * Removes the first or last item of an array.
  *
  * [$pop](https://www.mongodb.com/docs/manual/reference/operator/update/pop/#mongodb-update-up.-pop)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$pop` = "\$pop"
 
@@ -566,7 +566,7 @@ const val `$pop` = "\$pop"
  * specified query.
  *
  * [$pull](https://www.mongodb.com/docs/manual/reference/operator/update/pull/#mongodb-update-up.-pull)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$pull` = "\$pull"
 
@@ -574,7 +574,7 @@ const val `$pull` = "\$pull"
  * Adds an item to an array.
  *
  * [$push](https://www.mongodb.com/docs/manual/reference/operator/update/push/#mongodb-update-up.-push)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$push` = "\$push"
 
@@ -582,7 +582,7 @@ const val `$push` = "\$push"
  * Removes all matching values from an array.
  *
  * [$pullAll](https://www.mongodb.com/docs/manual/reference/operator/update/pullAll/#mongodb-update-up.-pullAll)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$pullAll` = "\$pullAll"
 
@@ -593,7 +593,7 @@ const val `$pullAll` = "\$pullAll"
  * append multiple items for array updates.
  *
  * [$each](https://www.mongodb.com/docs/manual/reference/operator/update/each/#mongodb-update-up.-each)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$each` = "\$each"
 
@@ -602,7 +602,7 @@ const val `$each` = "\$each"
  * position in the array to add elements.
  *
  * [$position](https://www.mongodb.com/docs/manual/reference/operator/update/position/#mongodb-update-up.-position)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$position` = "\$position"
 
@@ -613,7 +613,7 @@ const val `$position` = "\$position"
  * integer values.
  *
  * [$bit](https://www.mongodb.com/docs/manual/reference/operator/update/bit/#mongodb-update-up.-bit)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bit` = "\$bit"
 
@@ -630,7 +630,7 @@ const val `$bit` = "\$bit"
  * $set is an alias for $addFields.
  *
  * [$addFields](https://www.mongodb.com/docs/manual/reference/operator/aggregation/addFields/#mongodb-pipeline-pipe.-addFields)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$addFields` = "\$addFields"
 
@@ -640,7 +640,7 @@ const val `$addFields` = "\$addFields"
  * and bucket boundaries.
  *
  * [$bucket](https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucket/#mongodb-pipeline-pipe.-bucket)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bucket` = "\$bucket"
 
@@ -653,7 +653,7 @@ const val `$bucket` = "\$bucket"
  * specified number of buckets.
  *
  * [$bucketAuto](https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucketAuto/#mongodb-pipeline-pipe.-bucketAuto)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$bucketAuto` = "\$bucketAuto"
 
@@ -662,7 +662,7 @@ const val `$bucketAuto` = "\$bucketAuto"
  * view.
  *
  * [$collStats](https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/#mongodb-pipeline-pipe.-collStats)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$collStats` = "\$collStats"
 
@@ -674,7 +674,7 @@ const val `$collStats` = "\$collStats"
  * accumulator.
  *
  * [$count](https://www.mongodb.com/docs/manual/reference/operator/aggregation/count/#mongodb-pipeline-pipe.-count)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$count` = "\$count"
 
@@ -687,7 +687,7 @@ const val `$count` = "\$count"
  * or facets, in a single stage.
  *
  * [$facet](https://www.mongodb.com/docs/manual/reference/operator/aggregation/facet/#mongodb-pipeline-pipe.-facet)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$facet` = "\$facet"
 
@@ -701,7 +701,7 @@ const val `$facet` = "\$facet"
  * field.
  *
  * [$geoNear](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/#mongodb-pipeline-pipe.-geoNear)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$geoNear` = "\$geoNear"
 
@@ -712,7 +712,7 @@ const val `$geoNear` = "\$geoNear"
  * recursive search for that document.
  *
  * [$graphLookup](https://www.mongodb.com/docs/manual/reference/operator/aggregation/graphLookup/#mongodb-pipeline-pipe.-graphLookup)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$graphLookup` = "\$graphLookup"
 
@@ -727,7 +727,7 @@ const val `$graphLookup` = "\$graphLookup"
  * fields.
  *
  * [$group](https://www.mongodb.com/docs/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$group` = "\$group"
 
@@ -736,7 +736,7 @@ const val `$group` = "\$group"
  * index for the collection.
  *
  * [$indexStats](https://www.mongodb.com/docs/manual/reference/operator/aggregation/indexStats/#mongodb-pipeline-pipe.-indexStats)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$indexStats` = "\$indexStats"
 
@@ -748,7 +748,7 @@ const val `$indexStats` = "\$indexStats"
  * documents (after the first n documents).
  *
  * [$limit](https://www.mongodb.com/docs/manual/reference/operator/aggregation/limit/#mongodb-pipeline-pipe.-limit)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$limit` = "\$limit"
 
@@ -758,7 +758,7 @@ const val `$limit` = "\$limit"
  * collection.
  *
  * [$listSessions](https://www.mongodb.com/docs/manual/reference/operator/aggregation/listSessions/#mongodb-pipeline-pipe.-listSessions)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$listSessions` = "\$listSessions"
 
@@ -769,7 +769,7 @@ const val `$listSessions` = "\$listSessions"
  * processing.
  *
  * [$lookup](https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/#mongodb-pipeline-pipe.-lookup)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$lookup` = "\$lookup"
 
@@ -782,7 +782,7 @@ const val `$lookup` = "\$lookup"
  * documents (no match).
  *
  * [$match](https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/#mongodb-pipeline-pipe.-match)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$match` = "\$match"
 
@@ -800,7 +800,7 @@ const val `$match` = "\$match"
  * New in version 4.2.
  *
  * [$merge](https://www.mongodb.com/docs/manual/reference/operator/aggregation/merge/#mongodb-pipeline-pipe.-merge)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$merge` = "\$merge"
 
@@ -811,7 +811,7 @@ const val `$merge` = "\$merge"
  * the pipeline.
  *
  * [$out](https://www.mongodb.com/docs/manual/reference/operator/aggregation/out/#mongodb-pipeline-pipe.-out)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$out` = "\$out"
 
@@ -819,7 +819,7 @@ const val `$out` = "\$out"
  * Returns plan cache information for a collection.
  *
  * [$planCacheStats](https://www.mongodb.com/docs/manual/reference/operator/aggregation/planCacheStats/#mongodb-pipeline-pipe.-planCacheStats)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$planCacheStats` = "\$planCacheStats"
 
@@ -832,7 +832,7 @@ const val `$planCacheStats` = "\$planCacheStats"
  * See also $unset for removing existing fields.
  *
  * [$project](https://www.mongodb.com/docs/manual/reference/operator/aggregation/project/#mongodb-pipeline-pipe.-project)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$project` = "\$project"
 
@@ -846,7 +846,7 @@ const val `$project` = "\$project"
  * outputs either one or zero documents.
  *
  * [$redact](https://www.mongodb.com/docs/manual/reference/operator/aggregation/redact/#mongodb-pipeline-pipe.-redact)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$redact` = "\$redact"
 
@@ -861,7 +861,7 @@ const val `$redact` = "\$redact"
  * $replaceWith is an alias for $replaceRoot stage.
  *
  * [$replaceRoot](https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceRoot/#mongodb-pipeline-pipe.-replaceRoot)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$replaceRoot` = "\$replaceRoot"
 
@@ -876,7 +876,7 @@ const val `$replaceRoot` = "\$replaceRoot"
  * $replaceWith is an alias for $replaceRoot stage.
  *
  * [$replaceWith](https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceWith/#mongodb-pipeline-pipe.-replaceWith)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$replaceWith` = "\$replaceWith"
 
@@ -885,7 +885,7 @@ const val `$replaceWith` = "\$replaceWith"
  * documents from its input.
  *
  * [$sample](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sample/#mongodb-pipeline-pipe.-sample)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$sample` = "\$sample"
 
@@ -898,7 +898,7 @@ const val `$sample` = "\$sample"
  * > self-managed deployments.
  *
  * [$search](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-search)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$search` = "\$search"
 
@@ -910,7 +910,7 @@ const val `$search` = "\$search"
  * New in version 5.0.
  *
  * [$setWindowFields](https://www.mongodb.com/docs/manual/reference/operator/aggregation/setWindowFields/#mongodb-pipeline-pipe.-setWindowFields)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$setWindowFields` = "\$setWindowFields"
 
@@ -923,7 +923,7 @@ const val `$setWindowFields` = "\$setWindowFields"
  * after the first n documents).
  *
  * [$skip](https://www.mongodb.com/docs/manual/reference/operator/aggregation/skip/#mongodb-pipeline-pipe.-skip)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$skip` = "\$skip"
 
@@ -933,7 +933,7 @@ const val `$skip` = "\$skip"
  * of documents in each distinct group.
  *
  * [$sortByCount](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sortByCount/#mongodb-pipeline-pipe.-sortByCount)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$sortByCount` = "\$sortByCount"
 
@@ -945,7 +945,7 @@ const val `$sortByCount` = "\$sortByCount"
  * New in version 4.4.
  *
  * [$unionWith](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unionWith/#mongodb-pipeline-pipe.-unionWith)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$unionWith` = "\$unionWith"
 
@@ -958,7 +958,7 @@ const val `$unionWith` = "\$unionWith"
  * elements and can be zero for an empty array.
  *
  * [$unwind](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/#mongodb-pipeline-pipe.-unwind)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$unwind` = "\$unwind"
 
@@ -969,7 +969,7 @@ const val `$unwind` = "\$unwind"
  * operations for the MongoDB deployment.
  *
  * [$currentOp](https://www.mongodb.com/docs/manual/reference/operator/aggregation/currentOp/#mongodb-pipeline-pipe.-currentOp)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$currentOp` = "\$currentOp"
 
@@ -980,7 +980,7 @@ const val `$currentOp` = "\$currentOp"
  * propagated to the system.sessions collection.
  *
  * [$listLocalSessions](https://www.mongodb.com/docs/manual/reference/operator/aggregation/listLocalSessions/#mongodb-pipeline-pipe.-listLocalSessions)
- * @since 1.0.0
+ * @since 2.0.0
  */
 const val `$listLocalSessions` = "\$listLocalSessions"
 
