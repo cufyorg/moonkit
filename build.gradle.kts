@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.0"
-    kotlin("plugin.serialization") version "1.7.0"
+    kotlin("jvm") version kotlin_version
+    kotlin("plugin.serialization") version kotlin_version
     id("maven-publish")
 }
 
-group = "org.cufy.mangaka"
-version = "1.2.0-beta.1"
+group = "org.cufy.monkt"
+version = "2.0.0"
 
 repositories {
     mavenCentral()
@@ -15,16 +15,20 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":bson"))
+    implementation(project(":mongodb"))
+
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 
-    implementation("org.cufy:weakness:1.0.0")
+    implementation(Dependencies.Kotlin.serialization)
+    implementation(Dependencies.Kotlin.coroutines_core)
+    implementation(Dependencies.Kotlin.coroutines_reactive)
+    implementation(Dependencies.Kotlin.reflect)
 
-    implementation("org.litote.kmongo:kmongo:4.6.0")
-    implementation("org.litote.kmongo:kmongo-coroutine:4.6.0")
-    implementation("org.mongodb:mongodb-driver-sync:4.6.0")
-    implementation("org.mongodb:mongodb-driver-reactivestreams:4.6.0")
+    implementation(Dependencies.MongoDB.driver_sync)
+    implementation(Dependencies.MongoDB.driver_reactivestreams)
+
+    implementation(Dependencies.weakness)
 
     testImplementation(kotlin("test"))
 }
@@ -42,7 +46,7 @@ afterEvaluate {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
-                artifactId = "mangaka"
+                artifactId = "monkt"
             }
         }
     }
