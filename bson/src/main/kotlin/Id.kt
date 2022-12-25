@@ -13,23 +13,32 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.cufy.mangaka
+package org.cufy.bson
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import org.bson.BsonObjectId
-import org.bson.BsonString
-import org.bson.BsonValue
-import org.bson.types.ObjectId
+
+/**
+ * Return the best fitting native wrapper for
+ * this id.
+ * A [BsonObjectId] if it is a valid object id
+ * and a [BsonString] if it is not.
+ *
+ * @since 2.0.0
+ */
+val <T> Id<T>.bson: org.bson.BsonValue
+    get() = when {
+        ObjectId.isValid(value) -> BsonObjectId(ObjectId(value))
+        else -> BsonString(value)
+    }
 
 /**
  * Construct a new id.
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 fun <T> Id(): Id<T> {
     return Id(ObjectId())
@@ -38,7 +47,7 @@ fun <T> Id(): Id<T> {
 /**
  * Construct a new id from the given [value].
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 fun <T> Id(value: ObjectId): Id<T> {
     return Id(value.toHexString())
@@ -46,6 +55,8 @@ fun <T> Id(value: ObjectId): Id<T> {
 
 /**
  * Case the given id into an id of [T].
+ *
+ * @since 2.0.0
  */
 fun <T> Id(value: Id<*>): Id<T> {
     @Suppress("UNCHECKED_CAST")
@@ -53,72 +64,36 @@ fun <T> Id(value: Id<*>): Id<T> {
 }
 
 /**
- * Construct a new id from normalizing the
- * given [value].
- *
- * @param value the value to normalize.
- * @since 1.0.0
- */
-fun <T> Id(value: Any): Id<T> {
-    return when (value) {
-        is Id<*> -> Id(value)
-        is String -> Id(value)
-        is BsonString -> Id(value.value)
-        is ObjectId -> Id(value)
-        is BsonObjectId -> Id(value.value)
-        else -> throw MangakaException("Unsupported id type: $value")
-    }
-}
-
-/**
  * An id wrapper.
  *
- * TODO documentation for class Id
- *
  * @author LSafer
- * @since 1.0.0
+ * @since 2.0.0
  */
 @Serializable(IdSerializer::class)
 data class Id<T>(
     /**
      * The string representation of the id.
      *
-     * @since 1.0.0
+     * @since 2.0.0
      */
     val value: String
 ) : CharSequence by value {
-    override fun toString() = value
+    override fun toString(): String = value
 }
-
-/**
- * Return the best fitting native wrapper for
- * this id.
- * A [BsonObjectId] if it is a valid object id
- * and a [BsonString] if it is not.
- *
- * @since 1.0.0
- */
-val Id<*>.bson: BsonValue
-    get() = when {
-        ObjectId.isValid(value) -> BsonObjectId(ObjectId(value))
-        else -> BsonString(value)
-    }
 
 /**
  * The serializer for [Id].
  *
  * @author LSafer
- * @since 1.0.0
+ * @since 2.0.0
  */
 internal object IdSerializer : KSerializer<Id<*>> {
     override val descriptor = String.serializer().descriptor
 
-    @OptIn(ExperimentalSerializationApi::class)
     override fun serialize(encoder: Encoder, value: Id<*>) {
         encoder.encodeInline(descriptor).encodeString(value.value)
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
     override fun deserialize(decoder: Decoder): Id<*> {
         return Id<Any?>(decoder.decodeInline(descriptor).decodeString())
     }
