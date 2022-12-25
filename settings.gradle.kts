@@ -1,1 +1,3 @@
-rootProject.name = "mangaka"
+rootProject.name = "monkt"
+include("bson")
+include("mongodb")

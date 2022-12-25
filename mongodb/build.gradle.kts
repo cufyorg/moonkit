@@ -1,13 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm") version kotlin_version
     kotlin("plugin.serialization") version kotlin_version
-    id("maven-publish")
 }
-
-group = "org.cufy.monkt"
-version = "2.0.0"
 
 repositories {
     mavenCentral()
@@ -16,7 +10,6 @@ repositories {
 
 dependencies {
     implementation(project(":bson"))
-    implementation(project(":mongodb"))
 
     implementation(kotlin("stdlib"))
 
@@ -29,26 +22,9 @@ dependencies {
     implementation(Dependencies.kmongo)
     implementation(Dependencies.kmongo_coroutine)
 
-    implementation(Dependencies.weakness)
-
     testImplementation(kotlin("test"))
 }
 
-tasks.test {
+tasks.getByName<Test>("test") {
     useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-                artifactId = "monkt"
-            }
-        }
-    }
 }
