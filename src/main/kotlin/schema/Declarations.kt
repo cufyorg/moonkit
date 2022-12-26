@@ -127,7 +127,7 @@ interface ElementSchema<T> : Schema<T> {
         model: Model<*>,
         root: Any,
         pathname: Pathname,
-        instance: T
+        instance: T & Any
     ): List<OptionData<*, *, *>>
 }
 

@@ -333,9 +333,11 @@ open class MapSchemaImpl<T, U>(
         model: Model<*>,
         root: Any,
         pathname: Pathname,
-        instance: T
+        instance: T & Any
     ): List<OptionData<*, *, *>> {
         val uInstance = encodeMapper.map(instance)
+
+        uInstance ?: return emptyList()
 
         return when (val schema = schema) {
             is ElementSchema<U> ->
@@ -395,11 +397,10 @@ open class NullableSchemaImpl<T>(
         model: Model<*>,
         root: Any,
         pathname: Pathname,
-        instance: T?
+        instance: T & Any
     ): List<OptionData<*, *, *>> {
-        val schema = schema
-        return when {
-            schema is ElementSchema<T> && instance != null ->
+        return when (val schema = schema) {
+            is ElementSchema<T> ->
                 schema.obtainOptions(model, root, pathname, instance)
             else -> emptyList()
         }
@@ -498,9 +499,10 @@ open class FieldDefinitionImpl<T : Any, M>(
     ): List<OptionData<*, *, *>> {
         val value = getter(instance)
         val subPathname = pathname + name
+        val schema = schema
 
-        val subOptions = when (val schema = schema) {
-            is ElementSchema<M> ->
+        val subOptions = when {
+            schema is ElementSchema<M> && value != null ->
                 schema.obtainOptions(model, root, subPathname, value)
             else -> emptyList()
         }
