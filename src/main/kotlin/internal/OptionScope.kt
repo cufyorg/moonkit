@@ -33,9 +33,7 @@ fun <T : Any, M, C> OptionScope(
     option: OptionData<T, M, C>,
     onWait: suspend (signals: List<Signal<*>>) -> List<Any?>
 ): OptionScope<T, M, C> {
-    var nextSignalIndex = 0
-    val enqueuedSignals = mutableListOf<Signal<*>>()
-    val items = mutableListOf<Any?>()
+    val queue = mutableListOf<Pair<Signal<*>, SignalPropertyImpl<*>>>()
 
     return object : OptionScope<T, M, C> {
         override val model: Model<*> = option.model
@@ -47,30 +45,61 @@ fun <T : Any, M, C> OptionScope(
         override val configuration: C = option.configuration
 
         override fun <I : Signal<O>, O> enqueue(signal: I): SignalProperty<O> {
-            val index = nextSignalIndex++
+            val property = SignalPropertyImpl<O>()
 
-            enqueuedSignals += signal
+            queue += signal to property
 
-            return SignalProperty {
-                if (index > items.lastIndex) {
-                    error("Used the result of an enqueue before wait().")
-                }
-
-                @Suppress("UNCHECKED_CAST")
-                items[index] as O
-            }
+            return property
         }
 
         override suspend fun wait() {
-            if (enqueuedSignals.isNotEmpty()) {
-                val currentSignals = enqueuedSignals.toList()
-                enqueuedSignals.clear()
-                val currentItems = onWait(currentSignals)
-                if (currentItems.size != currentSignals.size) {
+            if (queue.isNotEmpty()) {
+                val (signals, properties) = queue.unzip()
+
+                queue.clear()
+
+                val items = onWait(signals)
+
+                if (items.size != properties.size) {
                     error("Responded items doesn't match the signals size.")
                 }
-                items.addAll(currentItems)
+
+                (properties zip items).forEach { (property, item) ->
+                    property.complete(item)
+                }
             }
         }
+    }
+}
+
+@InternalMonktApi
+class SignalPropertyImpl<O> : SignalProperty<O> {
+    private var isComplete: Boolean = false
+    private var _value: Any? = null
+    private val onComplete: MutableList<suspend (Any?) -> Any?> = mutableListOf()
+
+    suspend fun complete(value: Any?) {
+        require(!isComplete) { "Signal already completed" }
+        isComplete = true
+        _value = value
+        onComplete.forEach { it(value) }
+        onComplete.clear()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override val value: O
+        get() = when {
+            isComplete -> _value as O
+            else -> error("Used the result of an enqueue before wait().")
+        }
+
+    override fun <R> then(block: suspend (O) -> R): SignalProperty<R> {
+        val property = SignalPropertyImpl<R>()
+        onComplete += {
+            @Suppress("UNCHECKED_CAST")
+            val mapped = block(it as O)
+            property.complete(mapped)
+        }
+        return property
     }
 }

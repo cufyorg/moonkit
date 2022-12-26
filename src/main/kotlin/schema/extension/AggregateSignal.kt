@@ -15,7 +15,6 @@
  */
 package org.cufy.monkt.schema.extension
 
-import kotlinx.coroutines.runBlocking
 import org.bson.BsonNumber
 import org.cufy.bson.*
 import org.cufy.monkt.*
@@ -130,16 +129,12 @@ fun <T : Any> OptionScope<*, *, *>.find(
     model: Model<T>,
     filter: BsonDocument
 ): SignalProperty<List<T>> {
-    val aggregation by aggregate(model,
+    val property = aggregate(model,
         { `$match` by filter }
     )
-    val value by lazy {
-        aggregation.map {
-            // TODO: suspend instead of runBlocking
-            runBlocking { model(it) { isNew = false } }
-        }
+    return property.then {
+        model(it) { isNew = false }
     }
-    return SignalProperty { value }
 }
 
 /**
@@ -173,17 +168,15 @@ fun <T : Any> OptionScope<*, *, *>.count(
     model: Model<T>,
     filter: BsonDocument,
 ): SignalProperty<Long> {
-    val aggregation by aggregate(model,
+    val property = aggregate(model,
         { `$match` by filter },
         { `$count` by "count" }
     )
-    val value by lazy {
-        val count = aggregation[0]["count"]
-                as BsonNumber
+    return property.then {
+        val count = it[0]["count"] as BsonNumber
 
         count.longValue()
     }
-    return SignalProperty { value }
 }
 
 /**

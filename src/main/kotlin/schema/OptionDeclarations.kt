@@ -70,14 +70,19 @@ interface SignalHandler {
  * @author LSafer
  * @since 2.0.0
  */
-fun interface SignalProperty<O> {
-    operator fun invoke(): O
+interface SignalProperty<O> {
+    /**
+     * The property's value.
+     *
+     * Throw an [IllegalStateException] if
+     * accessed before calling [OptionScope.wait].
+     */
+    val value: O
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): O {
-        return invoke()
-    }
-
-    val value: O get() = invoke()
+    /**
+     * Map this signal property using the given mapper [block].
+     */
+    fun <R> then(block: suspend (O) -> R): SignalProperty<R>
 }
 
 /**
@@ -376,4 +381,13 @@ suspend fun <T : Any, M, C, R> OptionScope<T, M, C>.then(
 ): R {
     wait()
     return block(this)
+}
+
+/**
+ * Allows to treat [SignalProperty] as a property delegate.
+ *
+ * @since 2.0.0
+ */
+operator fun <O> SignalProperty<O>.getValue(thisRef: Any?, property: KProperty<*>): O {
+    return value
 }
