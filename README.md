@@ -1,21 +1,6 @@
-# Mangaka [![](https://jitpack.io/v/org.cufy/mangaka.svg)](https://jitpack.io/#org.cufy/mangaka)
+# Moonkt [![](https://jitpack.io/v/org.cufy/monkt.svg)](https://jitpack.io/#org.cufy/monkt)
 
 A mongoose equivalent for kotlin.
-
-### Introduction
-
-Node.js is the best when it comes to community support and
-simplicity.
-But, when it comes to the language itself and the builtin
-features, Yuk!
-I was used to a lot of libraries in Node.js and that what
-held me from
-going all in server-side Kotlin.
-After the introduction of ktor and kgraphql, it was mongoose
-the only
-library left to have an alternative in kotlin!
-
-So, I made mongoose in Kotlin 🤤
 
 ### Install
 
@@ -31,28 +16,36 @@ repositories {
 
 dependencies {
     // Replace TAG with the desired version
-    implementation("org.cufy:mangaka:TAG")
+    implementation("org.cufy:monkit:TAG")
 }
 ```
 
 ### Starting the connection
 
-The following is how to do the mangaka connection on the
-default mangaka instance.
+The following is how to do the monkt connection on the
+default monkt instance.
 
 ```kotlin
 suspend fun foo() {
-    Mangaka.connect("mongodb://localhost:27017", "Mangaka")
+    Monkt.connect("mongodb://localhost:27017", "Monkt")
+    // Initialization can be done later
+    thread {
+        runBlocking {
+            Monkt += Model1
+            Monkt += Model2
+            Monkt.init()
+        }
+    }
 }
 ```
 
 ### Schema Definition
 
-Mangaka was made to mimic the style of mongoose as possible.
+Monkt was made to mimic the style of mongoose as possible.
 Obviously a real mongoose in kotlin is impossible to be maid
 since type-unions are not a supported thing in kotlin. But,
 the thing that kotlin has instead is extension functions.
-So, mangaka took a good advantage of that.
+So, monkt took a good advantage of that.
 
 For example, the following with mongoose:
 
@@ -81,13 +74,12 @@ export const EntitySchema = new Schema<Entity>({
     }
 });
 
-export const EntityModel = model("Entity", EntitySchema, "entities");
+export const EntityModel = model("Entity", EntitySchema, "Entity");
 ```
 
-Has the following equivalent with mangaka:
+Has the following equivalent with monkt:
 
 ```kotlin
-@Serializable
 class Entity : Document {
     var value: String? = null
     lateinit var friendId: Id<Entity>
@@ -96,14 +88,14 @@ class Entity : Document {
 
 val EntitySchema = ObjectSchema(::Entity) {
     field(Entity::value) {
-        schema { StringSchema }
+        schema { NullableSchema(StringSchema) }
         default { "Initialized" }
-        validate { it != "Invalid" }
-        immutable { it == "Immutable" }
+        validate { value != "Invalid" }
+        immutable { value == "Immutable" }
     }
     field(Entity::friendId) {
         schema { IdSchema() }
-        existsAt { "entities" }
+        exists { EntityModel }
     }
     field(Entity::list) {
         schema { ArraySchema(StringSchema) }
@@ -111,18 +103,18 @@ val EntitySchema = ObjectSchema(::Entity) {
     }
 }
 
-val EntityModel = model("Entity", EntitySchema, "entities")
+val EntityModel: Model<Entity> = Model("Entity", EntitySchema)
 ```
 
 ### Model Usage
 
 The model is a tricky one, since in mongoose the model has
 mongoose internal stuff with javascript specific wizardry
-which is not even needed in mangaka. But, still the
-developer experience the first priority here in mangaka.
-So, the code appears the same but internal it is not.
+which is not even needed in monkt. But, still the
+developer experience is the first priority here in monkt.
+So, the code appears the same, but internally it is not.
 
-For example, the following code with mangaka:
+For example, the following code with monkt:
 
 ```typescript
 async function useEntityModel() {
@@ -136,17 +128,21 @@ async function useEntityModel() {
 }
 ```
 
-Has the following equivalent with mangaka:
+Has the following equivalent with monkt:
 
 ```kotlin
 suspend fun useEntityModel() {
     val entity = EntityModel()
-    EntityModel.create(document(
+    EntityModel.create({
         Entity::value by "SomeValue"
-    ))
-    EntityModel.findOne(document(
+        // equilvilant:
+        "value" by "SomeValue"
+    })
+    EntityModel.findOne({
         Entity::value by "SomeValue"
-    ))
+        // equilvilant:
+        "value" by "SomeValue"
+    })
 }
 ```
 
@@ -157,7 +153,7 @@ One of the best things about mongoose is the interface
 validating values without the need to know the client,
 database or collection they came from.
 This is one of the easiest to mimic features that was
-implemented in mangaka.
+implemented in monkt.
 
 For example, the following with mongoose:
 
@@ -169,20 +165,20 @@ async function useEntityDocument(entity: Entity) {
 }
 ```
 
-Has the following equivalent with mangaka:
+Has the following equivalent with monkt:
 
 ```kotlin
 suspend fun useEntityDocument(entity: Entity) {
     entity.validate()
     entity.save()
-    entity.remove()
+    entity.delete()
 }
 ```
 
 ### Static and Member functions
 
 This feature doesn't event need to be implemented in
-mangaka.
+monkt.
 The best thing about kotlin extension functions is that
 anyone can write their own extension function.
 
@@ -193,17 +189,20 @@ The following is an example for extension functions:
 val Entity.firstElement: String?
     get() = list.firstOrNull()
 
+// example of fantom value
+val Entity.fantomValue by Document.fantom()
+
 // example member function
 suspend fun Entity.findFriend(): Entity? {
-    return model.findOne(document(
+    return model.findOne({
         "_id" by friendId
-    ))
+    })
 }
 
 // example static function
 suspend fun Model<Entity>.findByValue(value: String): Entity? {
-    return findOne(document(
+    return findOne({
         Entity::value by value
-    ))
+    })
 }
 ```
