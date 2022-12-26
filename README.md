@@ -1,4 +1,4 @@
-# Moonkt [![](https://jitpack.io/v/org.cufy/monkt.svg)](https://jitpack.io/#org.cufy/monkt)
+# Monkt [![](https://jitpack.io/v/org.cufy/monkt.svg)](https://jitpack.io/#org.cufy/monkt)
 
 A mongoose equivalent for kotlin.
 

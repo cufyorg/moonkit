@@ -6,7 +6,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "org.cufy.monkt"
+group = "org.cufy"
 version = "2.0.0"
 
 repositories {
