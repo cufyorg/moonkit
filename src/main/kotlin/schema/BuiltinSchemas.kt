@@ -118,6 +118,18 @@ fun <T> ScalarSchemaBuilder<T>.encode(
     this.encoder = encoder
 }
 
+@OptIn(AdvancedMonktApi::class)
+inline fun <reified T> ScalarSchemaBuilder<T>.encodeSafe(
+    encoder: Encoder<in T>
+) {
+    this.encoder = Encoder<Any?> {
+        require(T::class.isInstance(it)) {
+            "Encoding Failure: Expected ${T::class.simpleName} but got $it"
+        }
+        encoder.encode(it as T)
+    }
+}
+
 /*==================================================
 ==================== EnumSchema ====================
 ==================================================*/
@@ -524,7 +536,7 @@ object UnitSchema : Schema<Unit> {
  */
 val StringSchema: ScalarSchema<String> = ScalarSchema {
     accept(BsonStringType)
-    encode { BsonString(it) }
+    encodeSafe { BsonString(it) }
     decode {
         it as BsonString
         it.value
@@ -538,7 +550,7 @@ val StringSchema: ScalarSchema<String> = ScalarSchema {
  */
 val BooleanSchema: ScalarSchema<Boolean> = ScalarSchema {
     accept(BsonBooleanType)
-    encode { BsonBoolean(it) }
+    encodeSafe { BsonBoolean(it) }
     decode {
         it as BsonBoolean
         it.value
@@ -552,7 +564,7 @@ val BooleanSchema: ScalarSchema<Boolean> = ScalarSchema {
  */
 val Int32Schema: ScalarSchema<Int> = ScalarSchema {
     accept(BsonInt32Type)
-    encode { BsonInt32(it) }
+    encodeSafe { BsonInt32(it) }
     decode {
         it as BsonInt32
         it.value
@@ -564,9 +576,10 @@ val Int32Schema: ScalarSchema<Int> = ScalarSchema {
  *
  * @since 2.0.0
  */
+@Suppress("USELESS_IS_CHECK")
 val Int64Schema: ScalarSchema<Long> = ScalarSchema {
     accept(BsonInt64Type)
-    encode { BsonInt64(it) }
+    encodeSafe { BsonInt64(it) }
     decode {
         it as BsonInt64
         it.value
@@ -580,7 +593,7 @@ val Int64Schema: ScalarSchema<Long> = ScalarSchema {
  */
 val DoubleSchema: ScalarSchema<Double> = ScalarSchema {
     accept(BsonDoubleType)
-    encode { BsonDouble(it) }
+    encodeSafe { BsonDouble(it) }
     decode {
         it as BsonDouble
         it.value
@@ -594,7 +607,7 @@ val DoubleSchema: ScalarSchema<Double> = ScalarSchema {
  */
 val Decimal128Schema: ScalarSchema<Decimal128> = ScalarSchema {
     accept(BsonDecimal128Type)
-    encode { BsonDecimal128(it) }
+    encodeSafe { BsonDecimal128(it) }
     decode {
         it as BsonDecimal128
         it.value
@@ -608,7 +621,7 @@ val Decimal128Schema: ScalarSchema<Decimal128> = ScalarSchema {
  */
 val ObjectIdSchema: ScalarSchema<ObjectId> = ScalarSchema {
     accept(BsonObjectIdType)
-    encode { BsonObjectId(it) }
+    encodeSafe { BsonObjectId(it) }
     decode {
         it as BsonObjectId
         it.value
@@ -630,7 +643,7 @@ val IdSchema: ScalarSchema<Id<Any>> = IdSchema()
 @Suppress("FunctionName")
 fun <T> IdSchema(): ScalarSchema<Id<T>> = ScalarSchema {
     accept(BsonObjectIdType, BsonStringType)
-    encode {
+    encodeSafe {
         when {
             ObjectId.isValid(it.value) -> BsonObjectId(ObjectId(it.value))
             else -> BsonString(it.value)
@@ -654,7 +667,7 @@ fun <T> IdSchema(): ScalarSchema<Id<T>> = ScalarSchema {
  */
 val BigDecimalSchema: ScalarSchema<BigDecimal> = ScalarSchema {
     accept(BsonDecimal128Type)
-    encode { BsonDecimal128(Decimal128(it)) }
+    encodeSafe { BsonDecimal128(Decimal128(it)) }
     decode {
         it as BsonDecimal128
         it.value.bigDecimalValue()
