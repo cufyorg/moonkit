@@ -100,7 +100,7 @@ open class ObjectSchemaCodecScope<T : Any>(
 interface ObjectSchemaBuilder<T : Any> :
     WithOptionsBuilder<T, T>,
     WithCodecBuilder<ObjectSchemaCodecBlock<T>>,
-    WithDeferredBuilder<ObjectSchemaBuilderBlock<T>> {
+    WithDeferredBuilder {
 
     /**
      * The object constructor.

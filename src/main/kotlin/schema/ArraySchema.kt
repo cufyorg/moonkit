@@ -86,7 +86,7 @@ interface ArraySchemaBuilder<T> :
     WithCoercersBuilder<T>,
     WithSchemaBuilder<T>,
     WithCodecBuilder<ArraySchemaCodecBlock<T>>,
-    WithDeferredBuilder<ArraySchemaBuilderBlock<T>> {
+    WithDeferredBuilder {
 
     /**
      * Build the schema.

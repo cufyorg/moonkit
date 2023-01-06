@@ -59,7 +59,7 @@ typealias ScalarSchemaBuilderBlock<T> =
  */
 interface ScalarSchemaBuilder<T> :
     WithDecoderBuilder<T>,
-    WithDeferredBuilder<ScalarSchemaBuilderBlock<T>> {
+    WithDeferredBuilder {
 
     /**
      * The wrapped encoder
@@ -163,7 +163,7 @@ typealias EnumSchemaBuilderBlock<T> =
  * @since 2.0.0
  */
 interface EnumSchemaBuilder<T> :
-    WithDeferredBuilder<EnumSchemaBuilderBlock<T>> {
+    WithDeferredBuilder {
 
     /**
      * Name / Runtime-Enum table.
@@ -334,7 +334,7 @@ typealias MapSchemaBuilderBlock<T, U> =
  */
 interface MapSchemaBuilder<T, U> :
     WithSchemaBuilder<U>,
-    WithDeferredBuilder<MapSchemaBuilderBlock<T, U>> {
+    WithDeferredBuilder {
 
     /**
      * Transforms runtime values of type `T` to `U`

@@ -480,13 +480,13 @@ fun <B> WithCodecBuilder<B>.onDecode(
  * @author LSafer
  * @since 2.0.0
  */
-interface WithDeferredBuilder<B> {
+interface WithDeferredBuilder {
     /**
      * Code to be invoked on this builder before
      * building.
      */
     @AdvancedMonktApi("Use `deferred()` instead")
-    val deferred: MutableList<B>
+    val deferred: MutableList<() -> Unit>
 }
 
 /**
@@ -494,9 +494,8 @@ interface WithDeferredBuilder<B> {
  * building.
  */
 @AdvancedMonktApi
-fun <B> WithDeferredBuilder<B>.deferred(
-    block: B
+fun <B : WithDeferredBuilder> B.deferred(
+    block: B.() -> Unit
 ) {
-    deferred += block
+    deferred += { block(this) }
 }
-

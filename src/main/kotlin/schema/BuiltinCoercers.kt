@@ -62,7 +62,7 @@ typealias ScalarCoercerBuilderBlock<T> =
  */
 interface ScalarCoercerBuilder<T> :
     WithDecoderBuilder<T>,
-    WithDeferredBuilder<ScalarCoercerBuilderBlock<T>> {
+    WithDeferredBuilder {
     /**
      * Build the coercer.
      *
@@ -131,7 +131,7 @@ typealias MapCoercerBuilderBlock<T, U> =
  * @since 2.0.0
  */
 interface MapCoercerBuilder<T, U> :
-    WithDeferredBuilder<MapCoercerBuilderBlock<T, U>> {
+    WithDeferredBuilder {
 
     /**
      * The wrapped coercer.

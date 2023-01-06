@@ -39,11 +39,11 @@ open class ScalarCoercerBuilderImpl<T> : ScalarCoercerBuilder<T> {
     override val predicate: MutableList<Predicate<BsonValue>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val deferred: MutableList<ScalarCoercerBuilderBlock<T>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @OptIn(AdvancedMonktApi::class)
     override fun build(): ScalarCoercer<T> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return ScalarCoercerImpl(
             types = types.toList(),
@@ -67,7 +67,7 @@ open class ScalarCoercerBuilderImpl<T> : ScalarCoercerBuilder<T> {
 @InternalMonktApi
 open class MapCoercerBuilderImpl<T, U> : MapCoercerBuilder<T, U> {
     @AdvancedMonktApi
-    override val deferred: MutableList<MapCoercerBuilderBlock<T, U>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     /**
      * The wrapped coercer.
@@ -89,7 +89,7 @@ open class MapCoercerBuilderImpl<T, U> : MapCoercerBuilder<T, U> {
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): MapCoercer<T, U> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return MapCoercerImpl(
             coercer = coercer
@@ -131,11 +131,11 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
     override val onEncode: MutableList<ArraySchemaCodecBlock<T>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val deferred: MutableList<ArraySchemaBuilderBlock<T>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): ArraySchema<T> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return ArraySchemaImpl(
             schema = schema?.value
@@ -172,14 +172,14 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
     override var predicate: MutableList<Predicate<BsonValue>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val deferred: MutableList<ScalarSchemaBuilderBlock<T>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @AdvancedMonktApi
     override var encoder: Encoder<in T>? = null // REQUIRED
 
     @OptIn(InternalMonktApi::class, AdvancedMonktApi::class)
     override fun build(): ScalarSchema<T> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return ScalarSchemaImpl(
             types = types.toList(),
@@ -205,14 +205,14 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
 @InternalMonktApi
 open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
     @AdvancedMonktApi
-    override val deferred: MutableList<EnumSchemaBuilderBlock<T>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @AdvancedMonktApi
     override val values: MutableMap<BsonValue, T> = mutableMapOf()
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): EnumSchema<T> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return EnumSchemaImpl(
             values = values.toMap()
@@ -232,7 +232,7 @@ open class MapSchemaBuilderImpl<T, U> : MapSchemaBuilder<T, U> {
     override var schema: Lazy<Schema<U>>? = null // REQUIRED
 
     @AdvancedMonktApi
-    override val deferred: MutableList<MapSchemaBuilderBlock<T, U>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     /**
      * Transforms runtime values of type `T` to `U`
@@ -260,7 +260,7 @@ open class MapSchemaBuilderImpl<T, U> : MapSchemaBuilder<T, U> {
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): MapSchema<T, U> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return MapSchemaImpl(
             lazySchema = schema
@@ -305,7 +305,7 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
     override val onDecode: MutableList<FieldDefinitionCodecBlock<T, M>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val deferred: MutableList<FieldDefinitionBuilderBlock<T, M>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @AdvancedMonktApi
     override var name: String? = null // REQUIRED
@@ -318,7 +318,7 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): FieldDefinition<T, M> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return FieldDefinitionImpl(
             name = name
@@ -368,7 +368,7 @@ open class FieldDefinitionMapperBuilderImpl<T : Any, M, N> :
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun applyTo(builder: FieldDefinitionBuilder<T, M>) {
-        this.deferred.forEach { it(this) }
+        this.deferred.forEach { it() }
         this.deferred.clear()
 
         val mappers = Mappers(
@@ -414,7 +414,7 @@ open class ObjectSchemaBuilderImpl<T : Any> : ObjectSchemaBuilder<T> {
     override val onDecode: MutableList<ObjectSchemaCodecBlock<T>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val deferred: MutableList<ObjectSchemaBuilderBlock<T>> = mutableListOf()
+    override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @AdvancedMonktApi
     override var constructor: ObjectSchemaConstructor<T>? = null // REQUIRED
@@ -424,7 +424,7 @@ open class ObjectSchemaBuilderImpl<T : Any> : ObjectSchemaBuilder<T> {
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): ObjectSchema<T> {
-        deferred.forEach { it(this) }
+        deferred.forEach { it() }
         deferred.clear()
         return ObjectSchemaImpl(
             constructor = constructor

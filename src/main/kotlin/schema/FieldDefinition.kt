@@ -174,7 +174,7 @@ interface FieldDefinitionBuilder<T : Any, M> :
     WithCoercersBuilder<M>,
     WithSchemaBuilder<M>,
     WithCodecBuilder<FieldDefinitionCodecBlock<T, M>>,
-    WithDeferredBuilder<FieldDefinitionBuilderBlock<T, M>> {
+    WithDeferredBuilder {
 
     /**
      * The name of the field.
