@@ -25,6 +25,8 @@ open class ScalarCoercerImpl<T>(
     override fun decode(bsonValue: BsonValue): T {
         return decoder.decode(bsonValue)
     }
+
+    override fun toString(): String = "ScalarCoercer(${types.joinToString(", ")})"
 }
 
 /**
@@ -57,6 +59,8 @@ open class MapCoercerImpl<T, U>(
         val uValue = coercer.decode(uBsonValue)
         return decodeMapper.map(uValue)
     }
+
+    override fun toString(): String = "MapCoercer($coercer)"
 }
 
 /**
@@ -195,6 +199,8 @@ open class ArraySchemaImpl<T>(
 
         return array
     }
+
+    override fun toString(): String = "ArraySchema($schema)"
 }
 
 /**
@@ -222,6 +228,8 @@ class DeterministicCoercerImpl<T>(
         return scope.value?.value
             ?: error("Deterministic Coercion Failed: got ${bsonValue.bsonType}")
     }
+
+    override fun toString(): String = "DeterministicCoercer()"
 }
 
 /**
@@ -250,6 +258,8 @@ open class ScalarSchemaImpl<T>(
     override fun encode(value: T): BsonValue {
         return encoder.encode(value)
     }
+
+    override fun toString(): String = "ScalarSchema(${types.joinToString(", ")})"
 }
 
 /**
@@ -285,6 +295,8 @@ open class EnumSchemaImpl<T>(
         }
         return bsonValue
     }
+
+    override fun toString(): String = "EnumSchema(${values.values.joinToString(", ")})"
 }
 
 /**
@@ -365,6 +377,8 @@ open class MapSchemaImpl<T, U>(
         val uBsonValue = schema.encode(uValue)
         return bsonDecodeMapper.map(uBsonValue)
     }
+
+    override fun toString(): String = "MapSchema($schema)"
 }
 
 /**
@@ -426,6 +440,8 @@ open class NullableSchemaImpl<T>(
             else -> schema.encode(value)
         }
     }
+
+    override fun toString(): String = "NullableSchema($schema)"
 }
 
 /**
@@ -566,6 +582,8 @@ open class FieldDefinitionImpl<T : Any, M>(
             ))
         }
     }
+
+    override fun toString(): String = "FieldDefinition($name, $schema)"
 }
 
 /**
@@ -673,4 +691,6 @@ open class ObjectSchemaImpl<T : Any>(
 
         return document
     }
+
+    override fun toString(): String = "ObjectSchema(${fields.joinToString(", ")})"
 }
