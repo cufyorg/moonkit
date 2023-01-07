@@ -130,6 +130,7 @@ typealias FieldDefinitionBuilderBlock<T, M> =
  * A block of code invoked to fill in options in
  * [FieldDefinitionMapperBuilder].
  */
+@OptIn(ExperimentalMonktApi::class)
 typealias FieldDefinitionMapperBuilderBlock<T, M, N> =
         FieldDefinitionMapperBuilder<T, M, N>.() -> Unit
 
@@ -214,6 +215,7 @@ interface FieldDefinitionBuilder<T : Any, M> :
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonktApi
 interface FieldDefinitionMapperBuilder<T : Any, M, N> :
     FieldDefinitionBuilder<T, N> {
     /**
@@ -266,6 +268,7 @@ fun <T : Any, M> FieldDefinitionBuilder(): FieldDefinitionBuilder<T, M> {
  *
  * @since 2.0.0
  */
+@ExperimentalMonktApi
 @OptIn(InternalMonktApi::class)
 fun <T : Any, M, N> FieldDefinitionMapperBuilder(): FieldDefinitionMapperBuilder<T, M, N> {
     return FieldDefinitionMapperBuilderImpl()
@@ -418,6 +421,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.set(
  * Set the given [block] to be the value encode
  * mapper.
  */
+@ExperimentalMonktApi
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.encodeMapper(
     block: Mapper<M, N>
@@ -431,6 +435,7 @@ fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.encodeMapper(
  * Set the given [block] to be the value decode
  * mapper.
  */
+@ExperimentalMonktApi
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.decodeMapper(
     block: Mapper<N, M>
@@ -444,6 +449,7 @@ fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.decodeMapper(
  * Set the given [block] to be the bson value
  * encode mapper.
  */
+@ExperimentalMonktApi
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.bsonEncodeMapper(
     block: BsonMapper<M, N>
@@ -457,6 +463,7 @@ fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.bsonEncodeMapper(
  * Set the given [block] to be the bson value
  * decode mapper.
  */
+@ExperimentalMonktApi
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.bsonDecodeMapper(
     block: BsonMapper<N, M>
@@ -553,6 +560,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M?>.unsetIfNull() {
  * @param block the mapped block.
  * @since 2.0.0
  */
+@ExperimentalMonktApi
 fun <T : Any, M, N> FieldDefinitionBuilder<T, M>.map(
     block: FieldDefinitionMapperBuilderBlock<T, M, N>
 ) {
