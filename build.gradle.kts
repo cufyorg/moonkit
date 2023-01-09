@@ -51,3 +51,18 @@ afterEvaluate {
         }
     }
 }
+
+subprojects {
+    group = "org.cufy.monkt"
+
+    afterEvaluate {
+        publishing {
+            publications {
+                create<MavenPublication>("maven") {
+                    from(components["java"])
+                    artifactId = project.name
+                }
+            }
+        }
+    }
+}

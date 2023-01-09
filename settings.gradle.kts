@@ -1,3 +1,3 @@
 rootProject.name = "monkt"
-include("bson")
-include("mongodb")
+include(":bson")
+include(":mongodb")
