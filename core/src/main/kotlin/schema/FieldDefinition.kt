@@ -308,7 +308,7 @@ fun <T : Any, M> FieldDefinition(
  */
 @Suppress("FunctionName")
 fun <T : Any, M> PropertyFieldDefinition(
-    property: KMutableProperty1<T, M>,
+    property: KMutableProperty1<in T, M>,
     schema: Schema<M>? = null,
     block: FieldDefinitionBuilderBlock<T, M> = {}
 ): FieldDefinition<T, M> {
@@ -349,7 +349,7 @@ fun <T : Any, M> FantomFieldDefinition(
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M> FieldDefinitionBuilder<T, M>.property(
-    property: KMutableProperty1<T, M>
+    property: KMutableProperty1<in T, M>
 ) {
     this.name = property.name
     this.getter = property.getter

@@ -208,7 +208,7 @@ fun <T : Any, M> ObjectSchemaBuilder<T>.field(
  * @since 2.0.0
  */
 fun <T : Any, M> ObjectSchemaBuilder<T>.field(
-    property: KMutableProperty1<T, M>,
+    property: KMutableProperty1<in T, M>,
     schema: Schema<M>? = null,
     block: FieldDefinitionBuilderBlock<T, M> = {}
 ) {
