@@ -350,6 +350,7 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
  * @author LSafer
  * @since 2.0.0
  */
+@OptIn(ExperimentalMonktApi::class)
 @InternalMonktApi
 open class FieldDefinitionMapperBuilderImpl<T : Any, M, N> :
     FieldDefinitionBuilderImpl<T, N>(),
