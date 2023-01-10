@@ -195,3 +195,40 @@ fun <T : Any> OptionScope<*, *, *>.count(
 ): SignalProperty<Long> {
     return count(model, document(filter))
 }
+
+/**
+ * Enqueue a signal to check if any document
+ * matches the given [filter].
+ *
+ * @param model the model to check on.
+ * @param filter the find filter.
+ * @return a delegate to the response of the signal.
+ * @see Model.exists
+ * @see OptionScope.enqueue
+ */
+fun <T : Any> OptionScope<*, *, *>.exists(
+    model: Model<T>,
+    filter: BsonDocument
+): SignalProperty<Boolean> {
+    val property = count(model, filter)
+    return property.then {
+        it > 0
+    }
+}
+
+/**
+ * Enqueue a signal to check if any document
+ * matches the given [filter].
+ *
+ * @param model the model to check on.
+ * @param filter the find filter.
+ * @return a delegate to the response of the signal.
+ * @see Model.exists
+ * @see OptionScope.enqueue
+ */
+fun <T : Any> OptionScope<*, *, *>.exists(
+    model: Model<T>,
+    filter: BsonDocumentBlock
+): SignalProperty<Boolean> {
+    return exists(model, document(filter))
+}
