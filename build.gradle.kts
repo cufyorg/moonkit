@@ -42,6 +42,11 @@ tasks.withType<KotlinCompile> {
 }
 
 afterEvaluate {
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
     publishing {
         publications {
             create<MavenPublication>("maven") {
@@ -54,6 +59,11 @@ afterEvaluate {
 
 subprojects {
     group = "org.cufy.monkt"
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
 
     afterEvaluate {
         publishing {
