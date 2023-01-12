@@ -15,6 +15,8 @@
  */
 package org.cufy.bson
 
+import org.bson.BsonRegularExpression
+
 /**
  * A type-safe container for a BSON document.
  *
@@ -137,6 +139,14 @@ typealias Decimal128 = org.bson.types.Decimal128
 typealias ObjectId = org.bson.types.ObjectId
 
 /**
+ * * A holder class for a BSON regular expression, so that we can delay compiling into a Pattern until necessary.
+ *
+ * @see BsonRegularExpression
+ * @since 2.0.0
+ */
+typealias BsonRegex = org.bson.BsonRegularExpression
+
+/**
  * Enumeration of all the BSON types currently supported.
  *
  * @see org.bson.BsonType
@@ -230,6 +240,14 @@ fun bint32(value: Int): BsonInt32 = BsonInt32(value)
 @BsonKeywordMarker
 fun bint64(value: Long): BsonInt64 = BsonInt64(value)
 
+/**
+ * Return a [BsonRegularExpression] with the given [value] and [options].
+ *
+ * @since 2.0.0
+ */
+@BsonKeywordMarker
+fun bregex(value: String, options: String = ""): BsonRegularExpression = BsonRegularExpression(value, options)
+
 //
 
 /**
@@ -288,3 +306,8 @@ val BsonInt64Type = BsonType.INT64
  * @since 3.4
  */
 val BsonDecimal128Type = BsonType.DECIMAL128
+
+/**
+ * A BSON regular expression.
+ */
+val BsonRegexType = BsonType.REGULAR_EXPRESSION
