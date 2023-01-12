@@ -66,6 +66,8 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.keys(
     configuration.keys.configure(block)
 }
 
+//
+
 /**
  * Configure the `partialFilterExpression` index
  * option with the given [block].
@@ -90,6 +92,75 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
 }
 
 /**
+ * Configure the `partialFilterExpression` index
+ * option of the given [pathname] with the given [block].
+ *
+ * If the current `partialFilterExpression` is not
+ * a [BsonDocument] then it will be replaced with
+ * a new [BsonDocument].
+ *
+ * If the current `partialFilterExpression[pathname]`
+ * is not a [BsonDocument] then it will be replaced
+ * with a new [BsonDocument].
+ */
+fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
+    pathname: Pathname,
+    block: BsonDocumentBlock
+) {
+    filter {
+        var filter = document["$pathname"]
+                as? BsonDocument
+
+        if (filter == null) {
+            filter = BsonDocument()
+            document["$pathname"] = filter
+        }
+
+        filter.configure(block)
+    }
+}
+
+/**
+ * Configure the `partialFilterExpression` index
+ * option of the given [relativeName] with the given [block].
+ *
+ * If the current `partialFilterExpression` is not
+ * a [BsonDocument] then it will be replaced with
+ * a new [BsonDocument].
+ *
+ * If the current `partialFilterExpression[relativeName]`
+ * is not a [BsonDocument] then it will be replaced
+ * with a new [BsonDocument].
+ */
+fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
+    relativeName: String,
+    block: BsonDocumentBlock
+) {
+    filter(pathname + relativeName, block)
+}
+
+/**
+ * Configure the `partialFilterExpression` index
+ * option of the given [relativeName] with the given [block].
+ *
+ * If the current `partialFilterExpression` is not
+ * a [BsonDocument] then it will be replaced with
+ * a new [BsonDocument].
+ *
+ * If the current `partialFilterExpression[relativeName]`
+ * is not a [BsonDocument] then it will be replaced
+ * with a new [BsonDocument].
+ */
+fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
+    relativeName: KCallable<*>,
+    block: BsonDocumentBlock
+) {
+    filter(relativeName.name, block)
+}
+
+//
+
+/**
  * Add an index key with the given [pathname] and [value].
  *
  * The resultant index will have the following
@@ -105,12 +176,12 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    pathname: Pathname, vararg types: BsonType
+    pathname: Pathname, vararg types: BsonType, value: BsonValue = bint32(1)
 ) {
-    keys { "$pathname" by bint32(1) }
+    keys { "$pathname" by value }
 
     if (types.isNotEmpty()) {
-        filter { "$pathname" by { `$type` by types.map { bint32(it.value) } } }
+        filter(pathname) { `$type` by types.map { bint32(it.value) } }
     }
 }
 
@@ -130,9 +201,9 @@ fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    relativeName: String, vararg types: BsonType
+    relativeName: String, vararg types: BsonType, value: BsonValue = bint32(1)
 ) {
-    key(pathname + relativeName, *types)
+    key(pathname + relativeName, *types, value = value)
 }
 
 /**
@@ -151,9 +222,9 @@ fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    relativeName: KCallable<*>, vararg types: BsonType
+    relativeName: KCallable<*>, vararg types: BsonType, value: BsonValue = bint32(1)
 ) {
-    key(relativeName.name, *types)
+    key(relativeName.name, *types, value = value)
 }
 
 // builder
@@ -183,6 +254,8 @@ fun <T : Any, M> WithOptionsBuilder<T, M>.index(
     }
 }
 
+//
+
 /**
  * Add a unique index from invoking the given [block].
  *
@@ -210,5 +283,21 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.unique(
 ) {
     unique {
         key(pathname, *types)
+    }
+}
+
+//
+
+/**
+ * Add a text index for this field.
+ *
+ * @param types targeted field types for this index. (using partial filter expression)
+ * @since 2.0.0
+ */
+fun <T : Any, M> FieldDefinitionBuilder<T, M>.text(
+    vararg types: BsonType,
+) {
+    index {
+        key(pathname, *types, value = bstring("text"))
     }
 }
