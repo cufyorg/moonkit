@@ -296,8 +296,11 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.unique(
  */
 fun <T : Any, M> FieldDefinitionBuilder<T, M>.text(
     vararg types: BsonType,
+    block: OptionBlock<Unit, Unit, IndexesBuilderConfiguration>
 ) {
     index {
         key(pathname, *types, value = bstring("text"))
+
+        block(it)
     }
 }
