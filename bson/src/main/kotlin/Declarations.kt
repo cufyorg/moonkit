@@ -15,7 +15,7 @@
  */
 package org.cufy.bson
 
-import org.bson.BsonRegularExpression
+import org.intellij.lang.annotations.Language
 
 /**
  * A type-safe container for a BSON document.
@@ -141,7 +141,7 @@ typealias ObjectId = org.bson.types.ObjectId
 /**
  * * A holder class for a BSON regular expression, so that we can delay compiling into a Pattern until necessary.
  *
- * @see BsonRegularExpression
+ * @see org.bson.BsonRegularExpression
  * @since 2.0.0
  */
 typealias BsonRegex = org.bson.BsonRegularExpression
@@ -241,12 +241,19 @@ fun bint32(value: Int): BsonInt32 = BsonInt32(value)
 fun bint64(value: Long): BsonInt64 = BsonInt64(value)
 
 /**
- * Return a [BsonRegularExpression] with the given [value] and [options].
+ * Return a [BsonRegex] with the given [value].
+ *
+ * @since 2.0.0
+ */
+fun bregex(@Language("RegExp") value: String): BsonRegex = BsonRegex(value)
+
+/**
+ * Return a [BsonRegex] with the given [value] and [options].
  *
  * @since 2.0.0
  */
 @BsonKeywordMarker
-fun bregex(value: String, options: String = ""): BsonRegularExpression = BsonRegularExpression(value, options)
+fun bregex(@Language("RegExp") value: String, options: String): BsonRegex = BsonRegex(value, options)
 
 //
 
