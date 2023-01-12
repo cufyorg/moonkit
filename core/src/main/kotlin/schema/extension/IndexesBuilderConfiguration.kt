@@ -285,22 +285,3 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.unique(
         key(pathname, *types)
     }
 }
-
-//
-
-/**
- * Add a text index for this field.
- *
- * @param types targeted field types for this index. (using partial filter expression)
- * @since 2.0.0
- */
-fun <T : Any, M> FieldDefinitionBuilder<T, M>.text(
-    vararg types: BsonType,
-    block: OptionBlock<Unit, Unit, IndexesBuilderConfiguration>
-) {
-    index {
-        key(pathname, *types, value = bstring("text"))
-
-        block(it)
-    }
-}
