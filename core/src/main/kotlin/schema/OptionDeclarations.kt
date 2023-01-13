@@ -384,6 +384,24 @@ suspend fun <T : Any, M, C, R> OptionScope<T, M, C>.then(
 }
 
 /**
+ * A shortcut function for calling [OptionScope.wait].
+ *
+ * This will invoke the given [block] then
+ * [OptionScope.wait] then return the value of
+ * the [block].
+ *
+ * @param block a block to be invoked after waiting.
+ * @return the value of the property returned from [block].
+ */
+suspend fun <T : Any, M, C, R> OptionScope<T, M, C>.by(
+    block: suspend OptionScope<T, M, C>.() -> SignalProperty<R>
+): R {
+    val value by block()
+    wait()
+    return value
+}
+
+/**
  * Allows to treat [SignalProperty] as a property delegate.
  *
  * @since 2.0.0
