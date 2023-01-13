@@ -226,6 +226,16 @@ open class BsonArrayBuilder(
     fun by(block: BsonDocumentBlock) {
         array += document(block)
     }
+
+    //
+
+    /**
+     * Put all the items in the given [list].
+     */
+    @BsonBuildMarker
+    fun byAll(list: List<BsonValue>) {
+        array += list
+    }
 }
 
 /**

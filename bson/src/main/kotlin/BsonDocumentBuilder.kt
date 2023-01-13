@@ -423,6 +423,16 @@ class BsonDocumentBuilder(
     infix fun KCallable<*>.by(block: BsonDocumentBlock) {
         name by block
     }
+
+    //
+
+    /**
+     * Put all the mappings in the given [map].
+     */
+    @BsonBuildMarker
+    fun byAll(map: Map<String, BsonValue>) {
+        document += map
+    }
 }
 
 /**
