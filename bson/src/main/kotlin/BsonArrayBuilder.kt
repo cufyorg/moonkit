@@ -234,7 +234,7 @@ open class BsonArrayBuilder(
      */
     @BsonBuildMarker
     fun byAll(list: List<BsonValue>) {
-        array += list
+        array.addAll(list)
     }
 }
 

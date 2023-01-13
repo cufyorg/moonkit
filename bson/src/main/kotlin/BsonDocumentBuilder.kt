@@ -431,7 +431,7 @@ class BsonDocumentBuilder(
      */
     @BsonBuildMarker
     fun byAll(map: Map<String, BsonValue>) {
-        document += map
+        document.putAll(map)
     }
 }
 
