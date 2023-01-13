@@ -15,6 +15,7 @@
  */
 package org.cufy.bson
 
+import java.math.BigDecimal
 import kotlin.reflect.KCallable
 
 /**
@@ -276,6 +277,31 @@ class BsonDocumentBuilder(
      */
     @BsonBuildMarker
     infix fun KCallable<*>.by(value: Decimal128?) {
+        name by value
+    }
+
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [bnull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDecimal128].
+     */
+    @BsonBuildMarker
+    infix fun String.by(value: BigDecimal?) {
+        document[this] = value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [bnull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDecimal128].
+     */
+    @BsonBuildMarker
+    infix fun KCallable<*>.by(value: BigDecimal?) {
         name by value
     }
 

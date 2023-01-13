@@ -15,6 +15,8 @@
  */
 package org.cufy.bson
 
+import java.math.BigDecimal
+
 /**
  * A block of code building a bson array.
  *
@@ -150,6 +152,18 @@ open class BsonArrayBuilder(
      */
     @BsonBuildMarker
     fun by(value: Decimal128?) {
+        array += value
+    }
+
+    /**
+     * Add the given [value].
+     *
+     * If [value] is null then [bnull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDecimal128].
+     */
+    @BsonBuildMarker
+    fun by(value: BigDecimal?) {
         array += value
     }
 

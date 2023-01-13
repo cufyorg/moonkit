@@ -15,6 +15,8 @@
  */
 package org.cufy.bson
 
+import java.math.BigDecimal
+
 /**
  * Construct a new bson document by copying the given map.
  */
@@ -129,6 +131,17 @@ operator fun BsonDocument.set(name: String, value: List<Id<*>>?) {
  */
 operator fun BsonDocument.set(name: String, value: Decimal128?) {
     put(name, value?.let { BsonDecimal128(it) } ?: bnull)
+}
+
+/**
+ * Set the field with the name [name] to the given [value].
+ *
+ * If [value] is null then [bnull] will be set instead.
+ *
+ * The given [value] will be wrapped with [BsonDecimal128].
+ */
+operator fun BsonDocument.set(name: String, value: BigDecimal?) {
+    put(name, value?.let { BsonDecimal128(Decimal128(it)) } ?: bnull)
 }
 
 //

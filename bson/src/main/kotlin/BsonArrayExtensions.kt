@@ -15,6 +15,8 @@
  */
 package org.cufy.bson
 
+import java.math.BigDecimal
+
 //
 
 /**
@@ -122,6 +124,17 @@ operator fun BsonArray.plusAssign(value: List<Id<*>>?) {
  */
 operator fun BsonArray.plusAssign(value: Decimal128?) {
     add(value?.let { BsonDecimal128(it) } ?: bnull)
+}
+
+/**
+ * Add the given [value].
+ *
+ * If [value] is null then [bnull] will be set instead.
+ *
+ * The given [value] will be wrapped with [BsonDecimal128].
+ */
+operator fun BsonArray.plusAssign(value: BigDecimal?) {
+    add(value?.let { BsonDecimal128(Decimal128(it)) } ?: bnull)
 }
 
 //
