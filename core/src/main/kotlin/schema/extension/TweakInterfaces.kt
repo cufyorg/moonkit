@@ -15,8 +15,10 @@
  */
 package org.cufy.monkt.schema.extension
 
+import org.cufy.bson.Pathname
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
+import kotlin.reflect.KCallable
 
 /*
  Important Note: these interface might change in
@@ -59,10 +61,57 @@ fun <C> WithFiltersTweak<C>.filter(block: ReturnOptionDataBlock<*, *, C, Boolean
 }
 
 /**
+ * Skip the options that are *not* in any of the
+ * given [pathnames].
+ */
+fun <C> WithFiltersTweak<C>.filter(vararg pathnames: Pathname) {
+    filter { pathname in pathnames }
+}
+
+/**
+ * Skip the options that are *not* in any of the
+ * given [pathnames].
+ */
+fun <C> WithFiltersTweak<C>.filter(vararg pathnames: String) {
+    filter { pathnames.any { pathname.contentEquals(it) } }
+}
+
+/**
+ * Skip the options that are *not* in any of the
+ * given [pathnames].
+ */
+fun <C> WithFiltersTweak<C>.filter(vararg pathnames: KCallable<*>) {
+    filter { pathnames.any { pathname.contentEquals(it.name) } }
+}
+
+/**
  * Skip the options that does satisfy the given
  * [block].
  */
-@OptIn(AdvancedMonktApi::class)
 fun <C> WithFiltersTweak<C>.skip(block: ReturnOptionDataBlock<*, *, C, Boolean>) {
-    filters += { !block() }
+    filter { !block() }
+}
+
+/**
+ * Skip the options that are in any of the given
+ * [pathnames].
+ */
+fun <C> WithFiltersTweak<C>.skip(vararg pathnames: Pathname) {
+    skip { pathname in pathnames }
+}
+
+/**
+ * Skip the options that are in any of the given
+ * [pathnames].
+ */
+fun <C> WithFiltersTweak<C>.skip(vararg pathnames: String) {
+    skip { pathnames.any { pathname.contentEquals(it) } }
+}
+
+/**
+ * Skip the options that are in any of the given
+ * [pathnames].
+ */
+fun <C> WithFiltersTweak<C>.skip(vararg pathnames: KCallable<*>) {
+    skip { pathnames.any { pathname.contentEquals(it.name) } }
 }
