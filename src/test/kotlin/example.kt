@@ -28,7 +28,7 @@ class ExampleTest {
     @AfterEach
     fun cleanup() {
         runBlocking {
-            monkt.getDatabase().dropSuspend()
+            monkt.database().dropSuspend()
             monkt.shutdown()
         }
     }
@@ -61,7 +61,7 @@ class ExampleTest {
 
             instance.save()
 
-            val source = Model1.getCollection().findSuspend().single()
+            val source = Model1.collection().findSuspend().single()
 
             assertEquals(setOf("_id"), source.keys)
         }
@@ -100,7 +100,7 @@ class ExampleTest {
 
             instance.save()
 
-            val source = Model1.getCollection().findSuspend().single()
+            val source = Model1.collection().findSuspend().single()
 
             assertEquals(setOf("_id", "value"), source.keys)
             assertEquals(source["value"], bnull)
@@ -131,7 +131,7 @@ class ExampleTest {
 
             instance.save()
 
-            val source0 = Model1.getCollection().findOneSuspend({ "_id" by instance._id })!!
+            val source0 = Model1.collection().findOneSuspend({ "_id" by instance._id })!!
 
             assertEquals(bstring("Alpha"), source0["value"])
 
@@ -139,7 +139,7 @@ class ExampleTest {
 
             instance.save()
 
-            val source1 = Model1.getCollection().findOneSuspend({ "_id" by instance._id })!!
+            val source1 = Model1.collection().findOneSuspend({ "_id" by instance._id })!!
 
             assertEquals(bstring("Alpha"), source1["value"])
         }
@@ -200,7 +200,7 @@ class ExampleTest {
         runBlocking {
             monkt.init()
 
-            Model1.getCollection().insertManySuspend(
+            Model1.collection().insertManySuspend(
                 { "name" by "A"; "value" by "0" },
                 { "name" by "A"; "value" by "1" },
                 { "name" by "B"; "value" by "2" },

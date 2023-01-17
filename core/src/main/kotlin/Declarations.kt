@@ -45,7 +45,7 @@ open class Monkt {
      * uses this monkt instance.
      */
     @OptIn(InternalMonktApi::class)
-    suspend fun getClient(): MonktClient {
+    suspend fun client(): MonktClient {
         return deferredClient.await()
     }
 
@@ -54,7 +54,7 @@ open class Monkt {
      * uses this monkt instance.
      */
     @OptIn(InternalMonktApi::class)
-    suspend fun getDatabase(): MonktDatabase {
+    suspend fun database(): MonktDatabase {
         return deferredDatabase.await()
     }
 
@@ -63,14 +63,14 @@ open class Monkt {
      * uses this monkt instance.
      */
     @ExperimentalMonktApi("Blocking property")
-    val client: MonktClient get() = runBlocking { getClient() }
+    val client: MonktClient get() = runBlocking { client() }
 
     /**
      * The database to be used by the models that
      * uses this monkt instance.
      */
     @ExperimentalMonktApi("Blocking property")
-    val database: MonktDatabase get() = runBlocking { getDatabase() }
+    val database: MonktDatabase get() = runBlocking { database() }
 
     /**
      * True, if this instance was shutdown.
@@ -188,7 +188,7 @@ open class Model<T : Any>(
      * @since 2.0.0
      */
     @OptIn(InternalMonktApi::class)
-    suspend fun getMonkt(): Monkt {
+    suspend fun monkt(): Monkt {
         return deferredMonkt.await()
     }
 
@@ -197,8 +197,8 @@ open class Model<T : Any>(
      *
      * @since 2.0.0
      */
-    suspend fun getCollection(): MonktCollection {
-        return getMonkt().getDatabase().getCollection(name)
+    suspend fun collection(): MonktCollection {
+        return monkt().database().getCollection(name)
     }
 
     /**
@@ -207,7 +207,7 @@ open class Model<T : Any>(
      * @since 2.0.0
      */
     @ExperimentalMonktApi("Blocking property")
-    val monkt: Monkt get() = runBlocking { getMonkt() }
+    val monkt: Monkt get() = runBlocking { monkt() }
 
     /**
      * The monkt instance.
@@ -215,7 +215,7 @@ open class Model<T : Any>(
      * @since 2.0.0
      */
     @ExperimentalMonktApi("Blocking property")
-    val collection: MonktCollection get() = runBlocking { getCollection() }
+    val collection: MonktCollection get() = runBlocking { collection() }
 }
 
 /**
