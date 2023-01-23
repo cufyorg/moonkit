@@ -59,49 +59,6 @@ open class ScalarCoercerBuilderImpl<T> : ScalarCoercerBuilder<T> {
 }
 
 /**
- * A builder for creating a [MapCoercer]
- *
- * @author LSafer
- * @since 2.0.0
- */
-@InternalMonktApi
-open class MapCoercerBuilderImpl<T, U> : MapCoercerBuilder<T, U> {
-    @AdvancedMonktApi
-    override val deferred: MutableList<() -> Unit> = mutableListOf()
-
-    /**
-     * The wrapped coercer.
-     */
-    @AdvancedMonktApi
-    override var coercer: Coercer<out U>? = null // REQUIRED
-
-    /**
-     * Transforms runtime values of type `U` to `T`
-     */
-    @AdvancedMonktApi
-    override var decodeMapper: Mapper<U, T>? = null // REQUIRED
-
-    /**
-     * Transforms bson values of type `T` to `U`
-     */
-    @AdvancedMonktApi
-    override var bsonEncodeMapper: BsonMapper<T, U> = BsonMapper { it }
-
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
-    override fun build(): MapCoercer<T, U> {
-        deferred.forEach { it() }
-        deferred.clear()
-        return MapCoercerImpl(
-            coercer = coercer
-                ?: error("coercer is required but was not provided"),
-            decodeMapper = decodeMapper
-                ?: error("decodeMapper is required but was not provided"),
-            bsonEncodeMapper = bsonEncodeMapper
-        )
-    }
-}
-
-/**
  * A builder for creating an [ArraySchema]
  *
  * @author LSafer
@@ -216,61 +173,6 @@ open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
         deferred.clear()
         return EnumSchemaImpl(
             values = values.toMap()
-        )
-    }
-}
-
-/**
- * A builder for creating a [MapSchema]
- *
- * @author LSafer
- * @since 2.0.0
- */
-@InternalMonktApi
-open class MapSchemaBuilderImpl<T, U> : MapSchemaBuilder<T, U> {
-    @AdvancedMonktApi
-    override var schema: Lazy<Schema<U>>? = null // REQUIRED
-
-    @AdvancedMonktApi
-    override val deferred: MutableList<() -> Unit> = mutableListOf()
-
-    /**
-     * Transforms runtime values of type `T` to `U`
-     */
-    @AdvancedMonktApi
-    override var encodeMapper: Mapper<T, U>? = null // REQUIRED
-
-    /**
-     * Transforms runtime values of type `U` to `T`
-     */
-    @AdvancedMonktApi
-    override var decodeMapper: Mapper<U, T>? = null // REQUIRED
-
-    /**
-     * Transforms bson values of type `T` to `U`
-     */
-    @AdvancedMonktApi
-    override var bsonEncodeMapper: BsonMapper<T, U> = BsonMapper { it }
-
-    /**
-     * Transforms bson values of type `U` to `T`
-     */
-    @AdvancedMonktApi
-    override var bsonDecodeMapper: BsonMapper<U, T> = BsonMapper { it }
-
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
-    override fun build(): MapSchema<T, U> {
-        deferred.forEach { it() }
-        deferred.clear()
-        return MapSchemaImpl(
-            lazySchema = schema
-                ?: error("schema is required but was not provided"),
-            encodeMapper = encodeMapper
-                ?: error("mapEncoder is required but was not provided"),
-            decodeMapper = decodeMapper
-                ?: error("mapDecoder function is required but was not provided"),
-            bsonEncodeMapper = bsonEncodeMapper,
-            bsonDecodeMapper = bsonDecodeMapper
         )
     }
 }

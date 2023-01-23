@@ -127,14 +127,6 @@ typealias FieldDefinitionBuilderBlock<T, M> =
         FieldDefinitionBuilder<T, M>.() -> Unit
 
 /**
- * A block of code invoked to fill in options in
- * [FieldDefinitionMapperBuilder].
- */
-@OptIn(ExperimentalMonktApi::class)
-typealias FieldDefinitionMapperBuilderBlock<T, M, N> =
-        FieldDefinitionMapperBuilder<T, M, N>.() -> Unit
-
-/**
  * A scope passed to field definition operation
  * listeners.
  *
@@ -209,51 +201,6 @@ interface FieldDefinitionBuilder<T : Any, M> :
 }
 
 /**
- * A builder for applying a mapped
- * [FieldDefinition] configuration.
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonktApi
-interface FieldDefinitionMapperBuilder<T : Any, M, N> :
-    FieldDefinitionBuilder<T, N> {
-    /**
-     * Transforms runtime values of type `M` to `N`
-     */
-    @AdvancedMonktApi("Use `encodeMapper()` instead")
-    var encodeMapper: Mapper<M, N>? // REQUIRED
-
-    /**
-     * Transforms runtime values of type `N` to `M`
-     */
-    @AdvancedMonktApi("Use `decodeMapper()` instead")
-    var decodeMapper: Mapper<N, M>? // REQUIRED
-
-    /**
-     * Transforms bson values of type `M` to `N`
-     */
-    @AdvancedMonktApi("Use `bsonEncodeMapper()` instead")
-    var bsonEncodeMapper: BsonMapper<M, N>
-
-    /**
-     * Transforms bson values of type `N` to `M`
-     */
-    @AdvancedMonktApi("Use `bsonDecodeMapper()` instead")
-    var bsonDecodeMapper: BsonMapper<N, M>
-
-    /**
-     * Apply this definition to the given [builder].
-     *
-     * This will invoke the deferred code and
-     * removes it.
-     *
-     * @since 2.0.0
-     */
-    fun applyTo(builder: FieldDefinitionBuilder<T, M>)
-}
-
-/**
  * Obtain a new [FieldDefinitionBuilder].
  *
  * @since 2.0.0
@@ -261,17 +208,6 @@ interface FieldDefinitionMapperBuilder<T : Any, M, N> :
 @OptIn(InternalMonktApi::class)
 fun <T : Any, M> FieldDefinitionBuilder(): FieldDefinitionBuilder<T, M> {
     return FieldDefinitionBuilderImpl()
-}
-
-/**
- * Obtain a new [FieldDefinitionMapperBuilder].
- *
- * @since 2.0.0
- */
-@ExperimentalMonktApi
-@OptIn(InternalMonktApi::class)
-fun <T : Any, M, N> FieldDefinitionMapperBuilder(): FieldDefinitionMapperBuilder<T, M, N> {
-    return FieldDefinitionMapperBuilderImpl()
 }
 
 /**
@@ -415,62 +351,6 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.set(
     setter = block
 }
 
-// encodeMapper
-
-/**
- * Set the given [block] to be the value encode
- * mapper.
- */
-@ExperimentalMonktApi
-@OptIn(AdvancedMonktApi::class)
-fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.encodeMapper(
-    block: Mapper<M, N>
-) {
-    encodeMapper = block
-}
-
-// decodeMapper
-
-/**
- * Set the given [block] to be the value decode
- * mapper.
- */
-@ExperimentalMonktApi
-@OptIn(AdvancedMonktApi::class)
-fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.decodeMapper(
-    block: Mapper<N, M>
-) {
-    decodeMapper = block
-}
-
-// bsonEncodeMapper
-
-/**
- * Set the given [block] to be the bson value
- * encode mapper.
- */
-@ExperimentalMonktApi
-@OptIn(AdvancedMonktApi::class)
-fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.bsonEncodeMapper(
-    block: BsonMapper<M, N>
-) {
-    bsonEncodeMapper = block
-}
-
-// bsonDecodeMapper
-
-/**
- * Set the given [block] to be the bson value
- * decode mapper.
- */
-@ExperimentalMonktApi
-@OptIn(AdvancedMonktApi::class)
-fun <T : Any, M, N> FieldDefinitionMapperBuilder<T, M, N>.bsonDecodeMapper(
-    block: BsonMapper<N, M>
-) {
-    bsonDecodeMapper = block
-}
-
 //
 
 /**
@@ -547,24 +427,4 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.unsetIf(
  */
 fun <T : Any, M> FieldDefinitionBuilder<T, M?>.unsetIfNull() {
     unsetIf { value == null }
-}
-
-/**
- * Apply the configuration in the given [block] to
- * this field definition.
- *
- * Required:
- * - [encodeMapper]
- * - [decodeMapper]
- *
- * @param block the mapped block.
- * @since 2.0.0
- */
-@ExperimentalMonktApi
-fun <T : Any, M, N> FieldDefinitionBuilder<T, M>.map(
-    block: FieldDefinitionMapperBuilderBlock<T, M, N>
-) {
-    val builder = FieldDefinitionMapperBuilder<T, M, N>()
-    builder.apply(block)
-    builder.applyTo(this)
 }
