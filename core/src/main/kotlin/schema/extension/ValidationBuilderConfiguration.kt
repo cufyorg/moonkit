@@ -149,37 +149,6 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.required(
 }
 
 /**
- * Add a validator that insures no other document
- * has the same value as the value of this field.
- */
-@OptIn(AdvancedMonktApi::class)
-@Deprecated("Use `unique` instead. This validator is unnecessary")
-fun <T : Any, M> FieldDefinitionBuilder<T, M>.singleton(
-    block: ReturnOptionBlock<T, M?, ValidationBuilderConfiguration, Boolean> = { true }
-) {
-    validate {
-        val shouldSingleton = block(it)
-
-        if (!shouldSingleton)
-            return@validate true
-
-        val root = root
-        val pathname = pathname
-        val schema = fieldDefinition.schema
-        val model = model
-
-        val id = Document.getId(root)
-
-        val duplicateCount by count(model) {
-            "_id" by { `$ne` by id }
-            "$pathname" by schema.encode(value)
-        }
-
-        then { duplicateCount <= 0 }
-    }
-}
-
-/**
  * Add a validator that insures the id is pointing
  * to a valid document.
  *
