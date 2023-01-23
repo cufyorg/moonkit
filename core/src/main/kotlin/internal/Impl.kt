@@ -51,6 +51,8 @@ open class ArraySchemaImpl<T>(
         pathname: Pathname,
         dejaVu: Set<Schema<*>>
     ): List<OptionData<Unit, Unit, *>> {
+        val declaration = this
+
         val subOptions = when (val schema = schema) {
             is ElementSchema<T> ->
                 schema.obtainStaticOptions(model, pathname, dejaVu)
@@ -58,7 +60,7 @@ open class ArraySchemaImpl<T>(
         }
 
         return subOptions + staticOptions.map { option ->
-            OptionData(model, pathname, option)
+            OptionData(model, pathname, declaration, option)
         }
     }
 
@@ -69,6 +71,8 @@ open class ArraySchemaImpl<T>(
         pathname: Pathname,
         instance: List<T>
     ): List<OptionData<*, *, *>> {
+        val declaration = this
+
         val subOptions = when (val schema = schema) {
             is ElementSchema<T> ->
                 instance.filterNotNull().flatMapIndexed { index, item ->
@@ -80,7 +84,7 @@ open class ArraySchemaImpl<T>(
         }
 
         return subOptions + options.map { option ->
-            OptionData(model, root, pathname, this, instance, instance, option)
+            OptionData(model, root, pathname, declaration, instance, instance, option)
         }
     }
 
@@ -353,15 +357,17 @@ open class FieldDefinitionImpl<T : Any, M>(
         dejaVu: Set<Schema<*>>
     ): List<OptionData<Unit, Unit, *>> {
         val subPathname = pathname + name
+        val schema = schema
+        val declaration = this
 
-        val subOptions = when (val schema = schema) {
+        val subOptions = when (schema) {
             is ElementSchema<M> ->
                 schema.obtainStaticOptions(model, subPathname, dejaVu)
             else -> emptyList()
         }
 
         return subOptions + staticOptions.map { option ->
-            OptionData(model, subPathname, option)
+            OptionData(model, subPathname, declaration, option)
         }
     }
 
@@ -375,6 +381,7 @@ open class FieldDefinitionImpl<T : Any, M>(
         val value = getter(instance)
         val subPathname = pathname + name
         val schema = schema
+        val declaration = this
 
         val subOptions = when {
             schema is ElementSchema<M> && value != null ->
@@ -383,7 +390,7 @@ open class FieldDefinitionImpl<T : Any, M>(
         }
 
         return subOptions + options.map { option ->
-            OptionData(model, root, subPathname, schema, instance, value, option)
+            OptionData(model, root, subPathname, declaration, instance, value, option)
         }
     }
 
@@ -484,13 +491,14 @@ open class ObjectSchemaImpl<T : Any>(
             return emptyList()
 
         val subDejaVu = dejaVu + this
+        val declaration = this
 
         val subOptions = fields.flatMap {
             it.obtainStaticOptions(model, pathname, subDejaVu)
         }
 
         return subOptions + staticOptions.map { option ->
-            OptionData(model, pathname, option)
+            OptionData(model, pathname, declaration, option)
         }
     }
 
@@ -501,12 +509,14 @@ open class ObjectSchemaImpl<T : Any>(
         pathname: Pathname,
         instance: T
     ): List<OptionData<*, *, *>> {
+        val declaration = this
+
         val subOptions = fields.flatMap {
             it.obtainOptions(model, root, pathname, instance)
         }
 
         return subOptions + options.map { option ->
-            OptionData(model, root, pathname, this, instance, instance, option)
+            OptionData(model, root, pathname, declaration, instance, instance, option)
         }
     }
 

@@ -38,7 +38,7 @@ fun <T : Any, M, C> OptionScope(
     return object : OptionScope<T, M, C> {
         override val model: Model<*> = option.model
         override val root: Any = option.root
-        override val schema: Schema<M> = option.schema
+        override val declaration: Any = option.declaration
         override val instance: T = option.instance
         override val value: M = option.value
         override val pathname: Pathname = option.pathname

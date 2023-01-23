@@ -165,7 +165,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.singleton(
 
         val root = root
         val pathname = pathname
-        val schema = schema
+        val schema = fieldDefinition.schema
         val model = model
 
         val id = Document.getId(root)

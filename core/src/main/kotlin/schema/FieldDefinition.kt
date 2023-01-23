@@ -279,6 +279,14 @@ fun <T : Any, M> FantomFieldDefinition(
 
 //
 
+@Suppress("UNCHECKED_CAST")
+@OptIn(AdvancedMonktApi::class)
+val <T : Any, M, C> OptionScope<T, M, C>.fieldDefinition: FieldDefinition<T, M>
+    get() = declaration as? FieldDefinition<T, M>
+        ?: error("Option was not declared in a FieldDefinition")
+
+//
+
 /**
  * Set the name, setter and getter of the definition
  * from the given [property].

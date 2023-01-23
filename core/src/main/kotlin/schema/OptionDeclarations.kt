@@ -105,11 +105,6 @@ interface OptionScope<T : Any, M, C> {
     val root: Any
 
     /**
-     * The schema of the [value].
-     */
-    val schema: Schema<M>
-
-    /**
      * The instance executing on.
      */
     val instance: T
@@ -131,6 +126,12 @@ interface OptionScope<T : Any, M, C> {
      * to this field and separated by a dot `.`
      */
     val pathname: Pathname
+
+    /**
+     * The declaration the option was in. (FieldDefinition, ObjectSchema, etc.)
+     */
+    @AdvancedMonktApi("Use the extensions provided with the declaration")
+    val declaration: Any
 
     /**
      * The actual option scope.
@@ -282,9 +283,9 @@ class OptionData<T : Any, M, C>(
      */
     val pathname: Pathname,
     /**
-     * The schema of the [value].
+     * The declaration the option was in.
      */
-    val schema: Schema<M>,
+    val declaration: Any,
     /**
      * The option's instance.
      *
@@ -323,7 +324,7 @@ class OptionData<T : Any, M, C>(
  * @param model the container model.
  * @param root the root instance.
  * @param pathname the path to the option.
- * @param schema the schema for the value.
+ * @param declaration the declaration the option was in.
  * @param instance the option's instance.
  * @param value the option's value.
  * @param option the option object.
@@ -332,7 +333,7 @@ fun <T : Any, M, C> OptionData(
     model: Model<*>,
     root: Any,
     pathname: Pathname,
-    schema: Schema<M>,
+    declaration: Any,
     instance: T,
     value: M,
     option: Option<T, M, C>
@@ -340,7 +341,7 @@ fun <T : Any, M, C> OptionData(
     model,
     root,
     pathname,
-    schema,
+    declaration,
     instance,
     value,
     option.configuration,
@@ -353,17 +354,19 @@ fun <T : Any, M, C> OptionData(
  *
  * @param model the container model.
  * @param pathname the path to the option.
+ * @param declaration the declaration the option was in.
  * @param option the option object.
  */
 fun <C> OptionData(
     model: Model<*>,
     pathname: Pathname,
+    declaration: Any,
     option: Option<Unit, Unit, C>
 ) = OptionData(
     model,
     Unit,
     pathname,
-    UnitSchema,
+    declaration,
     Unit,
     Unit,
     option.configuration,

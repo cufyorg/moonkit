@@ -127,3 +127,11 @@ fun <T> ArraySchema(
     builder.apply(block)
     return builder.build()
 }
+
+//
+
+@Suppress("UNCHECKED_CAST")
+@OptIn(AdvancedMonktApi::class)
+val <T, C> OptionScope<List<T>, List<T>, C>.arraySchema: ArraySchema<T>
+    get() = declaration as? ArraySchema<T>
+        ?: error("Option was not declared in an ArraySchema")

@@ -154,6 +154,14 @@ fun <T : Any> ObjectSchema(
     return builder.build()
 }
 
+//
+
+@Suppress("UNCHECKED_CAST")
+@OptIn(AdvancedMonktApi::class)
+val <T : Any, C> OptionScope<T, T, C>.objectSchema: ObjectSchema<T>
+    get() = declaration as? ObjectSchema<T>
+        ?: error("Option was not declared in an ObjectSchema")
+
 // constructor
 
 /**
