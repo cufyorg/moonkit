@@ -306,7 +306,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.property(
 ) {
     this.name = property.name
     // check for `isOpen` just in case a property was overridden by a lateinit
-    if (property.isLateinit || property.isOpen)
+    if (property.isLateinit || property.isOpen || property.isAbstract)
         this.getter = {
             try {
                 property.get(it)
