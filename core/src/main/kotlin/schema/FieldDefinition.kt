@@ -171,8 +171,9 @@ open class FieldDefinitionCodecScope<T : Any, M>(
  * @since 2.0.0
  */
 interface FieldDefinitionBuilder<T : Any, M> :
-    WithOptionsBuilder<T, M>,
-    WithCoercersBuilder<M>,
+    WithOptionsBuilder<T, M?>,
+    WithDecodersBuilder<M>,
+    WithEncodersBuilder<M>,
     WithSchemaBuilder<M>,
     WithCodecBuilder<FieldDefinitionCodecBlock<T, M>>,
     WithDeferredBuilder {

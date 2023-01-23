@@ -31,46 +31,60 @@ import kotlin.math.roundToLong
 ==================================================*/
 
 /**
- * The block of [DeterministicCoercer].
+ * The block of [DeterministicDecoder].
  */
-typealias DeterministicCoercerBlock<T> =
-        DeterministicCoercerScope<T>.(BsonValue) -> Unit
+typealias DeterministicDecoderBlock<T> =
+        DeterministicDecoderScope<T>.(BsonValue) -> Unit
 
 /**
- * A scope for [DeterministicCoercerBlock].
+ * A scope for [DeterministicDecoderBlock].
  *
  * @author LSafer
  * @since 2.0.0
  */
-class DeterministicCoercerScope<T> {
+class DeterministicDecoderScope<T> {
     /**
-     * The coerced value. Or null if coercion fail.
+     * The decoded value. Or null if decoding fail.
      */
-    internal var value: Lazy<T>? = null
+    private var lazyValue: Lazy<T>? = null
 
     /**
-     * Indicate coercion success with the coercion
+     * Indicate decoding success with the decoding
      * result being the result of invoking the
      * given [block].
      */
     fun decodeTo(block: () -> T) {
-        value = lazy(block)
+        lazyValue = lazy(block)
     }
+
+    /**
+     * Check if the decoding succeeded.
+     */
+    val isDecoded: Boolean
+        get() = lazyValue != null
+
+    /**
+     * Return the decoded value.
+     */
+    val decodedValue: T
+        get() = lazyValue
+            .let { it ?: error("Deterministic Decoding Failed") }
+            .value
 }
 
 /**
- * Construct a coercer to be used to safely create
- * a coercer with only one [block].
+ * Construct a decoder to be used to safely create
+ * a decoder with only one [block].
  *
- * @param block the coercing block.
+ * @param block the decoding block.
  * @since 2.0.0
  */
 @OptIn(InternalMonktApi::class)
 @Suppress("FunctionName")
-fun <T> DeterministicCoercer(
-    block: DeterministicCoercerBlock<T>
-): Coercer<T> {
-    return DeterministicCoercerImpl(block)
+fun <T> DeterministicDecoder(
+    block: DeterministicDecoderBlock<T>
+): Decoder<T> {
+    return DeterministicDecoderImpl(block)
 }
 
 /*==================================================
@@ -81,9 +95,9 @@ fun <T> DeterministicCoercer(
 // Id BigDecimal
 
 /**
- * Standard coercing algorithm for type [String].
+ * Standard decoding algorithm for type [String].
  */
-val StandardStringCoercer: ScalarCoercer<String> = ScalarCoercer {
+val StandardStringDecoder: ScalarDecoder<String> = ScalarDecoder {
     expect(BsonStringType, BsonBooleanType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type, BsonObjectIdType)
     deterministic {
         when (it) {
@@ -99,9 +113,9 @@ val StandardStringCoercer: ScalarCoercer<String> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [Boolean]
+ * Standard decoding algorithm for type [Boolean]
  */
-val StandardBooleanCoercer: ScalarCoercer<Boolean> = ScalarCoercer {
+val StandardBooleanDecoder: ScalarDecoder<Boolean> = ScalarDecoder {
     expect(BsonStringType, BsonBooleanType)
     deterministic {
         when (it) {
@@ -112,9 +126,9 @@ val StandardBooleanCoercer: ScalarCoercer<Boolean> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [Int]
+ * Standard decoding algorithm for type [Int]
  */
-val StandardInt32Coercer: ScalarCoercer<Int> = ScalarCoercer {
+val StandardInt32Decoder: ScalarDecoder<Int> = ScalarDecoder {
     expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
     deterministic {
         when (it) {
@@ -128,9 +142,9 @@ val StandardInt32Coercer: ScalarCoercer<Int> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [Long]
+ * Standard decoding algorithm for type [Long]
  */
-val StandardInt64Coercer: ScalarCoercer<Long> = ScalarCoercer {
+val StandardInt64Decoder: ScalarDecoder<Long> = ScalarDecoder {
     expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
     deterministic {
         when (it) {
@@ -144,9 +158,9 @@ val StandardInt64Coercer: ScalarCoercer<Long> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [Double]
+ * Standard decoding algorithm for type [Double]
  */
-val StandardDoubleCoercer: ScalarCoercer<Double> = ScalarCoercer {
+val StandardDoubleDecoder: ScalarDecoder<Double> = ScalarDecoder {
     expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
     deterministic {
         when (it) {
@@ -160,9 +174,9 @@ val StandardDoubleCoercer: ScalarCoercer<Double> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [Decimal128]
+ * Standard decoding algorithm for type [Decimal128]
  */
-val StandardDecimal128Coercer: ScalarCoercer<Decimal128> = ScalarCoercer {
+val StandardDecimal128Decoder: ScalarDecoder<Decimal128> = ScalarDecoder {
     expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
     deterministic {
         when (it) {
@@ -176,9 +190,9 @@ val StandardDecimal128Coercer: ScalarCoercer<Decimal128> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [ObjectId]
+ * Standard decoding algorithm for type [ObjectId]
  */
-val StandardObjectIdCoercer: ScalarCoercer<ObjectId> = ScalarCoercer {
+val StandardObjectIdDecoder: ScalarDecoder<ObjectId> = ScalarDecoder {
     expect(BsonStringType, BsonObjectIdType)
     deterministic {
         when (it) {
@@ -196,7 +210,7 @@ val StandardObjectIdCoercer: ScalarCoercer<ObjectId> = ScalarCoercer {
  *
  * @since 2.0.0
  */
-val StandardIdCoercer: ScalarCoercer<Id<Any>> = StandardIdCoercer()
+val StandardIdDecoder: ScalarDecoder<Id<Any>> = StandardIdDecoder()
 
 /**
  * A schema for [Id] and both [BsonObjectId] and [BsonString].
@@ -204,7 +218,7 @@ val StandardIdCoercer: ScalarCoercer<Id<Any>> = StandardIdCoercer()
  * @since 2.0.0
  */
 @Suppress("FunctionName")
-fun <T> StandardIdCoercer(): ScalarCoercer<Id<T>> = ScalarCoercer {
+fun <T> StandardIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
     expect(BsonObjectIdType, BsonStringType)
     deterministic {
         when (it) {
@@ -215,9 +229,9 @@ fun <T> StandardIdCoercer(): ScalarCoercer<Id<T>> = ScalarCoercer {
 }
 
 /**
- * Standard coercing algorithm for type [BigDecimal]
+ * Standard decoding algorithm for type [BigDecimal]
  */
-val StandardBigDecimalCoercer: ScalarCoercer<BigDecimal> = ScalarCoercer {
+val StandardBigDecimalDecoder: ScalarDecoder<BigDecimal> = ScalarDecoder {
     expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
     deterministic {
         when (it) {
@@ -233,19 +247,19 @@ val StandardBigDecimalCoercer: ScalarCoercer<BigDecimal> = ScalarCoercer {
 //
 
 /**
- * More lenient coercing algorithm for type [Id].
+ * More lenient decoding algorithm for type [Id].
  *
- * If `null` or `undefined` coerce to a new Id.
+ * If `null` or `undefined` decode to a new Id.
  */
-val LenientIdCoercer: ScalarCoercer<Id<Any>> = LenientIdCoercer()
+val LenientIdDecoder: ScalarDecoder<Id<Any>> = LenientIdDecoder()
 
 /**
- * More lenient coercing algorithm for type [Id].
+ * More lenient decoding algorithm for type [Id].
  *
- * If `null` or `undefined` coerce to a new Id.
+ * If `null` or `undefined` decode to a new Id.
  */
 @Suppress("FunctionName")
-fun <T> LenientIdCoercer(): ScalarCoercer<Id<T>> = ScalarCoercer {
+fun <T> LenientIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
     expect(BsonStringType, BsonObjectIdType, BsonUndefinedType, BsonNullType)
     deterministic {
         when (it) {

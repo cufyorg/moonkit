@@ -19,40 +19,37 @@ import org.cufy.bson.BsonType
 import org.cufy.bson.BsonValue
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
-import java.util.function.Predicate
 
 /**
- * A builder for creating a [ScalarCoercer]
+ * A builder for creating a [ScalarDecoder]
  *
  * @author LSafer
  * @since 2.0.0
  */
 @InternalMonktApi
-open class ScalarCoercerBuilderImpl<T> : ScalarCoercerBuilder<T> {
-    @AdvancedMonktApi
-    override var decoder: Decoder<out T>? = null // REQUIRED
-
+open class ScalarDecoderBuilderImpl<T> : ScalarDecoderBuilder<T> {
     @AdvancedMonktApi
     override var types: MutableList<BsonType> = mutableListOf()
 
     @AdvancedMonktApi
-    override val predicate: MutableList<Predicate<BsonValue>> = mutableListOf()
+    override val canDecodeBlocks: MutableList<(BsonValue) -> Boolean> = mutableListOf()
+
+    @AdvancedMonktApi
+    override var decodeBlock: ((BsonValue) -> T)? = null
 
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @OptIn(AdvancedMonktApi::class)
-    override fun build(): ScalarCoercer<T> {
+    override fun build(): ScalarDecoder<T> {
         deferred.forEach { it() }
         deferred.clear()
-        return ScalarCoercerImpl(
+        return ScalarDecoderImpl(
             types = types.toList(),
-            decoder = decoder
-                ?: error("decoder is required but was not provided"),
-            predicate = predicate.toList().let {
-                Predicate { bsonValue ->
-                    it.any { it.test(bsonValue) }
-                }
+            decodeBlock = decodeBlock
+                ?: error("decodeBlock is required but was not provided"),
+            canDecodeBlock = canDecodeBlocks.toList().let {
+                { bsonValue -> it.any { it(bsonValue) } }
             }
         )
     }
@@ -73,10 +70,16 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
     override val staticOptions: MutableList<Option<Unit, Unit, *>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val coercers: MutableList<Coercer<out T>> = mutableListOf()
+    override val decoders: MutableList<Decoder<out T>> = mutableListOf()
 
     @AdvancedMonktApi
     override var finalDecoder: Decoder<out T>? = null
+
+    @AdvancedMonktApi
+    override val encoders: MutableList<Encoder<in T>> = mutableListOf()
+
+    @AdvancedMonktApi
+    override var finalEncoder: Encoder<in T>? = null
 
     @AdvancedMonktApi
     override var schema: Lazy<Schema<T>>? = null // REQUIRED
@@ -99,8 +102,10 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
                 ?: error("schema is required but was not provided"),
             options = options.toList(),
             staticOptions = staticOptions.toList(),
-            coercers = coercers.toList(),
+            decoders = decoders.toList(),
             finalDecoder = finalDecoder,
+            encoders = encoders.toList(),
+            finalEncoder = finalEncoder,
             onEncode = onEncode.toList().takeIf { it.isNotEmpty() }?.let {
                 { it.forEach { it() } }
             },
@@ -120,19 +125,22 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
 @InternalMonktApi
 open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
     @AdvancedMonktApi
-    override var decoder: Decoder<out T>? = null // REQUIRED
-
-    @AdvancedMonktApi
     override var types: MutableList<BsonType> = mutableListOf()
 
     @AdvancedMonktApi
-    override var predicate: MutableList<Predicate<BsonValue>> = mutableListOf()
+    override var canDecodeBlocks: MutableList<(BsonValue) -> Boolean> = mutableListOf()
+
+    @AdvancedMonktApi
+    override var decodeBlock: ((BsonValue) -> T)? = null
+
+    @AdvancedMonktApi
+    override val canEncodeBlocks: MutableList<(Any?) -> Boolean> = mutableListOf()
+
+    @AdvancedMonktApi
+    override var encodeBlock: ((T) -> BsonValue)? = null
 
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
-
-    @AdvancedMonktApi
-    override var encoder: Encoder<in T>? = null // REQUIRED
 
     @OptIn(InternalMonktApi::class, AdvancedMonktApi::class)
     override fun build(): ScalarSchema<T> {
@@ -140,14 +148,15 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
         deferred.clear()
         return ScalarSchemaImpl(
             types = types.toList(),
-            decoder = decoder
-                ?: error("decoder is required but was not provided"),
-            encoder = encoder
-                ?: error("encoder is required but was not provided"),
-            predicate = predicate.toList().let {
-                Predicate { bsonValue ->
-                    it.any { it.test(bsonValue) }
-                }
+            decodeBlock = decodeBlock
+                ?: error("decodeBlock is required but was not provided"),
+            encodeBlock = encodeBlock
+                ?: error("encodeBlock is required but was not provided"),
+            canDecodeBlock = canDecodeBlocks.toList().let {
+                { bsonValue -> it.any { it(bsonValue) } }
+            },
+            canEncodeBlock = canEncodeBlocks.toList().let {
+                { value -> it.any { it(value) } }
             }
         )
     }
@@ -186,16 +195,22 @@ open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
 @InternalMonktApi
 open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M> {
     @AdvancedMonktApi
-    override val options: MutableList<Option<T, M, *>> = mutableListOf()
+    override val options: MutableList<Option<T, M?, *>> = mutableListOf()
 
     @AdvancedMonktApi
     override val staticOptions: MutableList<Option<Unit, Unit, *>> = mutableListOf()
 
     @AdvancedMonktApi
-    override val coercers: MutableList<Coercer<out M>> = mutableListOf()
+    override val decoders: MutableList<Decoder<out M>> = mutableListOf()
 
     @AdvancedMonktApi
     override var finalDecoder: Decoder<out M>? = null
+
+    @AdvancedMonktApi
+    override val encoders: MutableList<Encoder<in M>> = mutableListOf()
+
+    @AdvancedMonktApi
+    override var finalEncoder: Encoder<in M>? = null
 
     @AdvancedMonktApi
     override var schema: Lazy<Schema<M>>? = null // REQUIRED
@@ -233,8 +248,10 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
                 ?: error("setter is required but was not provided"),
             options = options.toList(),
             staticOptions = staticOptions.toList(),
-            coercers = coercers.toList(),
+            decoders = decoders.toList(),
             finalDecoder = finalDecoder,
+            encoders = encoders.toList(),
+            finalEncoder = finalEncoder,
             onEncode = onEncode.toList().takeIf { it.isNotEmpty() }?.let {
                 { it.forEach { it() } }
             },
@@ -242,57 +259,6 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
                 { it.forEach { it() } }
             }
         )
-    }
-}
-
-/**
- * A builder for applying a mapped
- * [FieldDefinition] configuration.
- *
- * @author LSafer
- * @since 2.0.0
- */
-@OptIn(ExperimentalMonktApi::class)
-@InternalMonktApi
-open class FieldDefinitionMapperBuilderImpl<T : Any, M, N> :
-    FieldDefinitionBuilderImpl<T, N>(),
-    FieldDefinitionMapperBuilder<T, M, N> {
-    @AdvancedMonktApi
-    override var encodeMapper: Mapper<M, N>? = null // REQUIRED
-
-    @AdvancedMonktApi
-    override var decodeMapper: Mapper<N, M>? = null // REQUIRED
-
-    @AdvancedMonktApi
-    override var bsonEncodeMapper: BsonMapper<M, N> = BsonMapper { it }
-
-    @AdvancedMonktApi
-    override var bsonDecodeMapper: BsonMapper<N, M> = BsonMapper { it }
-
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
-    override fun applyTo(builder: FieldDefinitionBuilder<T, M>) {
-        this.deferred.forEach { it() }
-        this.deferred.clear()
-
-        val mappers = Mappers(
-            encodeMapper = this.encodeMapper
-                ?: error("encodeMapper is required but was not provided"),
-            decodeMapper = this.decodeMapper
-                ?: error("decodeMapper is required but was not provided"),
-            bsonEncodeMapper = this.bsonEncodeMapper,
-            bsonDecodeMapper = this.bsonDecodeMapper
-        )
-
-        builder.options += this.options.map { mapOption(it, this.schema, mappers) }
-        builder.staticOptions += this.staticOptions
-        builder.coercers += this.coercers.map { mapCoercer(it, mappers) }
-        this.finalDecoder?.let { builder.finalDecoder = mapDecoder(it, mappers) }
-        this.schema?.let { builder.schema = lazy { mapSchema(it.value, mappers) } }
-        builder.onEncode += mapFieldDefinitionCodecBlock(this.onEncode, this.schema, mappers)
-        builder.onDecode += mapFieldDefinitionCodecBlock(this.onDecode, this.schema, mappers)
-        this.name?.let { builder.name = it }
-        this.getter?.let { builder.getter = mapFieldDefinitionGetter(it, mappers) }
-        this.setter?.let { builder.setter = mapFieldDefinitionSetter(it, mappers) }
     }
 }
 

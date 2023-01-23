@@ -17,15 +17,25 @@ open class ArraySchemaImpl<T>(
      */
     override val schema: Schema<T>,
     /**
-     * The coercers to be used to coerce the
+     * The coerce decoders to be used to coerce the
      * values. (order matters)
      */
-    val coercers: List<Coercer<out T>>,
+    val decoders: List<Decoder<out T>>,
     /**
      * The final decoder to be used when all
      * coercers fail.
      */
     val finalDecoder: Decoder<out T>?,
+    /**
+     * The coerce encoders to be used to coerce the
+     * values. (order matters)
+     */
+    val encoders: List<Encoder<in T>>,
+    /**
+     * The final encoder to be used when all
+     * coercers fail.
+     */
+    val finalEncoder: Encoder<in T>?,
     /**
      * The instance options.
      */
@@ -94,6 +104,11 @@ open class ArraySchemaImpl<T>(
     }
 
     @AdvancedMonktApi
+    override fun canEncode(value: Any?): Boolean {
+        return value is List<*>
+    }
+
+    @AdvancedMonktApi
     override fun decode(bsonValue: BsonValue): List<T> {
         bsonValue as BsonArray
 
@@ -104,13 +119,14 @@ open class ArraySchemaImpl<T>(
                 if (schema.canDecode(item))
                     return@run schema.decode(item)
 
-                val coercer = coercers.firstOrNull { it.canDecode(item) }
+                val decoder = decoders.firstOrNull { it.canDecode(item) }
 
-                if (coercer != null)
-                    return@run coercer.decode(item)
+                if (decoder != null)
+                    return@run decoder.decode(item)
 
                 finalDecoder?.let {
-                    return@run it.decode(item)
+                    if (it.canDecode(item))
+                        return@run it.decode(item)
                 }
 
                 return@forEach /* Skip Decoding */
@@ -132,7 +148,28 @@ open class ArraySchemaImpl<T>(
 
     @AdvancedMonktApi
     override fun encode(value: List<T>): BsonValue {
-        val array = BsonArray(value.map { schema.encode(it) })
+        val array = BsonArray()
+
+        value.forEach { item ->
+            val bsonValue = run {
+                if (schema.canEncode(item))
+                    return@run schema.encode(item)
+
+                val encoder = encoders.firstOrNull { it.canEncode(item) }
+
+                if (encoder != null)
+                    return@run encoder.encode(item)
+
+                finalEncoder?.let {
+                    if (it.canEncode(item))
+                        return@run it.encode(item)
+                }
+
+                return@forEach /* Skip Encoding */
+            }
+
+            array += bsonValue
+        }
 
         onEncode?.let {
             it(ArraySchemaCodecScope(
@@ -149,32 +186,54 @@ open class ArraySchemaImpl<T>(
 }
 
 /**
- * A coercer to be used to safely create a coercer
+ * A decoder to be used to safely create a decoder
  * with only one [block].
  *
  * @author LSafer
  * @since 2.0.0
  */
 @InternalMonktApi
-class DeterministicCoercerImpl<T>(
-    val block: DeterministicCoercerBlock<T>
-) : Coercer<T> {
+class DeterministicDecoderImpl<T>(
+    val block: DeterministicDecoderBlock<T>
+) : Decoder<T> {
     @AdvancedMonktApi
     override fun canDecode(bsonValue: BsonValue): Boolean {
-        val scope = DeterministicCoercerScope<T>()
+        val scope = DeterministicDecoderScope<T>()
         scope.apply { block(bsonValue) }
-        return scope.value != null
+        return scope.isDecoded
     }
 
     @AdvancedMonktApi
     override fun decode(bsonValue: BsonValue): T {
-        val scope = DeterministicCoercerScope<T>()
+        val scope = DeterministicDecoderScope<T>()
         scope.apply { block(bsonValue) }
-        return scope.value?.value
-            ?: error("Deterministic Coercion Failed: got ${bsonValue.bsonType}")
+        return scope.decodedValue
     }
 
-    override fun toString(): String = "DeterministicCoercer()"
+    override fun toString(): String = "DeterministicDecoder()"
+}
+
+/**
+ * The default implementation of [ScalarDecoder].
+ *
+ * @param T the type of the runtime value.
+ * @since 2.0.0
+ */
+@InternalMonktApi
+data class ScalarDecoderImpl<T>(
+    override val types: List<BsonType>,
+    val decodeBlock: (BsonValue) -> T,
+    val canDecodeBlock: (BsonValue) -> Boolean
+) : ScalarDecoder<T> {
+    override fun canDecode(bsonValue: BsonValue): Boolean {
+        return canDecodeBlock(bsonValue)
+    }
+
+    override fun decode(bsonValue: BsonValue): T {
+        return decodeBlock(bsonValue)
+    }
+
+    override fun toString(): String = "ScalarDecoder(${types.joinToString(", ")})"
 }
 
 /**
@@ -186,22 +245,25 @@ class DeterministicCoercerImpl<T>(
 @InternalMonktApi
 open class ScalarSchemaImpl<T>(
     override val types: List<BsonType>,
-    val decoder: Decoder<out T>,
-    val encoder: Encoder<in T>,
-    val predicate: Predicate<BsonValue>
+    val canDecodeBlock: (BsonValue) -> Boolean,
+    val decodeBlock: (BsonValue) -> T,
+    val canEncodeBlock: (Any?) -> Boolean,
+    val encodeBlock: (T) -> BsonValue,
 ) : ScalarSchema<T> {
     override fun canDecode(bsonValue: BsonValue): Boolean {
-        return predicate.test(bsonValue)
+        return canDecodeBlock(bsonValue)
     }
 
-    @OptIn(AdvancedMonktApi::class)
+    override fun canEncode(value: Any?): Boolean {
+        return canEncodeBlock(value)
+    }
+
     override fun decode(bsonValue: BsonValue): T {
-        return decoder.decode(bsonValue)
+        return decodeBlock(bsonValue)
     }
 
-    @OptIn(AdvancedMonktApi::class)
     override fun encode(value: T): BsonValue {
-        return encoder.encode(value)
+        return encodeBlock(value)
     }
 
     override fun toString(): String = "ScalarSchema(${types.joinToString(", ")})"
@@ -223,6 +285,10 @@ open class EnumSchemaImpl<T>(
 
     override fun canDecode(bsonValue: BsonValue): Boolean {
         return values.containsKey(bsonValue)
+    }
+
+    override fun canEncode(value: Any?): Boolean {
+        return values.containsValue(value)
     }
 
     override fun decode(bsonValue: BsonValue): T {
@@ -289,6 +355,11 @@ open class NullableSchemaImpl<T>(
     }
 
     @AdvancedMonktApi
+    override fun canEncode(value: Any?): Boolean {
+        return value == null || schema.canEncode(value)
+    }
+
+    @AdvancedMonktApi
     override fun decode(bsonValue: BsonValue): T? {
         return when (bsonValue) {
             is BsonNull -> null
@@ -320,19 +391,29 @@ open class FieldDefinitionImpl<T : Any, M>(
     override val setter: FieldDefinitionSetter<T, M>,
     lazySchema: Lazy<Schema<M>>,
     /**
-     * A list of coercers to be used when the
-     * [schema] cannot decode the value.
+     * A list of coerce decoders to be used when
+     * the [schema] cannot decode the value.
      */
-    val coercers: List<Coercer<out M>>,
+    val decoders: List<Decoder<out M>>,
     /**
      * The final decoder to be used when all
      * coercers fail.
      */
     val finalDecoder: Decoder<out M>?,
     /**
+     * A list of coerce encoders to be used when
+     * the [schema] cannot encode the value.
+     */
+    val encoders: List<Encoder<in M>>,
+    /**
+     * The final encoder to be used when all
+     * coercers fail.
+     */
+    val finalEncoder: Encoder<in M>?,
+    /**
      * The instance options.
      */
-    val options: List<Option<T, M, *>>,
+    val options: List<Option<T, M?, *>>,
     /**
      * The static options.
      */
@@ -404,13 +485,14 @@ open class FieldDefinitionImpl<T : Any, M>(
             if (schema.canDecode(bsonValue))
                 return@run schema.decode(bsonValue)
 
-            val coercer = coercers.firstOrNull { it.canDecode(bsonValue) }
+            val decoder = decoders.firstOrNull { it.canDecode(bsonValue) }
 
-            if (coercer != null)
-                return@run coercer.decode(bsonValue)
+            if (decoder != null)
+                return@run decoder.decode(bsonValue)
 
             finalDecoder?.let {
-                return@run it.decode(bsonValue)
+                if (it.canDecode(bsonValue))
+                    return@run it.decode(bsonValue)
             }
 
             return /* Skip Decoding */
@@ -434,7 +516,26 @@ open class FieldDefinitionImpl<T : Any, M>(
         val schema = schema
 
         val value = getter(instance)
-        val bsonValue = schema.encode(value)
+
+        val bsonValue = run {
+            if (schema.canEncode(value))
+                @Suppress("UNCHECKED_CAST")
+                return@run schema.encode(value as M)
+
+            val encoder = encoders.firstOrNull { it.canEncode(value) }
+
+            if (encoder != null)
+                @Suppress("UNCHECKED_CAST")
+                return@run encoder.encode(value as M)
+
+            finalEncoder?.let {
+                if (it.canEncode(value))
+                    @Suppress("UNCHECKED_CAST")
+                    return@run it.encode(value as M)
+            }
+
+            return /* Skip Encoding */
+        }
 
         document[name] = bsonValue
 
@@ -523,6 +624,11 @@ open class ObjectSchemaImpl<T : Any>(
     @AdvancedMonktApi
     override fun canDecode(bsonValue: BsonValue): Boolean {
         return bsonValue is BsonDocument
+    }
+
+    @AdvancedMonktApi
+    override fun canEncode(value: Any?): Boolean {
+        return true
     }
 
     @AdvancedMonktApi

@@ -25,6 +25,24 @@ import org.cufy.monkt.*
  */
 fun interface Encoder<T> {
     /**
+     * Return `true` if this encoder can encode
+     * the given [value].
+     *
+     * This function doesn't fully guarantee that
+     * [encode] will succeed. It was put only to
+     * know if this encoder accepts the [value] or
+     * not.
+     *
+     * @param value the value to be checked.
+     * @return true, if this encoder can encode [value].
+     * @since 2.0.0
+     */
+    @AdvancedMonktApi
+    fun canEncode(value: Any?): Boolean {
+        return true
+    }
+
+    /**
      * Encode the given [value] to bson.
      *
      * @param value the value to be encoded.
@@ -44,6 +62,24 @@ fun interface Encoder<T> {
  */
 fun interface Decoder<T> {
     /**
+     * Return true if this decoder can decode the
+     * given [bsonValue].
+     *
+     * This function doesn't fully guarantee that
+     * [encode] will succeed. It was put only to
+     * know if this decoder accepts the [bsonValue]
+     * or not.
+     *
+     * @param bsonValue the value to be checked.
+     * @return true, if this decoder can decode [bsonValue].
+     * @since 2.0.0
+     */
+    @AdvancedMonktApi
+    fun canDecode(bsonValue: BsonValue): Boolean {
+        return true
+    }
+
+    /**
      * Decode the given [bsonValue] to [T].
      *
      * @param bsonValue the value to be decoded.
@@ -51,30 +87,6 @@ fun interface Decoder<T> {
      */
     @AdvancedMonktApi
     fun decode(bsonValue: BsonValue): T
-}
-
-/**
- * A coercer defines how to decode bson values.
- *
- * Coercer equality and hashCode calculations
- * should be based on pointer value.
- * (aka, [System.identityHashCode] and `===`)
- *
- * @author LSafer
- * @since 2.0.0
- * @see Schema
- */
-interface Coercer<T> : Decoder<T> {
-    /**
-     * Return true if this schema can decode the
-     * given [bsonValue].
-     *
-     * @param bsonValue the value to be checked.
-     * @return true, if this schema can decode [bsonValue].
-     * @since 2.0.0
-     */
-    @AdvancedMonktApi
-    fun canDecode(bsonValue: BsonValue): Boolean
 }
 
 /**
@@ -88,7 +100,7 @@ interface Coercer<T> : Decoder<T> {
  * @author LSafer
  * @since 2.0.0
  */
-interface Schema<T> : Encoder<T>, Decoder<T>, Coercer<T>
+interface Schema<T> : Encoder<T>, Decoder<T>
 
 /**
  * A schema that supports the options' system.
@@ -129,38 +141,4 @@ interface ElementSchema<T> : Schema<T> {
         pathname: Pathname,
         instance: T & Any
     ): List<OptionData<*, *, *>>
-}
-
-/**
- * A mapper that maps values of type `T` to `U`.
- *
- * @author LSafer
- * @since 2.0.0
- */
-fun interface Mapper<T, U> {
-    /**
-     * Map the given [value] to [U].
-     *
-     * @param value the value to be mapped.
-     * @return the mapped value.
-     * @since 2.0.0
-     */
-    fun map(value: T): U
-}
-
-/**
- * A mapper that maps bson values for type `T` to `U`.
- *
- * @author LSafer
- * @since 2.0.0
- */
-fun interface BsonMapper<T, U> {
-    /**
-     * Map the given [value] to a bson value for [U].
-     *
-     * @param value the value to be mapped.
-     * @return the mapped value.
-     * @since 2.0.0
-     */
-    fun map(value: BsonValue): BsonValue
 }

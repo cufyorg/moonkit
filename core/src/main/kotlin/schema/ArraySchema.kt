@@ -83,7 +83,8 @@ open class ArraySchemaCodecScope<T>(
  */
 interface ArraySchemaBuilder<T> :
     WithOptionsBuilder<List<T>, List<T>>,
-    WithCoercersBuilder<T>,
+    WithDecodersBuilder<T>,
+    WithEncodersBuilder<T>,
     WithSchemaBuilder<T>,
     WithCodecBuilder<ArraySchemaCodecBlock<T>>,
     WithDeferredBuilder {

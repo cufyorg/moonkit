@@ -117,7 +117,7 @@ fun <T : Any> Document.Companion.performDecoding(model: Model<T>, document: Bson
     val instance = model.schema.decode(document)
 
     val bsonId = document["_id"] ?: bundefined
-    val id = LenientIdCoercer.decode(bsonId)
+    val id = LenientIdDecoder.decode(bsonId)
 
     Document.setId(instance, id)
     Document.setModel(instance, model)

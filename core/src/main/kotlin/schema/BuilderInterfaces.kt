@@ -15,11 +15,9 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.BsonType
 import org.cufy.bson.BsonUndefinedType
 import org.cufy.bson.BsonValue
 import org.cufy.monkt.*
-import java.util.function.Predicate
 import kotlin.reflect.KClass
 
 /*
@@ -116,10 +114,10 @@ fun <T : Any, M, C> WithOptionsBuilder<T, M>.staticOption(
     staticOption(Option(configuration, block))
 }
 
-/* ========== - WithCoercersBuilder  - ========== */
+/* ========== - WithEncodersBuilder  - ========== */
 
 /**
- * An interface for builders with coercers.
+ * An interface for builders with coercer encoders.
  *
  * Important Note: this interface might change in
  * the future. It was made to make it easier to
@@ -130,58 +128,117 @@ fun <T : Any, M, C> WithOptionsBuilder<T, M>.staticOption(
  * @author LSafer
  * @since 2.0.0
  */
-interface WithCoercersBuilder<T> {
+interface WithEncodersBuilder<T> {
+    /**
+     * A list of coercers to be used when a direct
+     * encoding fails.
+     */
+    @AdvancedMonktApi("Use `encoder()` instead")
+    val encoders: MutableList<Encoder<in T>>
+
+    /**
+     * A function to be invoked when encoding
+     * coercion fails for some value.
+     */
+    @AdvancedMonktApi("Use `finalEncoder()` instead")
+    var finalEncoder: Encoder<in T>?
+}
+
+// encoders
+
+/**
+ * Add the given [encoder] to be used as an
+ * encoding coercer.
+ */
+@OptIn(AdvancedMonktApi::class)
+fun <T> WithEncodersBuilder<T>.encoder(
+    encoder: Encoder<in T>
+) {
+    encoders += encoder
+}
+
+// finalEncoder
+
+/**
+ * The final encoder to be used when all
+ * coercers failed.
+ */
+@OptIn(AdvancedMonktApi::class)
+fun <T> WithEncodersBuilder<T>.finalEncoder(
+    encoder: Encoder<in T>
+) {
+    finalEncoder = encoder
+}
+
+/**
+ * Make sure this field is encoded and not skipped
+ * after coercion failure.
+ *
+ * This will override the currently set [finalEncoder]
+ */
+fun <T> WithEncodersBuilder<T>.requireEncode() {
+    finalEncoder {
+        error("Required encoding failed for value: $it")
+    }
+}
+
+/* ========== - WithDecodersBuilder  - ========== */
+
+/**
+ * An interface for builders with coercer decoders.
+ *
+ * Important Note: this interface might change in
+ * the future. It was made to make it easier to
+ * implement features for different kids of tweaks
+ * with less code and not to be used by regular
+ * users.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface WithDecodersBuilder<T> {
     /**
      * A list of coercers to be used when a direct
      * decoding fails.
      */
-    @AdvancedMonktApi("Use `coercer()` instead")
-    val coercers: MutableList<Coercer<out T>>
+    @AdvancedMonktApi("Use `decoder()` instead")
+    val decoders: MutableList<Decoder<out T>>
 
     /**
-     * A function to be invoked when coercion
-     * fails for some value.
+     * A function to be invoked when decoding
+     * coercion fails for some value.
      */
     @AdvancedMonktApi("Use `finalDecoder()` instead")
     var finalDecoder: Decoder<out T>?
 }
 
-// coercers
+// decoders
 
 /**
- * Add the given [coercer].
+ * Add the given [decoder] to be used as a
+ * decoding coercer.
  */
 @OptIn(AdvancedMonktApi::class)
-fun <T> WithCoercersBuilder<T>.coercer(
-    coercer: Coercer<out T>
+fun <T> WithDecodersBuilder<T>.decoder(
+    decoder: Decoder<out T>
 ) {
-    coercers += coercer
+    decoders += decoder
 }
 
 /**
- * Add a scalar coercer that uses the
- * given [block].
- */
-fun <T> WithCoercersBuilder<T>.coercer(
-    block: ScalarCoercerBuilderBlock<T>
-) {
-    coercer(ScalarCoercer(block))
-}
-
-/**
- * Add a default coercer that uses the given [decoder].
+ * Add a default coercer decoder that uses the given [block].
  *
  * This will only cover the value `undefined`. To
  * set a default value for when the coercion fails
  * you might use [finalDecoder] instead.
  */
-fun <T> WithCoercersBuilder<T>.default(
-    decoder: Decoder<out T>
+fun <T> WithDecodersBuilder<T>.default(
+    block: (BsonValue) -> T
 ) {
-    coercer {
-        accept(BsonUndefinedType)
-        decode(decoder)
-    }
+    decoder(ScalarDecoder {
+        canDecode(BsonUndefinedType)
+        decode(block)
+    })
 }
 
 // finalDecoder
@@ -191,10 +248,10 @@ fun <T> WithCoercersBuilder<T>.default(
  * coercers failed.
  */
 @OptIn(AdvancedMonktApi::class)
-fun <T> WithCoercersBuilder<T>.finalDecoder(
-    block: Decoder<out T>
+fun <T> WithDecodersBuilder<T>.finalDecoder(
+    decoder: Decoder<out T>
 ) {
-    finalDecoder = block
+    finalDecoder = decoder
 }
 
 /**
@@ -203,9 +260,9 @@ fun <T> WithCoercersBuilder<T>.finalDecoder(
  *
  * This will override the currently set [finalDecoder]
  */
-fun <T> WithCoercersBuilder<T>.requireDecode() {
+fun <T> WithDecodersBuilder<T>.requireDecode() {
     finalDecoder {
-        error("Required Coercing failed for value: $it")
+        error("Required decoding failed for value: $it")
     }
 }
 
@@ -251,6 +308,20 @@ fun <T> WithSchemaBuilder<T>.schema(
 }
 
 /**
+ * Set the values' schema to be a nullable schema
+ * wrapping the schema returned by the given [block].
+ *
+ * This will replace the current schema.
+ *
+ * @since 2.0.0
+ */
+fun <T> WithSchemaBuilder<T?>.nullableSchema(
+    block: () -> Schema<T>
+) {
+    schema { NullableSchema(block()) }
+}
+
+/**
  * Set the values' schema to be an array schema
  * with the given builder [block]
  *
@@ -258,7 +329,6 @@ fun <T> WithSchemaBuilder<T>.schema(
  *
  * @since 2.0.0
  */
-@ExperimentalMonktApi
 fun <I> WithSchemaBuilder<List<I>>.arraySchema(
     schema: Schema<I>? = null,
     block: ArraySchemaBuilderBlock<I> = {}
@@ -274,7 +344,6 @@ fun <I> WithSchemaBuilder<List<I>>.arraySchema(
  *
  * @since 2.0.0
  */
-@ExperimentalMonktApi
 fun <T> WithSchemaBuilder<T>.enumSchema(
     map: Map<BsonValue, T>? = null,
     block: EnumSchemaBuilderBlock<T> = {}
@@ -290,128 +359,11 @@ fun <T> WithSchemaBuilder<T>.enumSchema(
  *
  * @since 2.0.0
  */
-@ExperimentalMonktApi
 fun <T : Enum<T>> WithSchemaBuilder<T>.enumSchema(
     enumClass: KClass<T>,
     block: EnumSchemaBuilderBlock<T> = {}
 ) {
     schema { EnumSchema(enumClass, block) }
-}
-
-/* ============= - ScalarBuilder  - ============= */
-
-/**
- * An interface for builders building scalar types.
- *
- * Important Note: this interface might change in
- * the future. It was made to make it easier to
- * implement features for different kids of tweaks
- * with less code and not to be used by regular
- * users.
- *
- * @author LSafer
- * @since 2.0.0
- */
-interface WithDecoderBuilder<T> {
-    @AdvancedMonktApi("Use `decode()` instead")
-    var decoder: Decoder<out T>?
-
-    @AdvancedMonktApi("Use `accept()` instead")
-    val types: MutableList<BsonType>
-
-    @AdvancedMonktApi("Use `accept()` instead")
-    val predicate: MutableList<Predicate<BsonValue>>
-}
-
-//
-
-/**
- * Set the decoder and the predicate from the given
- * [coercer].
- *
- * This will replace the current decoder
- *
- * @since 2.0.0
- */
-@OptIn(AdvancedMonktApi::class)
-fun <T> WithDecoderBuilder<T>.coercer(
-    coercer: Coercer<out T>
-) {
-    this.predicate += Predicate { coercer.canDecode(it) }
-    this.decoder = coercer
-}
-
-/**
- * Set the decoder and the predicate from a
- * deterministic coercer that uses the given
- * [block].
- *
- * This will replace the current decoder
- *
- * @since 2.0.0
- */
-fun <T> WithDecoderBuilder<T>.deterministic(
-    block: DeterministicCoercerBlock<T>
-) {
-    coercer(DeterministicCoercer(block))
-}
-
-// types
-
-/**
- * Add the given [types] to the accepted types.
- *
- * This will not add them to the predicate.
- */
-@OptIn(AdvancedMonktApi::class)
-fun <T> WithDecoderBuilder<T>.expect(
-    vararg types: BsonType
-) {
-    this.types += types
-}
-
-// predicate
-
-/**
- * Add the given [predicate].
- *
- * @since 2.0.0
- */
-@OptIn(AdvancedMonktApi::class)
-fun <T> WithDecoderBuilder<T>.accept(
-    predicate: Predicate<BsonValue>
-) {
-    this.predicate += predicate
-}
-
-// decoder
-
-/**
- * Set the decoder to the given [decoder].
- *
- * This will replace the current decoder.
- */
-@OptIn(AdvancedMonktApi::class)
-fun <T> WithDecoderBuilder<T>.decode(
-    decoder: Decoder<out T>
-) {
-    this.decoder = decoder
-}
-
-//
-
-/**
- * Add the given [types] to the accepted types and
- * add a predicate that allows the matching values.
- *
- * @since 2.0.0
- */
-@OptIn(AdvancedMonktApi::class)
-fun <T> WithDecoderBuilder<T>.accept(
-    vararg types: BsonType
-) {
-    this.types += types
-    this.predicate += Predicate { it.bsonType in types }
 }
 
 /* ============ - WithCodecBuilder - ============ */

@@ -22,115 +22,6 @@ import java.math.BigDecimal
 import kotlin.reflect.KClass
 
 /*==================================================
-=================== ScalarSchema ===================
-==================================================*/
-
-/**
- * A schema for scalar values.
- *
- * @param T the type of the runtime value.
- * @since 2.0.0
- */
-interface ScalarSchema<T> : Schema<T>, ScalarCoercer<T> {
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(AdvancedMonktApi::class)
-    override fun canDecode(bsonValue: BsonValue): Boolean
-
-    @Suppress("UnnecessaryOptInAnnotation")
-    @OptIn(AdvancedMonktApi::class)
-    override fun decode(bsonValue: BsonValue): T
-
-    @OptIn(AdvancedMonktApi::class)
-    override fun encode(value: T): BsonValue
-}
-
-/**
- * A block of code invoked to fill in options in
- * [ScalarSchemaBuilder].
- */
-typealias ScalarSchemaBuilderBlock<T> =
-        ScalarSchemaBuilder<T>.() -> Unit
-
-/**
- * A builder for creating a [ScalarSchema]
- *
- * @author LSafer
- * @since 2.0.0
- */
-interface ScalarSchemaBuilder<T> :
-    WithDecoderBuilder<T>,
-    WithDeferredBuilder {
-
-    /**
-     * The wrapped encoder
-     */
-    @AdvancedMonktApi("Use `encode()` instead")
-    var encoder: Encoder<in T>? // REQUIRED
-
-    /**
-     * Build the schema.
-     *
-     * This will invoke the deferred code and
-     * removes it.
-     *
-     * @since 2.0.0
-     */
-    fun build(): ScalarSchema<T>
-}
-
-/**
- * Obtain a new [ScalarSchemaBuilder].
- *
- * @since 2.0.0
- */
-@OptIn(InternalMonktApi::class)
-fun <T> ScalarSchemaBuilder(): ScalarSchemaBuilder<T> {
-    return ScalarSchemaBuilderImpl()
-}
-
-/**
- * Construct a new [ScalarSchema] with the given
- * [block]
- *
- * @param block the builder block.
- * @return a new scalar schema.
- * @since 2.0.0
- */
-fun <T> ScalarSchema(
-    block: ScalarSchemaBuilderBlock<T> = {}
-): ScalarSchema<T> {
-    val builder = ScalarSchemaBuilder<T>()
-    builder.apply(block)
-    return builder.build()
-}
-
-// encoder
-
-/**
- * Set the encoder to be the given [encoder]
- *
- * @since 2.0.0
- */
-@OptIn(AdvancedMonktApi::class)
-fun <T> ScalarSchemaBuilder<T>.encode(
-    encoder: Encoder<in T>
-) {
-    this.encoder = encoder
-}
-
-@OptIn(AdvancedMonktApi::class)
-inline fun <reified T> ScalarSchemaBuilder<T>.encodeSafe(
-    encoder: Encoder<in T>
-) {
-    this.encoder = Encoder<Any?> {
-        require(T::class.isInstance(it)) {
-            "Encoding Failure: Expected ${T::class.simpleName} but got $it"
-        }
-        encoder.encode(it as T)
-    }
-}
-
-/*==================================================
 ==================== EnumSchema ====================
 ==================================================*/
 
@@ -336,35 +227,6 @@ fun <T> NullableSchema(
 }
 
 /*==================================================
-==================== UnitSchema ====================
-==================================================*/
-
-/**
- * The schema for the value [Unit].
- *
- * All its functions will throw an error.
- *
- * @author LSafer
- * @since 2.0.0
- */
-object UnitSchema : Schema<Unit> {
-    @AdvancedMonktApi
-    override fun encode(value: Unit): BsonValue {
-        error("Unit Schema Usage")
-    }
-
-    @AdvancedMonktApi
-    override fun decode(bsonValue: BsonValue) {
-        error("Unit Schema Usage")
-    }
-
-    @AdvancedMonktApi
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        error("Unit Schema Usage")
-    }
-}
-
-/*==================================================
 ===================== Built In =====================
 ==================================================*/
 
@@ -377,8 +239,9 @@ object UnitSchema : Schema<Unit> {
  * @since 2.0.0
  */
 val StringSchema: ScalarSchema<String> = ScalarSchema {
-    accept(BsonStringType)
-    encodeSafe { BsonString(it) }
+    canDecode(BsonStringType)
+    canEncode { it is String }
+    encode { BsonString(it) }
     decode {
         it as BsonString
         it.value
@@ -391,8 +254,9 @@ val StringSchema: ScalarSchema<String> = ScalarSchema {
  * @since 2.0.0
  */
 val BooleanSchema: ScalarSchema<Boolean> = ScalarSchema {
-    accept(BsonBooleanType)
-    encodeSafe { BsonBoolean(it) }
+    canDecode(BsonBooleanType)
+    canEncode { it is Boolean }
+    encode { BsonBoolean(it) }
     decode {
         it as BsonBoolean
         it.value
@@ -405,8 +269,9 @@ val BooleanSchema: ScalarSchema<Boolean> = ScalarSchema {
  * @since 2.0.0
  */
 val Int32Schema: ScalarSchema<Int> = ScalarSchema {
-    accept(BsonInt32Type)
-    encodeSafe { BsonInt32(it) }
+    canDecode(BsonInt32Type)
+    canEncode { it is Int }
+    encode { BsonInt32(it) }
     decode {
         it as BsonInt32
         it.value
@@ -420,8 +285,9 @@ val Int32Schema: ScalarSchema<Int> = ScalarSchema {
  */
 @Suppress("USELESS_IS_CHECK")
 val Int64Schema: ScalarSchema<Long> = ScalarSchema {
-    accept(BsonInt64Type)
-    encodeSafe { BsonInt64(it) }
+    canDecode(BsonInt64Type)
+    canEncode { it is Long }
+    encode { BsonInt64(it) }
     decode {
         it as BsonInt64
         it.value
@@ -434,8 +300,9 @@ val Int64Schema: ScalarSchema<Long> = ScalarSchema {
  * @since 2.0.0
  */
 val DoubleSchema: ScalarSchema<Double> = ScalarSchema {
-    accept(BsonDoubleType)
-    encodeSafe { BsonDouble(it) }
+    canDecode(BsonDoubleType)
+    canEncode { it is Double }
+    encode { BsonDouble(it) }
     decode {
         it as BsonDouble
         it.value
@@ -448,8 +315,9 @@ val DoubleSchema: ScalarSchema<Double> = ScalarSchema {
  * @since 2.0.0
  */
 val Decimal128Schema: ScalarSchema<Decimal128> = ScalarSchema {
-    accept(BsonDecimal128Type)
-    encodeSafe { BsonDecimal128(it) }
+    canDecode(BsonDecimal128Type)
+    canEncode { it is Decimal128 }
+    encode { BsonDecimal128(it) }
     decode {
         it as BsonDecimal128
         it.value
@@ -462,8 +330,9 @@ val Decimal128Schema: ScalarSchema<Decimal128> = ScalarSchema {
  * @since 2.0.0
  */
 val ObjectIdSchema: ScalarSchema<ObjectId> = ScalarSchema {
-    accept(BsonObjectIdType)
-    encodeSafe { BsonObjectId(it) }
+    canDecode(BsonObjectIdType)
+    canEncode { it is ObjectId }
+    encode { BsonObjectId(it) }
     decode {
         it as BsonObjectId
         it.value
@@ -484,8 +353,9 @@ val IdSchema: ScalarSchema<Id<Any>> = IdSchema()
  */
 @Suppress("FunctionName")
 fun <T> IdSchema(): ScalarSchema<Id<T>> = ScalarSchema {
-    accept(BsonObjectIdType, BsonStringType)
-    encodeSafe {
+    canDecode(BsonObjectIdType, BsonStringType)
+    canEncode { it is Id<*> }
+    encode {
         when {
             ObjectId.isValid(it.value) -> BsonObjectId(ObjectId(it.value))
             else -> BsonString(it.value)
@@ -508,8 +378,9 @@ fun <T> IdSchema(): ScalarSchema<Id<T>> = ScalarSchema {
  * @since 2.0.0
  */
 val BigDecimalSchema: ScalarSchema<BigDecimal> = ScalarSchema {
-    accept(BsonDecimal128Type)
-    encodeSafe { BsonDecimal128(Decimal128(it)) }
+    canDecode(BsonDecimal128Type)
+    canEncode { it is BigDecimal }
+    encode { BsonDecimal128(Decimal128(it)) }
     decode {
         it as BsonDecimal128
         it.value.bigDecimalValue()
