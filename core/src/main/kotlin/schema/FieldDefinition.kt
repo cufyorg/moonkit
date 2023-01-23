@@ -86,9 +86,17 @@ interface FieldDefinition<T : Any, M> {
         instance: T
     ): List<OptionData<*, *, *>>
 
+    /**
+     * decode this filed in the given [document]
+     * to the given [instance].
+     */
     @AdvancedMonktApi("Called by monkt internally")
     fun decode(instance: T, document: BsonDocument)
 
+    /**
+     * encode this filed in the given [instance]
+     * to the given [document].
+     */
     @AdvancedMonktApi("Called by monkt internally")
     fun encode(instance: T, document: BsonDocument)
 }
@@ -97,7 +105,7 @@ interface FieldDefinition<T : Any, M> {
  * The type of a field definition getter.
  */
 typealias FieldDefinitionGetter<T, M> =
-            (instance: T) -> M
+            (instance: T) -> M?
 
 /**
  * The type of a field definition setter.
@@ -149,7 +157,7 @@ open class FieldDefinitionCodecScope<T : Any, M>(
     /**
      * The value.
      */
-    val value: M,
+    val value: M?,
     /**
      * The value's source bson.
      */
@@ -296,7 +304,16 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.property(
     property: KMutableProperty1<in T, M>
 ) {
     this.name = property.name
-    this.getter = property.getter
+    if (property.isLateinit)
+        this.getter = {
+            try {
+                property.get(it)
+            } catch (_: UninitializedPropertyAccessException) {
+                null
+            }
+        }
+    else
+        this.getter = property.getter
     this.setter = property.setter
 }
 
@@ -409,7 +426,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.immutable(
  * given [block] returns true.
  */
 fun <T : Any, M> FieldDefinitionBuilder<T, M>.unsetIf(
-    block: ReturnOptionBlock<T, M, WritesConfiguration, Boolean>
+    block: ReturnOptionBlock<T, M?, WritesConfiguration, Boolean>
 ) {
     writes {
         val shouldUnset = block(it)
@@ -433,6 +450,6 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.unsetIf(
  * the runtime value is null rather than if the
  * encoded value is null.
  */
-fun <T : Any, M> FieldDefinitionBuilder<T, M?>.unsetIfNull() {
+fun <T : Any, M> FieldDefinitionBuilder<T, M>.unsetIfNull() {
     unsetIf { value == null }
 }

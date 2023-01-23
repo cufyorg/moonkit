@@ -155,7 +155,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.required(
 @OptIn(AdvancedMonktApi::class)
 @Deprecated("Use `unique` instead. This validator is unnecessary")
 fun <T : Any, M> FieldDefinitionBuilder<T, M>.singleton(
-    block: ReturnOptionBlock<T, M, ValidationBuilderConfiguration, Boolean> = { true }
+    block: ReturnOptionBlock<T, M?, ValidationBuilderConfiguration, Boolean> = { true }
 ) {
     validate {
         val shouldSingleton = block(it)
