@@ -173,7 +173,7 @@ fun <T : Any> OptionScope<*, *, *>.count(
         { `$count` by "count" }
     )
     return property.then {
-        val count = it[0]["count"] as BsonNumber
+        val count = it.firstOrNull()?.let { it["count"] as BsonNumber } ?: bint32(0)
 
         count.longValue()
     }
