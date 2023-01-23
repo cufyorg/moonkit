@@ -305,7 +305,8 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.property(
     property: KMutableProperty1<in T, M>
 ) {
     this.name = property.name
-    if (property.isLateinit)
+    // check for `isOpen` just in case a property was overridden by a lateinit
+    if (property.isLateinit || property.isOpen)
         this.getter = {
             try {
                 property.get(it)
