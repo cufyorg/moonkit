@@ -216,6 +216,8 @@ open class Model<T : Any>(
      */
     @ExperimentalMonktApi("Blocking property")
     val collection: MonktCollection get() = runBlocking { collection() }
+
+    override fun toString(): String = "Model($name)"
 }
 
 /**
