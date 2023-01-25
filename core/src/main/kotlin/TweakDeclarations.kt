@@ -485,3 +485,54 @@ fun FindAndDeleteTweak.options(block: DeleteOptionsScope.() -> Unit) {
 fun FindAndDeleteTweak.deletion(block: DeletionTweak.() -> Unit) {
     delete { deletion(block) }
 }
+
+/* ============= - AggregateTweak - ============= */
+
+/**
+ * A class to tweak the behaviour of an aggregate
+ * operation.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+class AggregateTweak {
+    /**
+     * A block to configure the aggregate publisher
+     * before being used.
+     */
+    @AdvancedMonktApi("Use `op()` instead")
+    var publisherBlock: AggregatePublisherScope.() -> Unit = {}
+
+    /**
+     * The tweak for the decoding operation.
+     */
+    @AdvancedMonktApi("Use `decode()` instead")
+    var decodeTweak: DecodeTweak = DecodeTweak()
+
+    init {
+        decode { isNew = false }
+    }
+}
+
+/**
+ * Add the given [block] to configure the aggregate
+ * publisher before being used.
+ */
+@OptIn(AdvancedMonktApi::class)
+fun AggregateTweak.op(block: AggregatePublisherScope.() -> Unit) {
+    publisherBlock.let { current ->
+        publisherBlock = {
+            current()
+            block()
+        }
+    }
+}
+
+/**
+ * Configure the instance decoding with the given
+ * [block].
+ */
+@OptIn(AdvancedMonktApi::class)
+fun AggregateTweak.decode(block: DecodeTweak.() -> Unit) {
+    decodeTweak.apply(block)
+}

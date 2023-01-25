@@ -1692,3 +1692,135 @@ suspend fun MonktCollection.ensureIndexSuspend(
         createIndexSuspend(key, session, block)
     }
 }
+
+/* ============= --- aggregate  --- ============= */
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ *
+ * @param pipelines the pipelines foreach collection.
+ * @param pipeline the pipeline operations to be
+ *                 performed on the combined
+ *                 documents.
+ * @return a list of pairs with each pair
+ *         containing the index of the collection
+ *         and the document.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+suspend fun List<MonktCollection>.aggregateSuspend(
+    pipelines: List<List<BsonDocument>>,
+    pipeline: List<BsonDocument> = emptyList(),
+    session: ClientSession? = null,
+    block: AggregatePublisherScope.() -> Unit = {}
+): List<Pair<Int, BsonDocument>> {
+    @Suppress("LocalVariableName")
+    val INDEX_FIELD_NAME = "_monkt_temp_"
+
+    require(pipelines.size == size) {
+        "List aggregation pipelines size mismatch: " +
+                "expected: $size; " +
+                "actual: ${pipelines.size}"
+    }
+
+    val pairs = zip(pipelines).mapIndexed { index, (collection, pipeline) ->
+        collection to array {
+            byAll(pipeline)
+            by { `$addFields` by { INDEX_FIELD_NAME by index } }
+        }
+    }
+
+    val productCollection = first()
+    val productPipeline = array {
+        byAll(pairs.first().second)
+        pairs.drop(1).forEach { (collection, pipeline) ->
+            by {
+                `$unionWith` by {
+                    "coll" by collection.namespace.collectionName
+                    "pipeline" by pipeline
+                }
+            }
+        }
+        byAll(pipeline)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    val data = productCollection.aggregateSuspend(
+        productPipeline as List<Bson>,
+        session,
+        block
+    )
+
+    return data.map {
+        val index = it.remove(INDEX_FIELD_NAME) as BsonInt32
+        index.value to it
+    }
+}
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ *
+ * @param pipelines the pipelines foreach collection.
+ * @param pipeline the pipeline operations to be
+ *                 performed on the combined
+ *                 documents.
+ * @return a list of pairs with each pair
+ *         containing the index of the collection
+ *         and the document.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+suspend fun List<MonktCollection>.aggregateSuspend(
+    pipelines: List<BsonArrayBlock>,
+    pipeline: BsonArrayBlock = {},
+    session: ClientSession? = null,
+    block: AggregatePublisherScope.() -> Unit = {}
+): List<Pair<Int, BsonDocument>> {
+    return aggregateSuspend(
+        pipelines = pipelines.map { array(it).map { it as BsonDocument } },
+        pipeline = array(pipeline).map { it as BsonDocument },
+        session = session,
+        block = block
+    )
+}
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ * It is allowed to add one additional item to be
+ * the pipeline for operations to be performed on
+ * the combined documents.
+ *
+ * @param pipelines the pipelines foreach collection
+ *                 and an optional item: pipeline
+ *                 operations to be performed on
+ *                 the combined documents.
+ * @return a list of pairs with each pair
+ *         containing the index of the collection
+ *         and the document.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+suspend fun List<MonktCollection>.aggregateSuspend(
+    vararg pipelines: BsonArrayBlock,
+    session: ClientSession? = null,
+    block: AggregatePublisherScope.() -> Unit = {}
+): List<Pair<Int, BsonDocument>> {
+    return aggregateSuspend(
+        pipelines = pipelines.drop(1),
+        pipeline = pipelines.getOrElse(size) { {} },
+        session = session,
+        block = block
+    )
+}

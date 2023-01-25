@@ -1916,17 +1916,24 @@ suspend fun <T : Any> Model<T>.exists(
  * aggregation pipeline.
  *
  * @param session the client session with which to associate this operation
- * @param pipeline  the aggregate pipeline
- * @return the result of the aggregation operation
+ * @param pipeline the aggregate pipeline.
+ * @param tweak aggregate operation tweaks.
+ * @return a list of instances of [T] from the aggregation result documents.
  * @since 2.0.0
  * @see MonktCollection.aggregateSuspend
  */
-suspend fun <T : Any> Model<T>.aggregate(
+@AdvancedMonktApi("Tweaks should be created and handled internally")
+suspend fun <T : Any> Model<T>.aggregateImpl(
     pipeline: List<Bson>,
     session: ClientSession? = null,
-    block: AggregatePublisherScope.() -> Unit = {}
-): List<BsonDocument> {
-    return collection().aggregateSuspend(pipeline, session, block)
+    tweak: AggregateTweak
+): List<T> {
+    val publisherBlock = tweak.publisherBlock
+    val decodeTweak = tweak.decodeTweak
+
+    val documents = collection().aggregateSuspend(pipeline, session, publisherBlock)
+
+    return decodeImpl(documents, decodeTweak)
 }
 
 /**
@@ -1934,17 +1941,171 @@ suspend fun <T : Any> Model<T>.aggregate(
  * aggregation pipeline.
  *
  * @param session the client session with which to associate this operation
- * @param pipeline  the aggregate pipeline
- * @return the result of the aggregation operation
+ * @param pipeline the aggregate pipeline.
+ * @param block the tweak block.
+ * @return a list of instances of [T] from the aggregation result documents.
  * @since 2.0.0
- * @see MonktCollection.aggregate
+ * @see MonktCollection.aggregateSuspend
+ */
+@OptIn(AdvancedMonktApi::class)
+suspend fun <T : Any> Model<T>.aggregate(
+    pipeline: List<Bson>,
+    session: ClientSession? = null,
+    block: AggregateTweak.() -> Unit = {}
+): List<T> {
+    val tweak = AggregateTweak()
+    tweak.apply(block)
+    return aggregateImpl(pipeline, session, tweak)
+}
+
+/**
+ * Aggregates documents according to the specified
+ * aggregation pipeline.
+ *
+ * @param session the client session with which to associate this operation
+ * @param pipeline the aggregate pipeline.
+ * @param block the tweak block.
+ * @return a list of instances of [T] from the aggregation result documents.
+ * @since 2.0.0
+ * @see MonktCollection.aggregateSuspend
  */
 suspend fun <T : Any> Model<T>.aggregate(
     vararg pipeline: BsonDocumentBlock,
     session: ClientSession? = null,
-    block: AggregatePublisherScope.() -> Unit = {}
-): List<BsonDocument> {
-    return collection().aggregateSuspend(*pipeline, session = session, block = block)
+    block: AggregateTweak.() -> Unit = {}
+): List<T> {
+    return aggregate(pipeline.map { document(it) }, session, block)
+}
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ *
+ * @param pipelines the pipelines foreach collection.
+ * @param pipeline the pipeline operations to be
+ *                 performed on the combined
+ *                 documents.
+ * @param tweak aggregate operation tweaks.
+ * @return a list of instances of [T] from the aggregation result documents.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+@AdvancedMonktApi("Tweaks should be created and handled internally")
+suspend fun <T : Any> List<Model<out T>>.aggregateImpl(
+    pipelines: List<List<BsonDocument>>,
+    pipeline: List<BsonDocument> = emptyList(),
+    session: ClientSession? = null,
+    tweak: AggregateTweak
+): List<T> {
+    val publisherBlock = tweak.publisherBlock
+    val decodeTweak = tweak.decodeTweak
+
+    val documents = map { it.collection() }
+        .aggregateSuspend(pipelines, pipeline, session, publisherBlock)
+
+    return documents
+        .mapIndexed { i, (mi, d) -> Triple(mi, i, d) }
+        .groupBy { (mi, _, _) -> get(mi) }
+        .mapValues { it.value.map { (_, i, d) -> i to d } }
+        .flatMap { (m, idl) ->
+            val (il, dl) = idl.unzip()
+            m.decodeImpl(dl, decodeTweak).zip(il)
+        }
+        .sortedBy { (_, i) -> i }
+        .map { (d, _) -> d }
+}
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ *
+ * @param pipelines the pipelines foreach collection.
+ * @param pipeline the pipeline operations to be
+ *                 performed on the combined
+ *                 documents.
+ * @param block the tweak block.
+ * @return a list of instances of [T] from the aggregation result documents.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+@OptIn(AdvancedMonktApi::class)
+suspend fun <T : Any> List<Model<out T>>.aggregate(
+    pipelines: List<List<BsonDocument>>,
+    pipeline: List<BsonDocument> = emptyList(),
+    session: ClientSession? = null,
+    block: AggregateTweak.() -> Unit = {}
+): List<T> {
+    val tweak = AggregateTweak()
+    tweak.apply(block)
+    return aggregateImpl(pipelines, pipeline, session, tweak)
+}
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ *
+ * @param pipelines the pipelines foreach collection.
+ * @param pipeline the pipeline operations to be
+ *                 performed on the combined
+ *                 documents.
+ * @param block the tweak block.
+ * @return a list of instances of [T] from the aggregation result documents.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+suspend fun <T : Any> List<Model<out T>>.aggregate(
+    pipelines: List<BsonArrayBlock>,
+    pipeline: BsonArrayBlock = {},
+    session: ClientSession? = null,
+    block: AggregateTweak.() -> Unit = {}
+): List<T> {
+    return aggregate(
+        pipelines = pipelines.map { array(it).map { it as BsonDocument } },
+        pipeline = array(pipeline).map { it as BsonDocument },
+        session = session,
+        block = block
+    )
+}
+
+/**
+ * Perform a bulk aggregation in all the
+ * collections in [this] list.
+ *
+ * The order of the given [pipelines] must match
+ * the order of the collections in [this] list.
+ * It is allowed to add one additional item to be
+ * the pipeline for operations to be performed on
+ * the combined documents.
+ *
+ * @param pipelines the pipelines foreach collection
+ *                 and an optional item: pipeline
+ *                 operations to be performed on
+ *                 the combined documents.
+ * @param block the tweak block.
+ * @return a list of instances of [T] from the aggregation result documents.
+ * @since 2.0.0
+ * @see MonktCollection.aggregate
+ */
+suspend fun <T : Any> List<Model<out T>>.aggregate(
+    vararg pipelines: BsonArrayBlock,
+    session: ClientSession? = null,
+    block: AggregateTweak.() -> Unit = {}
+): List<T> {
+    return aggregate(
+        pipelines = pipelines.drop(1),
+        pipeline = pipelines.getOrElse(size) { {} },
+        session = session,
+        block = block
+    )
 }
 
 /* ============= -- ensureIndex  -- ============= */

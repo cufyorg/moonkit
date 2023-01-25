@@ -61,7 +61,7 @@ object AggregateSignalHandler : SignalHandler {
             .withIndex()
             .groupBy { (_, signal) -> signal.model }
             .map { (model, signalsWithIndex) ->
-                model.aggregate({
+                model.collection().aggregateSuspend({
                     `$facet` by {
                         signalsWithIndex.forEach { (index, signal) ->
                             "$index" by signal.pipeline
