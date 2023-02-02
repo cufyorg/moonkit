@@ -2008,7 +2008,11 @@ suspend fun <T : Any> List<Model<out T>>.aggregateImpl(
 
     return documents
         .mapIndexed { i, (mi, d) -> Triple(mi, i, d) }
-        .groupBy { (mi, _, _) -> get(mi) }
+        .groupBy { (mi, _, _) ->
+            getOrElse(mi) {
+                error("Model List Aggregation failed: Model index out of bounds: $mi")
+            }
+        }
         .mapValues { it.value.map { (_, i, d) -> i to d } }
         .flatMap { (m, idl) ->
             val (il, dl) = idl.unzip()
