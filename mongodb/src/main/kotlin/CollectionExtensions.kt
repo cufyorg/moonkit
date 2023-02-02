@@ -1817,8 +1817,14 @@ suspend fun List<MonktCollection>.aggregateSuspend(
     session: ClientSession? = null,
     block: AggregatePublisherScope.() -> Unit = {}
 ): List<Pair<Int, BsonDocument>> {
+    val range = size..size + 1
+    require(pipelines.size in range) {
+        "List aggregation vararg pipelines size mismatch: " +
+                "expected: $range ; " +
+                "actual: ${pipelines.size}"
+    }
     return aggregateSuspend(
-        pipelines = pipelines.drop(1),
+        pipelines = pipelines.take(size),
         pipeline = pipelines.getOrElse(size) { {} },
         session = session,
         block = block

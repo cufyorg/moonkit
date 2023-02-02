@@ -2100,8 +2100,14 @@ suspend fun <T : Any> List<Model<out T>>.aggregate(
     session: ClientSession? = null,
     block: AggregateTweak.() -> Unit = {}
 ): List<T> {
+    val range = size..size + 1
+    require(pipelines.size in range) {
+        "List aggregation vararg pipelines size mismatch: " +
+                "expected: $range ; " +
+                "actual: ${pipelines.size}"
+    }
     return aggregate(
-        pipelines = pipelines.drop(1),
+        pipelines = pipelines.take(size),
         pipeline = pipelines.getOrElse(size) { {} },
         session = session,
         block = block
