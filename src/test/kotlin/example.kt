@@ -1,6 +1,7 @@
 package org.cufy.monkt.test
 
 import kotlinx.coroutines.runBlocking
+import org.bson.BsonNumber
 import org.cufy.bson.*
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
@@ -340,6 +341,41 @@ class ExampleTest {
                     else -> error("")
                 }
             })
+        }
+    }
+
+    @Test
+    fun `bulkAggregation for counting`() {
+        // @formatter:off
+        data class Document1(var value1: String = "") : Document
+        data class Document2(var value2: String = "") : Document
+
+        val Model1 = Model("Document1", ::Document1) { field(Document1::value1, StringSchema) }
+        val Model2 = Model("Document2", ::Document2) { field(Document2::value2, StringSchema) }
+        // @formatter:on
+
+
+        runBlocking {
+            monkt += Model1
+            monkt += Model2
+            monkt.init()
+
+            Model1.create(List(10) { document { "value1" by "$it" } })
+            Model2.create(List(15) { document { "value2" by "$it" } })
+
+            val count = listOf(Model1, Model2)
+                .map { it.collection() }
+                .aggregateSuspend(
+                    { by { `$match` by { "value1" by { `$regex` by bregex("^[1-7]+$") } } } },
+                    { by { `$match` by { "value2" by { `$regex` by bregex("^[1-3]+$") } } } },
+                    { by { `$count` by "count" } },
+                )
+                .single()
+                .second["count"] as? BsonNumber
+
+            // 1..7 (7)
+            // 1..3, 11..13 (6)
+            assertEquals(13L, count?.longValue())
         }
     }
 }
