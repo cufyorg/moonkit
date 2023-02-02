@@ -1702,13 +1702,15 @@ suspend fun MonktCollection.ensureIndexSuspend(
  * The order of the given [pipelines] must match
  * the order of the collections in [this] list.
  *
+ * The result is a list of collection-index/document
+ * pairs. If a document can't be mapped to a
+ * collection, it will be mapped to `-1`.
+ *
  * @param pipelines the pipelines foreach collection.
  * @param pipeline the pipeline operations to be
  *                 performed on the combined
  *                 documents.
- * @return a list of pairs with each pair
- *         containing the index of the collection
- *         and the document.
+ * @return the aggregation results.
  * @since 2.0.0
  * @see MonktCollection.aggregate
  */
@@ -1756,8 +1758,8 @@ suspend fun List<MonktCollection>.aggregateSuspend(
     )
 
     return data.map {
-        val index = it.remove(INDEX_FIELD_NAME) as BsonInt32
-        index.value to it
+        val index = it.remove(INDEX_FIELD_NAME) as? BsonInt32
+        (index?.value ?: -1) to it
     }
 }
 
