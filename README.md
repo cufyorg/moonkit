@@ -1,6 +1,11 @@
 # Monkt [![](https://jitpack.io/v/org.cufy/monkt.svg)](https://jitpack.io/#org.cufy/monkt)
 
-A mongoose equivalent for kotlin.
+DSL Based MongoDB driver wrapper for kotlin with an optional schema system.
+
+
+> Note: this README is demonstrating how to use the ORM module.
+> But, it is fine to only use the bson DSL and the driver
+> coroutines wrapper.
 
 ### Install
 
@@ -16,7 +21,10 @@ repositories {
 
 dependencies {
     // Replace TAG with the desired version
-    implementation("org.cufy:monkit:TAG")
+    const val monkt_version = "TAG"
+    implementation("org.cufy.monkt:bson:$monkt_version")
+    implementation("org.cufy.monkt:coroutines:$monkt_version")
+    implementation("org.cufy.monkt:orm:$monkt_version")
 }
 ```
 
@@ -114,7 +122,7 @@ which is not even needed in monkt. But, still the
 developer experience is the first priority here in monkt.
 So, the code appears the same, but internally it is not.
 
-For example, the following code with monkt:
+For example, the following code with mongoose:
 
 ```typescript
 async function useEntityModel() {

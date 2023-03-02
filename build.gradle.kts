@@ -15,23 +15,6 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":bson"))
-    implementation(project(":mongodb"))
-    implementation(project(":core"))
-
-    implementation(kotlin("stdlib"))
-
-    implementation(Dependencies.Kotlin.serialization)
-    implementation(Dependencies.Kotlin.coroutines_core)
-    implementation(Dependencies.Kotlin.coroutines_reactive)
-    implementation(Dependencies.Kotlin.reflect)
-
-    implementation(Dependencies.MongoDB.driver_sync)
-    implementation(Dependencies.MongoDB.driver_reactivestreams)
-
-    implementation(Dependencies.weakness)
-
-    testImplementation(kotlin("test"))
 }
 
 tasks.test {

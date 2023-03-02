@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(":bson"))
-    implementation(project(":mongodb"))
+    implementation(project(":coroutines"))
 
     implementation(kotlin("stdlib"))
 

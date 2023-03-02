@@ -1,4 +1,4 @@
 rootProject.name = "monkt"
 include(":bson")
-include(":mongodb")
-include(":core")
+include(":coroutines")
+include(":orm")
