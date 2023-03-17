@@ -38,6 +38,7 @@ open class RefBsonDocumentBuilder<T>(
  * Construct a new bson document using the given
  * builder [block] with [ref].
  */
+@BsonBuildMarker
 fun <T> document(
     ref: T,
     block: RefBsonDocumentBlock<T>
