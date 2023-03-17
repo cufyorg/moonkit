@@ -1843,7 +1843,8 @@ suspend fun List<MonktCollection>.aggregateSuspend(
  *                 performed on the combined
  *                 documents.
  * @return a list of pairs with each pair
- *         containing the collection and the document.
+ *         containing the index of the collection
+ *         and the document.
  * @since 2.0.0
  * @see MonktCollection.aggregateSuspend
  */
@@ -1852,15 +1853,12 @@ suspend fun aggregateSuspend(
     pipeline: BsonArray = barray,
     session: ClientSession? = null,
     block: AggregatePublisherScope.() -> Unit = {}
-): List<Pair<MonktCollection, BsonDocument>> {
+): List<Pair<Int, BsonDocument>> {
     val (collectionList, pipelineList) = pipelines.unzip()
-    val result = collectionList.aggregateSuspend(
+    return collectionList.aggregateSuspend(
         pipelines = pipelineList.map { it.map { it as BsonDocument } },
         pipeline = pipeline.map { it as BsonDocument },
         session = session,
         block = block
     )
-    return result.map { (index, document) ->
-        collectionList[index] to document
-    }
 }
