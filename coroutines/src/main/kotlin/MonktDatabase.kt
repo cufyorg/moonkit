@@ -39,6 +39,23 @@ fun MonktDatabase(database: MongoDatabase): MonktDatabase {
 }
 
 /**
+ * A utility interface for creating [MonktDatabase]
+ * implementations that delegates to another
+ * [MonktDatabase] implementation.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface MonktDatabaseDelegate : MonktDatabase {
+    /**
+     * The database delegating to.
+     */
+    val database: MonktDatabase
+
+    override val java get() = database.java
+}
+
+/**
  * A generic-free coroutine dependant wrapper for
  * [MongoDatabase]s
  *

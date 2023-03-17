@@ -55,6 +55,23 @@ fun MonktClient(client: MongoClient): MonktClient {
 }
 
 /**
+ * A utility interface for creating [MonktClient]
+ * implementations that delegates to another
+ * [MonktClient] implementation.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface MonktClientDelegate : MonktClient {
+    /**
+     * The client delegating to.
+     */
+    val client: MonktClient
+
+    override val java get() = client.java
+}
+
+/**
  * A generic-free coroutine dependant wrapper for
  * [MongoClient]s
  *

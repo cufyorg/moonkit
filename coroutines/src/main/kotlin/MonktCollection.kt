@@ -45,6 +45,23 @@ fun MonktCollection(collection: MongoCollection<BsonDocument>): MonktCollection 
 }
 
 /**
+ * A utility interface for creating [MonktCollection]
+ * implementations that delegates to another
+ * [MonktCollection] implementation.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface MonktCollectionDelegate : MonktCollection {
+    /**
+     * The collection delegating to.
+     */
+    val collection: MonktCollection
+
+    override val java get() = collection.java
+}
+
+/**
  * A generic-free coroutine dependant wrapper for
  * [MongoCollection]s
  *
