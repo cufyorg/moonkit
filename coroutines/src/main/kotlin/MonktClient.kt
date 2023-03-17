@@ -18,6 +18,7 @@ package org.cufy.monkt
 import com.mongodb.ClientSessionOptions
 import com.mongodb.connection.ClusterDescription
 import com.mongodb.connection.ClusterSettings
+import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import com.mongodb.reactivestreams.client.ClientSession
 import com.mongodb.reactivestreams.client.ListDatabasesPublisher
@@ -28,6 +29,32 @@ import org.reactivestreams.Publisher
 import java.io.Closeable
 
 /**
+ * Create a new client with the given connection string.
+ *
+ * @param connectionString the connection.
+ * @return the client.
+ * @since 2.0.0
+ * @see MongoClients.create
+ */
+fun createMonktClient(connectionString: String): MonktClient {
+    val client = MongoClients.create(connectionString)
+    return MonktClient(client)
+}
+
+/**
+ * Create a new [MonktClient] instance wrapping
+ * the given [client] instance.
+ *
+ * @param client the client to be wrapped.
+ * @since 2.0.0
+ */
+fun MonktClient(client: MongoClient): MonktClient {
+    return object : MonktClient {
+        override val client = client
+    }
+}
+
+/**
  * A generic-free coroutine dependant wrapper for
  * [MongoClient]s
  *
@@ -36,12 +63,14 @@ import java.io.Closeable
  * @author LSafer
  * @since 2.0.0
  */
-open class MonktClient(
+interface MonktClient : Closeable {
     /**
      * The wrapped client.
      */
     val client: MongoClient
-) : Closeable by client {
+
+    override fun close() = client.close()
+
     /**
      * Gets the current cluster description.
      *

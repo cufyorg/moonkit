@@ -26,6 +26,19 @@ import org.cufy.bson.BsonDocument
 import org.reactivestreams.Publisher
 
 /**
+ * Create a new [MonktDatabase] instance wrapping
+ * the given [database] instance.
+ *
+ * @param database the database to be wrapped.
+ * @since 2.0.0
+ */
+fun MonktDatabase(database: MongoDatabase): MonktDatabase {
+    return object : MonktDatabase {
+        override val database = database
+    }
+}
+
+/**
  * A generic-free coroutine dependant wrapper for
  * [MongoDatabase]s
  *
@@ -34,12 +47,12 @@ import org.reactivestreams.Publisher
  * @author LSafer
  * @since 2.0.0
  */
-open class MonktDatabase(
+interface MonktDatabase {
     /**
      * The wrapped collection.
      */
     val database: MongoDatabase
-) {
+
     // ignored members
     // - codecRegistry       : reflection
     // - withCodecRegistry() : reflection

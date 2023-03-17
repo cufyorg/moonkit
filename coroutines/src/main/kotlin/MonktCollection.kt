@@ -32,6 +32,19 @@ import org.cufy.bson.bdocument
 import org.reactivestreams.Publisher
 
 /**
+ * Create a new [MonktCollection] instance wrapping
+ * the given [collection] instance.
+ *
+ * @param collection the collection to be wrapped.
+ * @since 2.0.0
+ */
+fun MonktCollection(collection: MongoCollection<BsonDocument>): MonktCollection {
+    return object : MonktCollection {
+        override val collection = collection
+    }
+}
+
+/**
  * A generic-free coroutine dependant wrapper for
  * [MongoCollection]s
  *
@@ -40,12 +53,12 @@ import org.reactivestreams.Publisher
  * @author LSafer
  * @since 2.0.0
  */
-open class MonktCollection(
+interface MonktCollection {
     /**
      * The wrapped collection.
      */
     val collection: MongoCollection<BsonDocument>
-) {
+
     // ignored members
     // - documentClass       : reflection
     // - codecRegistry       : reflection
