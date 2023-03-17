@@ -1725,8 +1725,8 @@ suspend fun List<MonktCollection>.aggregateSuspend(
 
     require(pipelines.size == size) {
         "List aggregation pipelines size mismatch: " +
-                "expected: $size; " +
-                "actual: ${pipelines.size}"
+        "expected: $size; " +
+        "actual: ${pipelines.size}"
     }
 
     val pairs = zip(pipelines).mapIndexed { index, (collection, pipeline) ->
@@ -1822,8 +1822,8 @@ suspend fun List<MonktCollection>.aggregateSuspend(
     val range = size..size + 1
     require(pipelines.size in range) {
         "List aggregation vararg pipelines size mismatch: " +
-                "expected: $range ; " +
-                "actual: ${pipelines.size}"
+        "expected: $range ; " +
+        "actual: ${pipelines.size}"
     }
     return aggregateSuspend(
         pipelines = pipelines.take(size),
@@ -1831,4 +1831,36 @@ suspend fun List<MonktCollection>.aggregateSuspend(
         session = session,
         block = block
     )
+}
+
+/**
+ * Perform a bulk aggregation passed as
+ * collection/pipeline pairs [pipelines].
+ *
+ * @param pipelines pairs of the collection and its
+ *                   aggregation.
+ * @param pipeline the pipeline operations to be
+ *                 performed on the combined
+ *                 documents.
+ * @return a list of pairs with each pair
+ *         containing the collection and the document.
+ * @since 2.0.0
+ * @see MonktCollection.aggregateSuspend
+ */
+suspend fun aggregateSuspend(
+    pipelines: List<Pair<MonktCollection, BsonArray>>,
+    pipeline: BsonArray = barray,
+    session: ClientSession? = null,
+    block: AggregatePublisherScope.() -> Unit = {}
+): List<Pair<MonktCollection, BsonDocument>> {
+    val (collectionList, pipelineList) = pipelines.unzip()
+    val result = collectionList.aggregateSuspend(
+        pipelines = pipelineList.map { it.map { it as BsonDocument } },
+        pipeline = pipeline.map { it as BsonDocument },
+        session = session,
+        block = block
+    )
+    return result.map { (index, document) ->
+        collectionList[index] to document
+    }
 }
