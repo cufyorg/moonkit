@@ -34,7 +34,7 @@ import org.reactivestreams.Publisher
  */
 fun MonktDatabase(database: MongoDatabase): MonktDatabase {
     return object : MonktDatabase {
-        override val database = database
+        override val java = database
     }
 }
 
@@ -51,7 +51,7 @@ interface MonktDatabase {
     /**
      * The wrapped collection.
      */
-    val database: MongoDatabase
+    val java: MongoDatabase
 
     // ignored members
     // - codecRegistry       : reflection
@@ -62,14 +62,14 @@ interface MonktDatabase {
      *
      * @return the database name
      */
-    val name: String get() = database.name
+    val name: String get() = java.name
 
     /**
      * Get the read preference for the MongoDatabase.
      *
      * @return the [com.mongodb.ReadPreference]
      */
-    val readPreference: ReadPreference get() = database.readPreference
+    val readPreference: ReadPreference get() = java.readPreference
 
     /**
      * Get the read concern for the MongoCollection.
@@ -77,14 +77,14 @@ interface MonktDatabase {
      * @return the [com.mongodb.ReadConcern]
      * @since 1.2
      */
-    val readConcern: ReadConcern get() = database.readConcern
+    val readConcern: ReadConcern get() = java.readConcern
 
     /**
      * Get the write concern for the MongoDatabase.
      *
      * @return the [com.mongodb.WriteConcern]
      */
-    val writeConcern: WriteConcern get() = database.writeConcern
+    val writeConcern: WriteConcern get() = java.writeConcern
 
     // with - TODO should it be builder style?
 
@@ -95,7 +95,7 @@ interface MonktDatabase {
      * @return a new MongoDatabase instance with the different readPreference
      */
     fun withReadPreference(preference: ReadPreference): MonktDatabase =
-        MonktDatabase(database.withReadPreference(preference))
+        MonktDatabase(java.withReadPreference(preference))
 
     /**
      * Create a new MongoDatabase instance with a different read concern.
@@ -105,7 +105,7 @@ interface MonktDatabase {
      * @since 1.2
      */
     fun withReadConcern(concern: ReadConcern): MonktDatabase =
-        MonktDatabase(database.withReadConcern(concern))
+        MonktDatabase(java.withReadConcern(concern))
 
     /**
      * Create a new MongoDatabase instance with a different write concern.
@@ -114,7 +114,7 @@ interface MonktDatabase {
      * @return a new MongoDatabase instance with the different writeConcern
      */
     fun withWriteConcern(concern: WriteConcern): MonktDatabase =
-        MonktDatabase(database.withWriteConcern(concern))
+        MonktDatabase(java.withWriteConcern(concern))
 
     // get
 
@@ -125,7 +125,7 @@ interface MonktDatabase {
      * @return the collection
      */
     fun getCollection(name: String): MonktCollection =
-        MonktCollection(database.getCollection(name, BsonDocument::class.java))
+        MonktCollection(java.getCollection(name, BsonDocument::class.java))
 
     /**
      * Executes command in the context of the current database.
@@ -141,8 +141,8 @@ interface MonktDatabase {
         preference: ReadPreference = ReadPreference.primary(),
         session: ClientSession? = null
     ): Publisher<BsonDocument> = when (session) {
-        null -> database.runCommand(command, preference, BsonDocument::class.java)
-        else -> database.runCommand(session, command, preference, BsonDocument::class.java)
+        null -> java.runCommand(command, preference, BsonDocument::class.java)
+        else -> java.runCommand(session, command, preference, BsonDocument::class.java)
     }
 
     /**
@@ -155,8 +155,8 @@ interface MonktDatabase {
     fun drop(
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> database.drop()
-        else -> database.drop(session)
+        null -> java.drop()
+        else -> java.drop(session)
     }
 
     /**
@@ -169,8 +169,8 @@ interface MonktDatabase {
     fun listCollectionNames(
         session: ClientSession? = null
     ): Publisher<String> = when (session) {
-        null -> database.listCollectionNames()
-        else -> database.listCollectionNames(session)
+        null -> java.listCollectionNames()
+        else -> java.listCollectionNames(session)
     }
 
     /**
@@ -183,8 +183,8 @@ interface MonktDatabase {
     fun listCollections(
         session: ClientSession? = null
     ): ListCollectionsPublisher<BsonDocument> = when (session) {
-        null -> database.listCollections(BsonDocument::class.java)
-        else -> database.listCollections(session, BsonDocument::class.java)
+        null -> java.listCollections(BsonDocument::class.java)
+        else -> java.listCollections(session, BsonDocument::class.java)
     }
 
     /**
@@ -201,8 +201,8 @@ interface MonktDatabase {
         options: CreateCollectionOptions = CreateCollectionOptions(),
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> database.createCollection(name, options)
-        else -> database.createCollection(session, name, options)
+        null -> java.createCollection(name, options)
+        else -> java.createCollection(session, name, options)
     }
 
     /**
@@ -223,8 +223,8 @@ interface MonktDatabase {
         options: CreateViewOptions = CreateViewOptions(),
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> database.createView(name, on, pipeline, options)
-        else -> database.createView(session, name, on, pipeline, options)
+        null -> java.createView(name, on, pipeline, options)
+        else -> java.createView(session, name, on, pipeline, options)
     }
 
     /**
@@ -239,8 +239,8 @@ interface MonktDatabase {
         pipeline: List<Bson> = emptyList(),
         session: ClientSession? = null
     ): ChangeStreamPublisher<BsonDocument> = when (session) {
-        null -> database.watch(pipeline, BsonDocument::class.java)
-        else -> database.watch(session, pipeline, BsonDocument::class.java)
+        null -> java.watch(pipeline, BsonDocument::class.java)
+        else -> java.watch(session, pipeline, BsonDocument::class.java)
     }
 
     /**
@@ -256,7 +256,7 @@ interface MonktDatabase {
         pipeline: List<Bson>,
         session: ClientSession? = null
     ): AggregatePublisher<BsonDocument> = when (session) {
-        null -> database.aggregate(pipeline, BsonDocument::class.java)
-        else -> database.aggregate(session, pipeline, BsonDocument::class.java)
+        null -> java.aggregate(pipeline, BsonDocument::class.java)
+        else -> java.aggregate(session, pipeline, BsonDocument::class.java)
     }
 }

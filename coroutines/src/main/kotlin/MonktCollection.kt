@@ -40,7 +40,7 @@ import org.reactivestreams.Publisher
  */
 fun MonktCollection(collection: MongoCollection<BsonDocument>): MonktCollection {
     return object : MonktCollection {
-        override val collection = collection
+        override val java = collection
     }
 }
 
@@ -57,7 +57,7 @@ interface MonktCollection {
     /**
      * The wrapped collection.
      */
-    val collection: MongoCollection<BsonDocument>
+    val java: MongoCollection<BsonDocument>
 
     // ignored members
     // - documentClass       : reflection
@@ -71,14 +71,14 @@ interface MonktCollection {
      *
      * @return the namespace
      */
-    val namespace: MongoNamespace get() = collection.namespace
+    val namespace: MongoNamespace get() = java.namespace
 
     /**
      * Get the read preference for the MongoCollection.
      *
      * @return the [com.mongodb.ReadPreference]
      */
-    val readPreference: ReadPreference get() = collection.readPreference
+    val readPreference: ReadPreference get() = java.readPreference
 
     /**
      * Get the read concern for the MongoCollection.
@@ -86,14 +86,14 @@ interface MonktCollection {
      * @return the [com.mongodb.ReadConcern]
      * @since 1.2
      */
-    val readConcern: ReadConcern get() = collection.readConcern
+    val readConcern: ReadConcern get() = java.readConcern
 
     /**
      * Get the write concern for the MongoCollection.
      *
      * @return the [com.mongodb.WriteConcern]
      */
-    val writeConcern: WriteConcern get() = collection.writeConcern
+    val writeConcern: WriteConcern get() = java.writeConcern
 
     // with - TODO should it be builder style?
 
@@ -104,7 +104,7 @@ interface MonktCollection {
      * @return a new MongoCollection instance with the different readPreference
      */
     fun withReadPreference(preference: ReadPreference): MonktCollection =
-        MonktCollection(collection.withReadPreference(preference))
+        MonktCollection(java.withReadPreference(preference))
 
     /**
      * Create a new MongoCollection instance with a different read concern.
@@ -114,7 +114,7 @@ interface MonktCollection {
      * @since 1.2
      */
     fun withReadConcern(concern: ReadConcern): MonktCollection =
-        MonktCollection(collection.withReadConcern(concern))
+        MonktCollection(java.withReadConcern(concern))
 
     /**
      * Create a new MongoCollection instance with a different write concern.
@@ -123,7 +123,7 @@ interface MonktCollection {
      * @return a new MongoCollection instance with the different writeConcern
      */
     fun withWriteConcern(concern: WriteConcern): MonktCollection =
-        MonktCollection(collection.withWriteConcern(concern))
+        MonktCollection(java.withWriteConcern(concern))
 
     // count
 
@@ -138,7 +138,7 @@ interface MonktCollection {
         options: EstimatedDocumentCountOptions =
             EstimatedDocumentCountOptions()
     ): Publisher<Long> =
-        collection.estimatedDocumentCount(options)
+        java.estimatedDocumentCount(options)
 
     /**
      * Counts the number of documents in the collection according to the given options.
@@ -170,8 +170,8 @@ interface MonktCollection {
         options: CountOptions = CountOptions(),
         session: ClientSession? = null
     ): Publisher<Long> = when (session) {
-        null -> collection.countDocuments(filter, options)
-        else -> collection.countDocuments(session, filter, options)
+        null -> java.countDocuments(filter, options)
+        else -> java.countDocuments(session, filter, options)
     }
 
     // READ
@@ -193,8 +193,8 @@ interface MonktCollection {
         filter: Bson = bdocument,
         session: ClientSession? = null
     ): DistinctPublisher<BsonDocument> = when (session) {
-        null -> collection.distinct(field, filter, BsonDocument::class.java)
-        else -> collection.distinct(session, field, filter, BsonDocument::class.java)
+        null -> java.distinct(field, filter, BsonDocument::class.java)
+        else -> java.distinct(session, field, filter, BsonDocument::class.java)
     }
 
     /**
@@ -209,8 +209,8 @@ interface MonktCollection {
         filter: Bson = bdocument,
         session: ClientSession? = null
     ): FindPublisher<BsonDocument> = when (session) {
-        null -> collection.find(filter, BsonDocument::class.java)
-        else -> collection.find(session, filter, BsonDocument::class.java)
+        null -> java.find(filter, BsonDocument::class.java)
+        else -> java.find(session, filter, BsonDocument::class.java)
     }
 
     /**
@@ -225,8 +225,8 @@ interface MonktCollection {
         pipeline: List<Bson>,
         session: ClientSession? = null
     ): AggregatePublisher<BsonDocument> = when (session) {
-        null -> collection.aggregate(pipeline, BsonDocument::class.java)
-        else -> collection.aggregate(session, pipeline, BsonDocument::class.java)
+        null -> java.aggregate(pipeline, BsonDocument::class.java)
+        else -> java.aggregate(session, pipeline, BsonDocument::class.java)
     }
 
     /**
@@ -241,8 +241,8 @@ interface MonktCollection {
         pipeline: List<Bson> = emptyList(),
         session: ClientSession? = null
     ): ChangeStreamPublisher<BsonDocument> = when (session) {
-        null -> collection.watch(pipeline, BsonDocument::class.java)
-        else -> collection.watch(session, pipeline, BsonDocument::class.java)
+        null -> java.watch(pipeline, BsonDocument::class.java)
+        else -> java.watch(session, pipeline, BsonDocument::class.java)
     }
 
     // WRITE
@@ -261,8 +261,8 @@ interface MonktCollection {
         options: BulkWriteOptions = BulkWriteOptions(),
         session: ClientSession? = null
     ): Publisher<BulkWriteResult> = when (session) {
-        null -> collection.bulkWrite(requests, options)
-        else -> collection.bulkWrite(session, requests, options)
+        null -> java.bulkWrite(requests, options)
+        else -> java.bulkWrite(session, requests, options)
     }
 
     /**
@@ -280,8 +280,8 @@ interface MonktCollection {
         options: InsertOneOptions = InsertOneOptions(),
         session: ClientSession? = null
     ): Publisher<InsertOneResult> = when (session) {
-        null -> collection.insertOne(document, options)
-        else -> collection.insertOne(session, document, options)
+        null -> java.insertOne(document, options)
+        else -> java.insertOne(session, document, options)
     }
 
     /**
@@ -299,8 +299,8 @@ interface MonktCollection {
         options: InsertManyOptions = InsertManyOptions(),
         session: ClientSession? = null
     ): Publisher<InsertManyResult> = when (session) {
-        null -> collection.insertMany(documents, options)
-        else -> collection.insertMany(session, documents, options)
+        null -> java.insertMany(documents, options)
+        else -> java.insertMany(session, documents, options)
     }
 
     /**
@@ -318,8 +318,8 @@ interface MonktCollection {
         options: DeleteOptions = DeleteOptions(),
         session: ClientSession? = null
     ): Publisher<DeleteResult> = when (session) {
-        null -> collection.deleteOne(filter, options)
-        else -> collection.deleteOne(session, filter, options)
+        null -> java.deleteOne(filter, options)
+        else -> java.deleteOne(session, filter, options)
     }
 
     /**
@@ -336,8 +336,8 @@ interface MonktCollection {
         options: DeleteOptions = DeleteOptions(),
         session: ClientSession? = null
     ): Publisher<DeleteResult> = when (session) {
-        null -> collection.deleteMany(filter, options)
-        else -> collection.deleteMany(session, filter, options)
+        null -> java.deleteMany(filter, options)
+        else -> java.deleteMany(session, filter, options)
     }
 
     /**
@@ -356,8 +356,8 @@ interface MonktCollection {
         options: ReplaceOptions = ReplaceOptions(),
         session: ClientSession? = null
     ): Publisher<UpdateResult> = when (session) {
-        null -> collection.replaceOne(filter, replacement, options)
-        else -> collection.replaceOne(session, filter, replacement, options)
+        null -> java.replaceOne(filter, replacement, options)
+        else -> java.replaceOne(session, filter, replacement, options)
     }
 
     /**
@@ -376,8 +376,8 @@ interface MonktCollection {
         options: UpdateOptions = UpdateOptions(),
         session: ClientSession? = null
     ): Publisher<UpdateResult> = when (session) {
-        null -> collection.updateOne(filter, update, options)
-        else -> collection.updateOne(session, filter, update, options)
+        null -> java.updateOne(filter, update, options)
+        else -> java.updateOne(session, filter, update, options)
     }
 
     /**
@@ -398,8 +398,8 @@ interface MonktCollection {
         options: UpdateOptions = UpdateOptions(),
         session: ClientSession? = null
     ): Publisher<UpdateResult> = when (session) {
-        null -> collection.updateOne(filter, update, options)
-        else -> collection.updateOne(session, filter, update, options)
+        null -> java.updateOne(filter, update, options)
+        else -> java.updateOne(session, filter, update, options)
     }
 
     /**
@@ -418,8 +418,8 @@ interface MonktCollection {
         options: UpdateOptions = UpdateOptions(),
         session: ClientSession? = null
     ): Publisher<UpdateResult> = when (session) {
-        null -> collection.updateMany(filter, update, options)
-        else -> collection.updateMany(session, filter, update, options)
+        null -> java.updateMany(filter, update, options)
+        else -> java.updateMany(session, filter, update, options)
     }
 
     /**
@@ -438,8 +438,8 @@ interface MonktCollection {
         options: UpdateOptions = UpdateOptions(),
         session: ClientSession? = null
     ): Publisher<UpdateResult> = when (session) {
-        null -> collection.updateMany(filter, update, options)
-        else -> collection.updateMany(session, filter, update, options)
+        null -> java.updateMany(filter, update, options)
+        else -> java.updateMany(session, filter, update, options)
     }
 
     // ATOMIC
@@ -459,8 +459,8 @@ interface MonktCollection {
         options: FindOneAndDeleteOptions = FindOneAndDeleteOptions(),
         session: ClientSession? = null
     ): Publisher<BsonDocument> = when (session) {
-        null -> collection.findOneAndDelete(filter, options)
-        else -> collection.findOneAndDelete(session, filter, options)
+        null -> java.findOneAndDelete(filter, options)
+        else -> java.findOneAndDelete(session, filter, options)
     }
 
     /**
@@ -481,8 +481,8 @@ interface MonktCollection {
         options: FindOneAndReplaceOptions = FindOneAndReplaceOptions(),
         session: ClientSession? = null
     ): Publisher<BsonDocument> = when (session) {
-        null -> collection.findOneAndReplace(filter, replacement, options)
-        else -> collection.findOneAndReplace(session, filter, replacement, options)
+        null -> java.findOneAndReplace(filter, replacement, options)
+        else -> java.findOneAndReplace(session, filter, replacement, options)
     }
 
     /**
@@ -503,8 +503,8 @@ interface MonktCollection {
         options: FindOneAndUpdateOptions = FindOneAndUpdateOptions(),
         session: ClientSession? = null
     ): Publisher<BsonDocument> = when (session) {
-        null -> collection.findOneAndUpdate(filter, update, options)
-        else -> collection.findOneAndUpdate(session, filter, update, options)
+        null -> java.findOneAndUpdate(filter, update, options)
+        else -> java.findOneAndUpdate(session, filter, update, options)
     }
 
     /**
@@ -527,8 +527,8 @@ interface MonktCollection {
         options: FindOneAndUpdateOptions = FindOneAndUpdateOptions(),
         session: ClientSession? = null
     ): Publisher<BsonDocument> = when (session) {
-        null -> collection.findOneAndUpdate(filter, update, options)
-        else -> collection.findOneAndUpdate(session, filter, update, options)
+        null -> java.findOneAndUpdate(filter, update, options)
+        else -> java.findOneAndUpdate(session, filter, update, options)
     }
 
     // COLLECTION
@@ -543,8 +543,8 @@ interface MonktCollection {
     fun drop(
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> collection.drop()
-        else -> collection.drop(session)
+        null -> java.drop()
+        else -> java.drop(session)
     }
 
     /**
@@ -561,8 +561,8 @@ interface MonktCollection {
         options: IndexOptions = IndexOptions(),
         session: ClientSession? = null
     ): Publisher<String> = when (session) {
-        null -> collection.createIndex(key, options)
-        else -> collection.createIndex(session, key, options)
+        null -> java.createIndex(key, options)
+        else -> java.createIndex(session, key, options)
     }
 
     /**
@@ -579,8 +579,8 @@ interface MonktCollection {
         options: CreateIndexOptions = CreateIndexOptions(),
         session: ClientSession? = null
     ): Publisher<String> = when (session) {
-        null -> collection.createIndexes(indexes, options)
-        else -> collection.createIndexes(session, indexes, options)
+        null -> java.createIndexes(indexes, options)
+        else -> java.createIndexes(session, indexes, options)
     }
 
     /**
@@ -593,8 +593,8 @@ interface MonktCollection {
     fun listIndexes(
         session: ClientSession? = null
     ): ListIndexesPublisher<BsonDocument> = when (session) {
-        null -> collection.listIndexes(BsonDocument::class.java)
-        else -> collection.listIndexes(session, BsonDocument::class.java)
+        null -> java.listIndexes(BsonDocument::class.java)
+        else -> java.listIndexes(session, BsonDocument::class.java)
     }
 
     /**
@@ -611,8 +611,8 @@ interface MonktCollection {
         options: DropIndexOptions = DropIndexOptions(),
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> collection.dropIndex(name, options)
-        else -> collection.dropIndex(session, name, options)
+        null -> java.dropIndex(name, options)
+        else -> java.dropIndex(session, name, options)
     }
 
     /**
@@ -629,8 +629,8 @@ interface MonktCollection {
         options: DropIndexOptions = DropIndexOptions(),
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> collection.dropIndex(keys, options)
-        else -> collection.dropIndex(session, keys, options)
+        null -> java.dropIndex(keys, options)
+        else -> java.dropIndex(session, keys, options)
     }
 
     /**
@@ -645,8 +645,8 @@ interface MonktCollection {
         options: DropIndexOptions = DropIndexOptions(),
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> collection.dropIndexes(options)
-        else -> collection.dropIndexes(session, options)
+        null -> java.dropIndexes(options)
+        else -> java.dropIndexes(session, options)
     }
 
     /**
@@ -663,7 +663,7 @@ interface MonktCollection {
         options: RenameCollectionOptions = RenameCollectionOptions(),
         session: ClientSession? = null
     ): Publisher<Void> = when (session) {
-        null -> collection.renameCollection(namespace, options)
-        else -> collection.renameCollection(session, namespace, options)
+        null -> java.renameCollection(namespace, options)
+        else -> java.renameCollection(session, namespace, options)
     }
 }

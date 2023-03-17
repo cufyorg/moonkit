@@ -50,7 +50,7 @@ fun createMonktClient(connectionString: String): MonktClient {
  */
 fun MonktClient(client: MongoClient): MonktClient {
     return object : MonktClient {
-        override val client = client
+        override val java = client
     }
 }
 
@@ -67,9 +67,9 @@ interface MonktClient : Closeable {
     /**
      * The wrapped client.
      */
-    val client: MongoClient
+    val java: MongoClient
 
-    override fun close() = client.close()
+    override fun close() = java.close()
 
     /**
      * Gets the current cluster description.
@@ -84,7 +84,7 @@ interface MonktClient : Closeable {
      * @see com.mongodb.MongoClientSettings.Builder.applyToClusterSettings
      * @since 4.1
      */
-    val clusterDescription: ClusterDescription get() = client.clusterDescription
+    val clusterDescription: ClusterDescription get() = java.clusterDescription
 
     /**
      * Gets the database with the given name.
@@ -93,7 +93,7 @@ interface MonktClient : Closeable {
      * @return the database
      */
     fun getDatabase(name: String): MonktDatabase =
-        MonktDatabase(client.getDatabase(name))
+        MonktDatabase(java.getDatabase(name))
 
     /**
      * Get a list of the database names
@@ -105,8 +105,8 @@ interface MonktClient : Closeable {
     fun listDatabaseNames(
         session: ClientSession? = null
     ): Publisher<String> = when (session) {
-        null -> client.listDatabaseNames()
-        else -> client.listDatabaseNames(session)
+        null -> java.listDatabaseNames()
+        else -> java.listDatabaseNames(session)
     }
 
     /**
@@ -119,8 +119,8 @@ interface MonktClient : Closeable {
     fun listDatabases(
         session: ClientSession? = null
     ): ListDatabasesPublisher<BsonDocument> = when (session) {
-        null -> client.listDatabases(BsonDocument::class.java)
-        else -> client.listDatabases(session, BsonDocument::class.java)
+        null -> java.listDatabases(BsonDocument::class.java)
+        else -> java.listDatabases(session, BsonDocument::class.java)
     }
 
     /**
@@ -135,8 +135,8 @@ interface MonktClient : Closeable {
         pipeline: List<Bson> = emptyList(),
         session: ClientSession? = null
     ): ChangeStreamPublisher<BsonDocument> = when (session) {
-        null -> client.watch(pipeline, BsonDocument::class.java)
-        else -> client.watch(session, pipeline, BsonDocument::class.java)
+        null -> java.watch(pipeline, BsonDocument::class.java)
+        else -> java.watch(session, pipeline, BsonDocument::class.java)
     }
 
     /**
@@ -149,5 +149,5 @@ interface MonktClient : Closeable {
     fun startSession(
         options: ClientSessionOptions = ClientSessionOptions.builder().build()
     ): Publisher<ClientSession> =
-        client.startSession(options)
+        java.startSession(options)
 }
