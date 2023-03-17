@@ -31,7 +31,7 @@ typealias BsonDocumentBlock = BsonDocumentBuilder.() -> Unit
  * @author LSafer
  * @since 2.0.0
  */
-class BsonDocumentBuilder(
+open class BsonDocumentBuilder(
     /**
      * The document currently building.
      */
