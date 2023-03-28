@@ -427,6 +427,16 @@ open class BsonDocumentBuilder(
     //
 
     /**
+     * Set the field represented by the [receiver][this] to the given [value].
+     */
+    @BsonBuildMarker
+    infix fun <T> BsonField<T>.by(value: T) {
+        name by encode(value)
+    }
+
+    //
+
+    /**
      * Put all the mappings in the given [map].
      */
     @BsonBuildMarker
