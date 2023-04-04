@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2022-2023 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -15,114 +15,16 @@
  */
 package org.cufy.bson
 
+import kotlinx.serialization.Serializable
+import org.cufy.bson.internal.IdSerializer
 import org.intellij.lang.annotations.Language
 
-/**
- * A type-safe container for a BSON document.
- *
- * @see org.bson.BsonDocument
- * @since 2.0.0
- */
-typealias BsonDocument = org.bson.BsonDocument
+/* ============= ------------------ ============= */
 
 /**
- * A type-safe representation of the BSON array type.
- *
- * @see org.bson.BsonArray
- * @since 2.0.0
- */
-typealias BsonArray = org.bson.BsonArray
-
-/**
- * A representation of the BSON String type.
- *
- * @see org.bson.BsonString
- * @since 2.0.0
- */
-typealias BsonString = org.bson.BsonString
-
-/**
- * A representation of the BSON ObjectId type.
- *
- * @see org.bson.BsonObjectId
- * @since 2.0.0
- */
-typealias BsonObjectId = org.bson.BsonObjectId
-
-/**
- * A representation of the BSON Int32 type.
- *
- * @see org.bson.BsonInt32
- * @since 2.0.0
- */
-typealias BsonInt32 = org.bson.BsonInt32
-
-/**
- * A representation of the BSON Int64 type.
- *
- * @see org.bson.BsonInt64
- * @since 2.0.0
- */
-typealias BsonInt64 = org.bson.BsonInt64
-
-/**
- * Represents the value associated with the BSON Undefined type.
- *
- * @see org.bson.BsonUndefined
- * @since 2.0.0
- */
-typealias BsonUndefined = org.bson.BsonUndefined
-
-/**
- * A representation of the BSON Null type.
- *
- * @see org.bson.BsonNull
- * @since 2.0.0
- */
-typealias BsonNull = org.bson.BsonNull
-
-/**
- * A representation of the BSON Boolean type.
- *
- * @see org.bson.BsonBoolean
- * @since 2.0.0
- */
-typealias BsonBoolean = org.bson.BsonBoolean
-
-/**
- * A representation of the BSON Decimal128 type.
- *
- * @see org.bson.BsonDecimal128
- * @since 2.0.0
- */
-typealias BsonDecimal128 = org.bson.BsonDecimal128
-
-/**
- * A representation of the BSON Double type.
- *
- * @see org.bson.BsonDouble
- * @since 2.0.0
- */
-typealias BsonDouble = org.bson.BsonDouble
-
-/**
- * Base class for any BSON type.
- *
- * @see org.bson.BsonValue
- * @since 2.0.0
- */
-typealias BsonValue = org.bson.BsonValue
-
-/**
- * An interface for types that are able to render themselves into a [BsonDocument].
- *
- * @see org.bson.conversions.Bson
- * @since 2.0.0
- */
-typealias Bson = org.bson.conversions.Bson
-
-/**
- * A binary integer decimal representation of a 128-bit decimal value, supporting 34 decimal digits of significand and an exponent range
+ * A binary integer decimal representation of a
+ * 128-bit decimal value, supporting 34 decimal
+ * digits of significand and an exponent range
  * of -6143 to +6144.
  *
  * @see org.bson.types.Decimal128
@@ -138,183 +40,438 @@ typealias Decimal128 = org.bson.types.Decimal128
  */
 typealias ObjectId = org.bson.types.ObjectId
 
-/**
- * * A holder class for a BSON regular expression, so that we can delay compiling into a Pattern until necessary.
- *
- * @see org.bson.BsonRegularExpression
- * @since 2.0.0
- */
-typealias BsonRegex = org.bson.BsonRegularExpression
+/* ============= ------------------ ============= */
 
 /**
- * Enumeration of all the BSON types currently supported.
+ * An id wrapper.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+@Serializable(IdSerializer::class)
+data class Id<T>(val value: String) : CharSequence by value {
+    constructor() : this(ObjectId())
+    constructor(value: ObjectId) : this(value.toHexString())
+    constructor(value: Id<*>) : this(value.value)
+
+    override fun toString(): String = value
+}
+
+/**
+ * Enumeration of the supported [BsonElement] types.
  *
  * @see org.bson.BsonType
  * @since 2.0.0
  */
-typealias BsonType = org.bson.BsonType
+enum class BsonType(val value: Int) {
+    //    EndOfDocument(0x00),
+
+    /**
+     * The type for [BsonDouble].
+     *
+     * @see org.bson.BsonType.DOUBLE
+     * @since 2.0.0
+     */
+    Double(0x01),
+
+    /**
+     * The type for [BsonString].
+     *
+     * @see org.bson.BsonType.STRING
+     * @since 2.0.0
+     */
+    String(0x02),
+
+    /**
+     * The type for [BsonDocument].
+     *
+     * @see org.bson.BsonType.DOCUMENT
+     * @since 2.0.0
+     */
+    Document(0x03),
+
+    /**
+     * The type for [BsonArray].
+     *
+     * @see org.bson.BsonType.ARRAY
+     * @since 2.0.0
+     */
+    Array(0x04),
+
+    //    Binary(0x05),
+
+    /**
+     * The type for [BsonUndefined].
+     *
+     * @see org.bson.BsonType.UNDEFINED
+     * @since 2.0.0
+     */
+    Undefined(0x06),
+
+    /**
+     * The type for [BsonObjectId].
+     *
+     * @see org.bson.BsonType.OBJECT_ID
+     * @since 2.0.0
+     */
+    ObjectId(0x07),
+
+    /**
+     * The type for [BsonBoolean].
+     *
+     * @see org.bson.BsonType.BOOLEAN
+     * @since 2.0.0
+     */
+    Boolean(0x08),
+
+    //    DateTime(0x09),
+
+    /**
+     * The type for [BsonNull].
+     *
+     * @see org.bson.BsonType.NULL
+     * @since 2.0.0
+     */
+    Null(0x0a),
+
+    /**
+     * The type for [BsonRegExp].
+     *
+     * @see org.bson.BsonType.REGULAR_EXPRESSION
+     * @since 2.0.0
+     */
+    RegExp(0x0b),
+
+    //    DbPointer(0x0c),
+    //    Javascript(0x0d),
+    //    Symbol(0x0e),
+    //    JavascriptWithScope(0x0f),
+
+    /**
+     * The type for [BsonInt32].
+     *
+     * @see org.bson.BsonType.INT32
+     * @since 2.0.0
+     */
+    Int32(0x10),
+
+    //    Timestamp(0x11),
+
+    /**
+     * The type for [BsonInt64].
+     *
+     * @see org.bson.BsonType.INT64
+     * @since 2.0.0
+     */
+    Int64(0x12),
+
+    /**
+     * The type for [BsonDecimal128].
+     *
+     * @see org.bson.BsonType.DECIMAL128
+     * @since 2.0.0
+     */
+    Decimal128(0x13),
+
+    //    MinKey(0xff),
+    //    MaxKey(0x7f)
+}
+
+/* ============= ------------------ ============= */
 
 /**
- * An immutable BSON document that is represented using only the raw bytes.
+ * Base class for any BSON type.
  *
- * @see org.bson.RawBsonDocument
+ * @see org.bson.BsonValue
  * @since 2.0.0
  */
-internal typealias RawBsonDocument = org.bson.RawBsonDocument
+sealed interface BsonElement
 
 /**
- * An immutable BSON array that is represented using only the raw bytes.
+ * Return a new [BsonArray] instance backed by the given list.
+ */
+fun BsonArray(content: List<BsonElement> = emptyList()): BsonArray {
+    return BsonArrayImpl(content)
+}
+
+/**
+ * Construct a new bson array using the given
+ * builder [block].
+ */
+fun BsonArray(block: BsonArrayBlock): BsonArray {
+    return MutableBsonArray().apply(block)
+}
+
+/**
+ * A type-safe representation of the BSON array type.
  *
- * @see org.bson.RawBsonArray
+ * @see org.bson.BsonArray
  * @since 2.0.0
  */
-internal typealias RawBsonArray = org.bson.RawBsonArray
+sealed interface BsonArray : BsonElement, List<BsonElement>
 
 /**
- * A mapping from a name to a BsonValue.
+ * Construct a new bson document using the given
+ * builder [block].
+ */
+fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
+    return MutableBsonDocument().apply(block)
+}
+
+/**
+ * Return a new [BsonDocument] instance backed by the given map.
+ */
+fun BsonDocument(content: Map<String, BsonElement> = emptyMap()): BsonDocument {
+    return BsonDocumentImpl(content)
+}
+
+/**
+ * A type-safe container for a BSON document.
  *
- * @see org.bson.BsonElement
+ * @see org.bson.BsonDocument
  * @since 2.0.0
  */
-internal typealias BsonElement = org.bson.BsonElement
-
-//
+sealed interface BsonDocument : BsonElement, Map<String, BsonElement>
 
 /**
- * The global instance of bson null.
+ * Base class for the numeric BSON types.
+ * This class mirrors the functionality provided by [Number].
+ *
+ * @see org.bson.BsonNumber
+ * @since 2.0.0
  */
-@BsonKeywordMarker
-val bnull: BsonNull = BsonNull.VALUE
+sealed interface BsonNumber : BsonElement {
+    /**
+     * Returns the value of the specified number
+     * as an [Int], which may involve rounding or
+     * truncation.
+     */
+    fun toInt(): Int
+
+    /**
+     * Returns the value of the specified number
+     * as an [Long], which may involve rounding or
+     * truncation.
+     */
+    fun toLong(): Long
+
+    /**
+     * Returns the value of the specified number
+     * as a [Double], which may involve rounding.
+     */
+    fun toDouble(): Double
+
+    /**
+     * Returns the value of the specified number
+     * as a [Decimal128], which may involve rounding.
+     */
+    fun toDecimal128(): Decimal128
+}
 
 /**
- * A global instance of bson undefined.
+ * A representation of the BSON Int32 type.
+ *
+ * @see org.bson.BsonInt32
+ * @since 2.0.0
  */
-@BsonKeywordMarker
-val bundefined: BsonUndefined = BsonUndefined()
+data class BsonInt32(val value: Int) : BsonElement, BsonNumber {
+    override fun toInt() = value
+    override fun toLong() = value.toLong()
+    override fun toDouble() = value.toDouble()
+    override fun toDecimal128() = value.toDecimal128()
+
+    override fun equals(other: Any?) =
+        other is BsonInt32 && other.value == value
+
+    override fun hashCode() =
+        value
+
+    override fun toString() =
+        value.toString()
+}
 
 /**
- * The global instance of bson true.
+ * A representation of the BSON Int64 type.
+ *
+ * @see org.bson.BsonInt64
+ * @since 2.0.0
  */
-@BsonKeywordMarker
-val btrue: BsonBoolean = BsonBoolean.TRUE
+data class BsonInt64(val value: Long) : BsonElement, BsonNumber {
+    override fun toInt() = value.toInt()
+    override fun toLong() = value
+    override fun toDouble() = value.toDouble()
+    override fun toDecimal128() = value.toDecimal128()
+
+    override fun equals(other: Any?) =
+        other is BsonInt64 && other.value == value
+
+    override fun hashCode() =
+        value.hashCode()
+
+    override fun toString() =
+        value.toString()
+}
 
 /**
- * The global instance of bson false.
+ * A representation of the BSON Double type.
+ *
+ * @see org.bson.BsonDouble
+ * @since 2.0.0
  */
-@BsonKeywordMarker
-val bfalse: BsonBoolean = BsonBoolean.FALSE
+data class BsonDouble(val value: Double) : BsonElement, BsonNumber {
+    override fun toInt() = value.toInt()
+    override fun toLong() = value.toLong()
+    override fun toDouble() = value
+    override fun toDecimal128() = value.toDecimal128()
+
+    override fun equals(other: Any?) =
+        other is BsonDouble && other.value == value
+
+    override fun hashCode() =
+        value.hashCode()
+
+    override fun toString() =
+        value.toString()
+}
 
 /**
- * A global instance of an empty immutable array.
+ * A representation of the BSON Decimal128 type.
+ *
+ * @see org.bson.BsonDecimal128
+ * @since 2.0.0
  */
-@BsonKeywordMarker
-val barray: BsonArray = RawBsonArray.parse("[]")
+data class BsonDecimal128(val value: Decimal128) : BsonElement, BsonNumber {
+    override fun toInt() = value.toBigDecimal().toInt()
+    override fun toLong() = value.toBigDecimal().toLong()
+    override fun toDouble() = value.toBigDecimal().toDouble()
+    override fun toDecimal128() = value
+
+    override fun equals(other: Any?) =
+        other is BsonDecimal128 && other.value == value
+
+    override fun hashCode() =
+        value.hashCode()
+
+    override fun toString() =
+        value.toString()
+}
 
 /**
- * A global instance of an empty immutable object.
+ * A representation of the BSON String type.
+ *
+ * @see org.bson.BsonString
+ * @since 2.0.0
  */
-@BsonKeywordMarker
-val bdocument: BsonDocument = RawBsonDocument.parse("{}")
+data class BsonString(val value: String) : BsonElement {
+    override fun equals(other: Any?) =
+        other is BsonString && other.value == value
+
+    override fun hashCode() =
+        value.hashCode()
+
+    override fun toString() =
+        """"$value""""
+}
 
 /**
- * Return a [BsonDouble] with the given [value].
- */
-@BsonKeywordMarker
-fun bdouble(value: Double): BsonDouble = BsonDouble(value)
-
-/**
- * Return a [BsonString] with the given [value].
- */
-@BsonKeywordMarker
-fun bstring(value: String): BsonString = BsonString(value)
-
-/**
- * Return a [BsonInt32] with the given [value].
- */
-@BsonKeywordMarker
-fun bint32(value: Int): BsonInt32 = BsonInt32(value)
-
-/**
- * Return a [BsonInt64] with the given [value].
- */
-@BsonKeywordMarker
-fun bint64(value: Long): BsonInt64 = BsonInt64(value)
-
-/**
- * Return a [BsonRegex] with the given [value].
+ * Return a [BsonRegExp] with the given [pattern] and [options].
  *
  * @since 2.0.0
  */
-fun bregex(@Language("RegExp") value: String): BsonRegex = BsonRegex(value)
+fun BsonRegExp(@Language("RegExp") pattern: String, options: String): BsonRegExp {
+    return BsonRegExp(pattern, options.toSortedSet())
+}
 
 /**
- * Return a [BsonRegex] with the given [value] and [options].
+ * A holder class for a BSON regular expression,
+ * so that we can delay compiling into a Pattern
+ * until necessary.
  *
+ * @see org.bson.BsonRegularExpression
  * @since 2.0.0
  */
-@BsonKeywordMarker
-fun bregex(@Language("RegExp") value: String, options: String): BsonRegex = BsonRegex(value, options)
+data class BsonRegExp(@Language("RegExp") val pattern: String, val options: Set<Char> = emptySet()) : BsonElement {
+    override fun equals(other: Any?) =
+        other is BsonRegExp && other.pattern == pattern && other.options == options
 
-//
+    override fun hashCode() =
+        31 * pattern.hashCode() + options.hashCode()
 
-/**
- * A BSON double.
- */
-val BsonDoubleType = BsonType.DOUBLE
-
-/**
- * A BSON string.
- */
-val BsonStringType = BsonType.STRING
+    override fun toString() =
+        "/$pattern/${options.joinToString("")}"
+}
 
 /**
- * A BSON document.
- */
-val BsonDocumentType = BsonType.DOCUMENT
-
-/**
- * A BSON array.
- */
-val BsonArrayType = BsonType.ARRAY
-
-/**
- * A BSON undefined value.
- */
-val BsonUndefinedType = BsonType.UNDEFINED
-
-/**
- * A BSON ObjectId.
- */
-val BsonObjectIdType = BsonType.OBJECT_ID
-
-/**
- * A BSON bool.
- */
-val BsonBooleanType = BsonType.BOOLEAN
-
-/**
- * A BSON null value.
- */
-val BsonNullType = BsonType.NULL
-
-/**
- * A BSON 32-bit integer.
- */
-val BsonInt32Type = BsonType.INT32
-
-/**
- * A BSON 64-bit integer.
- */
-val BsonInt64Type = BsonType.INT64
-
-/**
- * A BSON Decimal128.
+ * A representation of the BSON ObjectId type.
  *
- * @since 3.4
+ * @see org.bson.BsonObjectId
+ * @since 2.0.0
  */
-val BsonDecimal128Type = BsonType.DECIMAL128
+data class BsonObjectId(val value: ObjectId) : BsonElement {
+    override fun equals(other: Any?) =
+        other is BsonObjectId && other.value == value
+
+    override fun hashCode(): Int =
+        value.hashCode()
+
+    override fun toString(): String =
+        """ObjectId("$value")"""
+}
 
 /**
- * A BSON regular expression.
+ * Return a [BsonBoolean] representing the given [value].
+ *
+ * @see org.bson.BsonBoolean
+ * @since 2.0.0
  */
-val BsonRegexType = BsonType.REGULAR_EXPRESSION
+fun BsonBoolean(value: Boolean): BsonBoolean {
+    return if (value) BsonBoolean.True else BsonBoolean.False
+}
+
+/**
+ * A representation of the BSON Boolean type.
+ *
+ * @see org.bson.BsonBoolean
+ * @since 2.0.0
+ */
+sealed interface BsonBoolean : BsonElement {
+    val value: Boolean
+
+    object True : BsonBoolean {
+        override val value = true
+
+        override fun hashCode() = 1
+        override fun toString() = "true"
+    }
+
+    object False : BsonBoolean {
+        override val value = false
+
+        override fun hashCode() = 0
+        override fun toString() = "false"
+    }
+}
+
+/**
+ * A representation of the BSON Null type.
+ *
+ * @see org.bson.BsonNull
+ * @since 2.0.0
+ */
+object BsonNull : BsonElement {
+    override fun hashCode() = 0
+    override fun toString() = "null"
+}
+
+/**
+ * Represents the value associated with the BSON Undefined type.
+ *
+ * @see org.bson.BsonUndefined
+ * @since 2.0.0
+ */
+object BsonUndefined : BsonElement {
+    override fun hashCode() = 0
+    override fun toString() = "undefined"
+}
+
+/* ============= ------------------ ============= */

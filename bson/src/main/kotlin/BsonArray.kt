@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2022-2023 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -17,35 +17,70 @@ package org.cufy.bson
 
 import java.math.BigDecimal
 
+/* ============= ------------------ ============= */
+
+/**
+ * A default implementation of [BsonArray].
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+internal class BsonArrayImpl(
+    private val content: List<BsonElement>
+) : BsonArray, List<BsonElement> by content {
+    override fun equals(other: Any?) =
+        content == other
+
+    override fun hashCode() =
+        content.hashCode()
+
+    override fun toString() =
+        content.joinToString(",", "[", "]")
+}
+
+/* ============= ------------------ ============= */
+
 /**
  * A block of code building a bson array.
  *
  * @since 2.0.0
  */
-typealias BsonArrayBlock = BsonArrayBuilder.() -> Unit
+typealias BsonArrayBlock = MutableBsonArray.() -> Unit
 
 /**
- * A builder building a [BsonArray].
+ * A mutable implementation of [BsonArray].
  *
  * @author LSafer
  * @since 2.0.0
  */
-open class BsonArrayBuilder(
+class MutableBsonArray(
     /**
      * The array currently building.
      */
-    val array: BsonArray = BsonArray()
-) {
-    //
+    private val content: MutableList<BsonElement> = mutableListOf()
+) : BsonArray, MutableList<BsonElement> by content {
+    /* ============= ------------------ ============= */
+
+    override fun equals(other: Any?) =
+        content == other
+
+    override fun hashCode() =
+        content.hashCode()
+
+    override fun toString() =
+        content.joinToString(",", "[", "]")
+
+    /* ============= ------------------ ============= */
 
     /**
      * Add the given [value].
      *
      * If [value] is null then [bnull] will be set instead.
      */
-    @BsonBuildMarker
-    fun by(value: BsonValue?) {
-        array += value
+    @BsonConstructorMarker
+    fun by(value: BsonElement?) {
+        value ?: return run { content += bnull }
+        content += value
     }
 
     /**
@@ -53,9 +88,10 @@ open class BsonArrayBuilder(
      *
      * If [value] is null then [bnull] will be set instead.
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: BsonDocument?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value
     }
 
     /**
@@ -63,12 +99,13 @@ open class BsonArrayBuilder(
      *
      * If [value] is null then [bnull] will be set instead.
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: BsonArray?) {
-        array += value
+        value ?: return run { content += bnull }
+        content.add(value)
     }
 
-    //
+    /* ============= ------------------ ============= */
 
     /**
      * Add the given [value].
@@ -77,9 +114,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonDocument].
      */
-    @BsonBuildMarker
-    fun by(value: Map<String, BsonValue>?) {
-        array += value
+    @BsonConstructorMarker
+    fun by(value: Map<String, BsonElement>?) {
+        value ?: return run { content += bnull }
+        content += value.toBsonDocument()
     }
 
     /**
@@ -89,9 +127,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonArray].
      */
-    @BsonBuildMarker
-    fun by(value: List<BsonValue>?) {
-        array += value
+    @BsonConstructorMarker
+    fun by(value: List<BsonElement>?) {
+        value ?: return run { content += bnull }
+        content.add(value.toBsonArray())
     }
 
     /**
@@ -101,9 +140,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonString].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: String?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -113,9 +153,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonObjectId].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: ObjectId?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -123,11 +164,12 @@ open class BsonArrayBuilder(
      *
      * If [value] is null then [bnull] will be set instead.
      *
-     * The given [value] will be wrapped using [Id.bson].
+     * The given [value] will be wrapped using [Id.b].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: Id<*>?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -135,12 +177,13 @@ open class BsonArrayBuilder(
      *
      * If [value] is null then [bnull] will be set instead.
      *
-     * The given [value] will be wrapped using [BsonArray] and [Id.bson].
+     * The given [value] will be wrapped using [BsonArray] and [Id.b].
      */
     @JvmName("byIdList")
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: List<Id<*>>?) {
-        array += value
+        value ?: return run { content += bnull }
+        content.add(value.map { it.b }.toBsonArray())
     }
 
     /**
@@ -150,9 +193,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonDecimal128].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: Decimal128?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -162,12 +206,13 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonDecimal128].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: BigDecimal?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
-    //
+    /* ============= ------------------ ============= */
 
     /**
      * Add the given [value].
@@ -176,9 +221,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonBoolean].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: Boolean?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -188,9 +234,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonInt32].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: Int?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -200,9 +247,10 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonInt64].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: Long?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
     /**
@@ -212,61 +260,33 @@ open class BsonArrayBuilder(
      *
      * The given [value] will be wrapped with [BsonDouble].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(value: Double?) {
-        array += value
+        value ?: return run { content += bnull }
+        content += value.b
     }
 
-    //
+    /* ============= ------------------ ============= */
 
     /**
      * Add the value from invoking the given [block].
      */
-    @BsonBuildMarker
+    @BsonConstructorMarker
     fun by(block: BsonDocumentBlock) {
-        array += document(block)
+        content += BsonDocument(block)
     }
 
-    //
+    /* ============= ------------------ ============= */
 
     /**
      * Put all the items in the given [list].
      */
-    @BsonBuildMarker
-    fun byAll(list: List<BsonValue>) {
-        array.addAll(list)
+    @BsonConstructorMarker
+    fun byAll(list: List<BsonElement>) {
+        content += list
     }
+
+    /* ============= ------------------ ============= */
 }
 
-/**
- * Construct a new bson array using the given
- * builder [block].
- */
-@BsonBuildMarker
-fun array(
-    block: BsonArrayBlock = {}
-): BsonArray {
-    val builder = BsonArrayBuilder()
-    builder.apply(block)
-    return builder.array
-}
-
-/**
- * Construct a new bson array with the given [items]
- */
-@BsonBuildMarker
-fun array(
-    vararg items: BsonValue
-): BsonArray {
-    return BsonArray(items.toList())
-}
-
-/**
- * Apply the given [block] to this array.
- */
-fun BsonArray.configure(
-    block: BsonArrayBlock
-) {
-    val builder = BsonArrayBuilder(this)
-    builder.apply(block)
-}
+/* ============= ------------------ ============= */

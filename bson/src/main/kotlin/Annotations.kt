@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2022-2023 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.cufy.bson
  * @since 2.0.0
  */
 @DslMarker
-annotation class BsonBuildMarker
+annotation class BsonConstructorMarker
 
 /**
  * A marker for bson keywords.

@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2022-2023 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -13,73 +13,13 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.cufy.bson
+package org.cufy.bson.internal
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-
-/**
- * Return the best fitting native wrapper for
- * this id.
- * A [BsonObjectId] if it is a valid object id
- * and a [BsonString] if it is not.
- *
- * @since 2.0.0
- */
-val <T> Id<T>.bson: org.bson.BsonValue
-    get() = when {
-        ObjectId.isValid(value) -> BsonObjectId(ObjectId(value))
-        else -> BsonString(value)
-    }
-
-/**
- * Construct a new id.
- *
- * @since 2.0.0
- */
-fun <T> Id(): Id<T> {
-    return Id(ObjectId())
-}
-
-/**
- * Construct a new id from the given [value].
- *
- * @since 2.0.0
- */
-fun <T> Id(value: ObjectId): Id<T> {
-    return Id(value.toHexString())
-}
-
-/**
- * Case the given id into an id of [T].
- *
- * @since 2.0.0
- */
-fun <T> Id(value: Id<*>): Id<T> {
-    @Suppress("UNCHECKED_CAST")
-    return value as Id<T>
-}
-
-/**
- * An id wrapper.
- *
- * @author LSafer
- * @since 2.0.0
- */
-@Serializable(IdSerializer::class)
-data class Id<T>(
-    /**
-     * The string representation of the id.
-     *
-     * @since 2.0.0
-     */
-    val value: String
-) : CharSequence by value {
-    override fun toString(): String = value
-}
+import org.cufy.bson.Id
 
 /**
  * The serializer for [Id].
