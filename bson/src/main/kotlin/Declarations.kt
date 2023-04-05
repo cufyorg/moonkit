@@ -185,7 +185,14 @@ enum class BsonType(val value: Int) {
  * @see org.bson.BsonValue
  * @since 2.0.0
  */
-sealed interface BsonElement
+sealed interface BsonElement {
+    /**
+     * Return the type of this element.
+     *
+     * @since 2.0.0
+     */
+    val type: BsonType
+}
 
 /**
  * Return a new [BsonArray] instance backed by the given list.
@@ -208,7 +215,9 @@ fun BsonArray(block: BsonArrayBlock): BsonArray {
  * @see org.bson.BsonArray
  * @since 2.0.0
  */
-sealed interface BsonArray : BsonElement, List<BsonElement>
+sealed interface BsonArray : BsonElement, List<BsonElement> {
+    override val type: BsonType get() = BsonType.Array
+}
 
 /**
  * Construct a new bson document using the given
@@ -231,7 +240,9 @@ fun BsonDocument(content: Map<String, BsonElement> = emptyMap()): BsonDocument {
  * @see org.bson.BsonDocument
  * @since 2.0.0
  */
-sealed interface BsonDocument : BsonElement, Map<String, BsonElement>
+sealed interface BsonDocument : BsonElement, Map<String, BsonElement> {
+    override val type: BsonType get() = BsonType.Document
+}
 
 /**
  * Base class for the numeric BSON types.
@@ -275,6 +286,8 @@ sealed interface BsonNumber : BsonElement {
  * @since 2.0.0
  */
 data class BsonInt32(val value: Int) : BsonElement, BsonNumber {
+    override val type: BsonType get() = BsonType.Int32
+
     override fun toInt() = value
     override fun toLong() = value.toLong()
     override fun toDouble() = value.toDouble()
@@ -297,6 +310,8 @@ data class BsonInt32(val value: Int) : BsonElement, BsonNumber {
  * @since 2.0.0
  */
 data class BsonInt64(val value: Long) : BsonElement, BsonNumber {
+    override val type: BsonType get() = BsonType.Int64
+
     override fun toInt() = value.toInt()
     override fun toLong() = value
     override fun toDouble() = value.toDouble()
@@ -319,6 +334,8 @@ data class BsonInt64(val value: Long) : BsonElement, BsonNumber {
  * @since 2.0.0
  */
 data class BsonDouble(val value: Double) : BsonElement, BsonNumber {
+    override val type: BsonType get() = BsonType.Double
+
     override fun toInt() = value.toInt()
     override fun toLong() = value.toLong()
     override fun toDouble() = value
@@ -341,6 +358,8 @@ data class BsonDouble(val value: Double) : BsonElement, BsonNumber {
  * @since 2.0.0
  */
 data class BsonDecimal128(val value: Decimal128) : BsonElement, BsonNumber {
+    override val type: BsonType get() = BsonType.Decimal128
+
     override fun toInt() = value.toBigDecimal().toInt()
     override fun toLong() = value.toBigDecimal().toLong()
     override fun toDouble() = value.toBigDecimal().toDouble()
@@ -363,6 +382,8 @@ data class BsonDecimal128(val value: Decimal128) : BsonElement, BsonNumber {
  * @since 2.0.0
  */
 data class BsonString(val value: String) : BsonElement {
+    override val type: BsonType get() = BsonType.String
+
     override fun equals(other: Any?) =
         other is BsonString && other.value == value
 
@@ -391,6 +412,8 @@ fun BsonRegExp(@Language("RegExp") pattern: String, options: String): BsonRegExp
  * @since 2.0.0
  */
 data class BsonRegExp(@Language("RegExp") val pattern: String, val options: Set<Char> = emptySet()) : BsonElement {
+    override val type: BsonType get() = BsonType.RegExp
+
     override fun equals(other: Any?) =
         other is BsonRegExp && other.pattern == pattern && other.options == options
 
@@ -408,6 +431,8 @@ data class BsonRegExp(@Language("RegExp") val pattern: String, val options: Set<
  * @since 2.0.0
  */
 data class BsonObjectId(val value: ObjectId) : BsonElement {
+    override val type: BsonType get() = BsonType.ObjectId
+
     override fun equals(other: Any?) =
         other is BsonObjectId && other.value == value
 
@@ -435,6 +460,8 @@ fun BsonBoolean(value: Boolean): BsonBoolean {
  * @since 2.0.0
  */
 sealed interface BsonBoolean : BsonElement {
+    override val type: BsonType get() = BsonType.Boolean
+
     val value: Boolean
 
     object True : BsonBoolean {
@@ -459,6 +486,8 @@ sealed interface BsonBoolean : BsonElement {
  * @since 2.0.0
  */
 object BsonNull : BsonElement {
+    override val type: BsonType get() = BsonType.Null
+
     override fun hashCode() = 0
     override fun toString() = "null"
 }
@@ -470,6 +499,8 @@ object BsonNull : BsonElement {
  * @since 2.0.0
  */
 object BsonUndefined : BsonElement {
+    override val type: BsonType get() = BsonType.Undefined
+
     override fun hashCode() = 0
     override fun toString() = "undefined"
 }

@@ -20,29 +20,6 @@ import java.math.BigDecimal
 /* ============= ------------------ ============= */
 
 /**
- * Return the type of this element.
- *
- * @since 2.0.0
- */
-val BsonElement.type: BsonType
-    get() = when (this) {
-        is BsonDocument -> BsonType.Document
-        is BsonArray -> BsonType.Array
-        is BsonString -> BsonType.String
-        is BsonRegExp -> BsonType.RegExp
-        is BsonObjectId -> BsonType.ObjectId
-        is BsonInt32 -> BsonType.Int32
-        is BsonInt64 -> BsonType.Int64
-        is BsonDouble -> BsonType.Double
-        is BsonDecimal128 -> BsonType.Decimal128
-        is BsonBoolean -> BsonType.Boolean
-        is BsonUndefined -> BsonType.Undefined
-        is BsonNull -> BsonType.Null
-    }
-
-/* ============= ------------------ ============= */
-
-/**
  * A global instance of [BsonArray] that has no items.
  *
  * @since 2.0.0
