@@ -66,32 +66,6 @@ fun <I, O : BsonElement> BsonFieldCodec(name: String, codec: Codec<I, O>): BsonF
 /* ============= ------------------ ============= */
 
 /**
- * Get the value of the field with the name of the
- * given [codec] and decode it using the given [codec].
- */
-operator fun <I, O : BsonElement> BsonDocument.get(codec: FieldCodec<I, O>): I {
-    return decodeAny(this[codec.name] ?: BsonUndefined, codec)
-}
-
-/**
- * Decode this document to [I] using the given [codec].
- */
-@CodecMarker
-infix fun <I> BsonDocument.decode(codec: Codec<I, BsonDocument>): I {
-    return decode(this, codec)
-}
-
-/**
- * Encode this instance to a [BsonDocument] using the given [codec].
- */
-@CodecMarker
-infix fun <I> I.encode(codec: Codec<I, BsonDocument>): BsonDocument {
-    return encode(this, codec)
-}
-
-/* ============= ------------------ ============= */
-
-/**
  * A codec that always decodes nullish values
  * to `null` and encodes `null` to [BsonNull] and
  * uses the given [codec] otherwise.

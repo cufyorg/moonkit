@@ -52,6 +52,52 @@ interface Codec<I, O> {
     fun decode(value: Any?): Result<I>
 }
 
+// Cast
+
+/**
+ * Encode [this] value to [O] using the given [codec].
+ *
+ * @receiver the value to encode.
+ * @param codec the codec to be used.
+ * @return the encoded value.
+ * @throws CodecException if encoding failed.
+ * @since 2.0.0
+ */
+@CodecKeywordMarker
+infix fun <I, O> I.encode(codec: Codec<I, O>): O {
+    return encode(this, codec)
+}
+
+/**
+ * Decode [this] value to [I] using the given [codec].
+ *
+ * @receiver the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@CodecKeywordMarker
+infix fun <I, O> O.decode(codec: Codec<I, O>): I {
+    return decode(this, codec)
+}
+
+/**
+ * Get the value of the field with the name of the
+ * given [codec] and encode it using the given [codec].
+ */
+operator fun <I, O> Map<String, I>.get(codec: FieldCodec<I, O>): O {
+    return encodeAny(this[codec.name], codec)
+}
+
+/**
+ * Get the value of the field with the name of the
+ * given [codec] and decode it using the given [codec].
+ */
+operator fun <I, O> Map<String, O>.get(codec: FieldCodec<I, O>): I {
+    return decodeAny(this[codec.name], codec)
+}
+
 // Encode Any
 
 /**
