@@ -80,7 +80,7 @@ infix fun <I, O> I.encode(codec: Codec<I, O>): O {
  */
 @JvmName("encodeAnyInfix")
 @CodecKeywordMarker
-infix fun <I, O> Any.encodeAny(codec: Codec<I, O>): O {
+infix fun <I, O> Any?.encodeAny(codec: Codec<I, O>): O {
     return encodeAny(this, codec)
 }
 
@@ -110,7 +110,7 @@ infix fun <I, O> O.decode(codec: Codec<I, O>): I {
  */
 @JvmName("decodeAnyInfix")
 @CodecKeywordMarker
-infix fun <I, O> Any.decodeAny(codec: Codec<I, O>): I {
+infix fun <I, O> Any?.decodeAny(codec: Codec<I, O>): I {
     return decodeAny(this, codec)
 }
 
