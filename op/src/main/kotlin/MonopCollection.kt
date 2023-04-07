@@ -679,7 +679,7 @@ fun MonopCollection.findOneByIdAndDelete(
  */
 fun MonopCollection.findOneByIdAndDelete(
     id: Id<*>,
-    options: FindOneAndDeleteOptions.() -> Unit = {}
+    options: FindOneAndDeleteOptions.() -> Unit
 ) = findOneByIdAndDelete(id, FindOneAndDeleteOptions(options))
 
 /* ============= ------------------ ============= */
@@ -1009,7 +1009,7 @@ fun MonopCollection.findOneById(
  */
 fun MonopCollection.findOneById(
     id: Id<*>,
-    options: FindOptions.() -> Unit = {}
+    options: FindOptions.() -> Unit
 ) = findOneById(id, FindOptions(options))
 
 /* ============= ------------------ ============= */

@@ -260,7 +260,7 @@ suspend fun MongoCollection.findOneByIdAndDelete(
 suspend fun MongoCollection.findOneByIdAndDelete(
     id: Id<*>,
     session: ClientSession? = null,
-    options: FindOneAndDeleteOptions.() -> Unit = {}
+    options: FindOneAndDeleteOptions.() -> Unit
 ) = findOneByIdAndDelete(id, FindOneAndDeleteOptions(options), session)
 
 //
@@ -503,7 +503,7 @@ suspend fun MongoCollection.findOneById(
 suspend fun MongoCollection.findOneById(
     id: Id<*>,
     session: ClientSession? = null,
-    options: FindOptions.() -> Unit = {}
+    options: FindOptions.() -> Unit
 ) = findOneById(id, FindOptions(options), session)
 
 /* ============= ------------------ ============= */
