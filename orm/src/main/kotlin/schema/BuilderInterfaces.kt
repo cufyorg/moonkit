@@ -15,8 +15,8 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.BsonUndefinedType
-import org.cufy.bson.BsonValue
+import org.cufy.bson.BsonElement
+import org.cufy.bson.BsonType
 import org.cufy.monkt.*
 import kotlin.reflect.KClass
 
@@ -233,10 +233,10 @@ fun <T> WithDecodersBuilder<T>.decoder(
  * you might use [finalDecoder] instead.
  */
 fun <T> WithDecodersBuilder<T>.default(
-    block: (BsonValue) -> T
+    block: (BsonElement) -> T
 ) {
     decoder(ScalarDecoder {
-        canDecode(BsonUndefinedType)
+        canDecode(BsonType.Undefined)
         decode(block)
     })
 }
@@ -345,7 +345,7 @@ fun <I> WithSchemaBuilder<List<I>>.arraySchema(
  * @since 2.0.0
  */
 fun <T> WithSchemaBuilder<T>.enumSchema(
-    map: Map<BsonValue, T>? = null,
+    map: Map<BsonElement, T>? = null,
     block: EnumSchemaBuilderBlock<T> = {}
 ) {
     schema { EnumSchema(map, block) }

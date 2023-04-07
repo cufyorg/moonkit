@@ -17,6 +17,10 @@ package org.cufy.monkt
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
+import org.cufy.mongodb.MongoClient
+import org.cufy.mongodb.MongoCollection
+import org.cufy.mongodb.MongoDatabase
+import org.cufy.mongodb.get
 import org.cufy.monkt.schema.*
 import org.cufy.monkt.schema.extension.*
 
@@ -32,20 +36,20 @@ open class Monkt {
      * The monkt client completable deferred.
      */
     @InternalMonktApi
-    val deferredClient = CompletableDeferred<MonktClient>()
+    val deferredClient = CompletableDeferred<MongoClient>()
 
     /**
      * The monkt database completable deferred.
      */
     @InternalMonktApi
-    val deferredDatabase = CompletableDeferred<MonktDatabase>()
+    val deferredDatabase = CompletableDeferred<MongoDatabase>()
 
     /**
      * The client to be used by the models that
      * uses this monkt instance.
      */
     @OptIn(InternalMonktApi::class)
-    suspend fun client(): MonktClient {
+    suspend fun client(): MongoClient {
         return deferredClient.await()
     }
 
@@ -54,7 +58,7 @@ open class Monkt {
      * uses this monkt instance.
      */
     @OptIn(InternalMonktApi::class)
-    suspend fun database(): MonktDatabase {
+    suspend fun database(): MongoDatabase {
         return deferredDatabase.await()
     }
 
@@ -63,14 +67,14 @@ open class Monkt {
      * uses this monkt instance.
      */
     @ExperimentalMonktApi("Blocking property")
-    val client: MonktClient get() = runBlocking { client() }
+    val client: MongoClient get() = runBlocking { client() }
 
     /**
      * The database to be used by the models that
      * uses this monkt instance.
      */
     @ExperimentalMonktApi("Blocking property")
-    val database: MonktDatabase get() = runBlocking { database() }
+    val database: MongoDatabase get() = runBlocking { database() }
 
     /**
      * True, if this instance was shutdown.
@@ -197,8 +201,8 @@ open class Model<T : Any>(
      *
      * @since 2.0.0
      */
-    suspend fun collection(): MonktCollection {
-        return monkt().database().getCollection(name)
+    suspend fun collection(): MongoCollection {
+        return monkt().database()[name]
     }
 
     /**
@@ -215,7 +219,7 @@ open class Model<T : Any>(
      * @since 2.0.0
      */
     @ExperimentalMonktApi("Blocking property")
-    val collection: MonktCollection get() = runBlocking { collection() }
+    val collection: MongoCollection get() = runBlocking { collection() }
 
     override fun toString(): String = "Model($name)"
 }

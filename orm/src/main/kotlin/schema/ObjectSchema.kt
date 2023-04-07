@@ -88,7 +88,7 @@ open class ObjectSchemaCodecScope<T : Any>(
     /**
      * The source document.
      */
-    val document: BsonDocument
+    val document: MutableBsonDocument
 )
 
 /**
@@ -160,7 +160,7 @@ fun <T : Any> ObjectSchema(
 @OptIn(AdvancedMonktApi::class)
 val <T : Any, C> OptionScope<T, T, C>.objectSchema: ObjectSchema<T>
     get() = declaration as? ObjectSchema<T>
-        ?: error("Option was not declared in an ObjectSchema")
+            ?: error("Option was not declared in an ObjectSchema")
 
 // constructor
 

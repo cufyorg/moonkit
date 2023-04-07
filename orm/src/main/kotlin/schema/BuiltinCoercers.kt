@@ -34,7 +34,7 @@ import kotlin.math.roundToLong
  * The block of [DeterministicDecoder].
  */
 typealias DeterministicDecoderBlock<T> =
-        DeterministicDecoderScope<T>.(BsonValue) -> Unit
+        DeterministicDecoderScope<T>.(BsonElement) -> Unit
 
 /**
  * A scope for [DeterministicDecoderBlock].
@@ -98,7 +98,7 @@ fun <T> DeterministicDecoder(
  * Standard decoding algorithm for type [String].
  */
 val StandardStringDecoder: ScalarDecoder<String> = ScalarDecoder {
-    expect(BsonStringType, BsonBooleanType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type, BsonObjectIdType)
+    expect(BsonType.String, BsonType.Boolean, BsonType.Int32, BsonType.Int64, BsonType.Double, BsonType.Decimal128, BsonType.ObjectId)
     deterministic {
         when (it) {
             is BsonString -> decodeTo { it.value }
@@ -108,6 +108,7 @@ val StandardStringDecoder: ScalarDecoder<String> = ScalarDecoder {
             is BsonDouble -> decodeTo { it.value.toString() }
             is BsonDecimal128 -> decodeTo { it.value.toString() }
             is BsonObjectId -> decodeTo { it.value.toHexString() }
+            else -> {}
         }
     }
 }
@@ -116,11 +117,12 @@ val StandardStringDecoder: ScalarDecoder<String> = ScalarDecoder {
  * Standard decoding algorithm for type [Boolean]
  */
 val StandardBooleanDecoder: ScalarDecoder<Boolean> = ScalarDecoder {
-    expect(BsonStringType, BsonBooleanType)
+    expect(BsonType.String, BsonType.Boolean)
     deterministic {
         when (it) {
             is BsonString -> it.value.toBooleanStrictOrNull()?.let { decodeTo { it } }
             is BsonBoolean -> decodeTo { it.value }
+            else -> {}
         }
     }
 }
@@ -129,7 +131,7 @@ val StandardBooleanDecoder: ScalarDecoder<Boolean> = ScalarDecoder {
  * Standard decoding algorithm for type [Int]
  */
 val StandardInt32Decoder: ScalarDecoder<Int> = ScalarDecoder {
-    expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
+    expect(BsonType.String, BsonType.Int32, BsonType.Int64, BsonType.Double, BsonType.Decimal128)
     deterministic {
         when (it) {
             is BsonString -> it.value.toIntOrNull()?.let { decodeTo { it } }
@@ -137,6 +139,7 @@ val StandardInt32Decoder: ScalarDecoder<Int> = ScalarDecoder {
             is BsonInt64 -> decodeTo { it.value.toInt() }
             is BsonDouble -> decodeTo { it.value.roundToInt() }
             is BsonDecimal128 -> decodeTo { it.value.toInt() }
+            else -> {}
         }
     }
 }
@@ -145,7 +148,7 @@ val StandardInt32Decoder: ScalarDecoder<Int> = ScalarDecoder {
  * Standard decoding algorithm for type [Long]
  */
 val StandardInt64Decoder: ScalarDecoder<Long> = ScalarDecoder {
-    expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
+    expect(BsonType.String, BsonType.Int32, BsonType.Int64, BsonType.Double, BsonType.Decimal128)
     deterministic {
         when (it) {
             is BsonString -> it.value.toLongOrNull()?.let { decodeTo { it } }
@@ -153,6 +156,7 @@ val StandardInt64Decoder: ScalarDecoder<Long> = ScalarDecoder {
             is BsonInt64 -> decodeTo { it.value }
             is BsonDouble -> decodeTo { it.value.roundToLong() }
             is BsonDecimal128 -> decodeTo { it.value.toLong() }
+            else -> {}
         }
     }
 }
@@ -161,7 +165,7 @@ val StandardInt64Decoder: ScalarDecoder<Long> = ScalarDecoder {
  * Standard decoding algorithm for type [Double]
  */
 val StandardDoubleDecoder: ScalarDecoder<Double> = ScalarDecoder {
-    expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
+    expect(BsonType.String, BsonType.Int32, BsonType.Int64, BsonType.Double, BsonType.Decimal128)
     deterministic {
         when (it) {
             is BsonString -> it.value.toDoubleOrNull()?.let { decodeTo { it } }
@@ -169,6 +173,7 @@ val StandardDoubleDecoder: ScalarDecoder<Double> = ScalarDecoder {
             is BsonInt64 -> decodeTo { it.value.toDouble() }
             is BsonDouble -> decodeTo { it.value }
             is BsonDecimal128 -> decodeTo { it.value.toDouble() }
+            else -> {}
         }
     }
 }
@@ -177,7 +182,7 @@ val StandardDoubleDecoder: ScalarDecoder<Double> = ScalarDecoder {
  * Standard decoding algorithm for type [Decimal128]
  */
 val StandardDecimal128Decoder: ScalarDecoder<Decimal128> = ScalarDecoder {
-    expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
+    expect(BsonType.String, BsonType.Int32, BsonType.Int64, BsonType.Double, BsonType.Decimal128)
     deterministic {
         when (it) {
             is BsonString -> it.value.toBigDecimalOrNull()?.let { decodeTo { Decimal128(it) } }
@@ -185,6 +190,7 @@ val StandardDecimal128Decoder: ScalarDecoder<Decimal128> = ScalarDecoder {
             is BsonInt64 -> decodeTo { Decimal128(it.value.toBigDecimal()) }
             is BsonDouble -> decodeTo { Decimal128(it.value.toBigDecimal()) }
             is BsonDecimal128 -> decodeTo { it.value }
+            else -> {}
         }
     }
 }
@@ -193,7 +199,7 @@ val StandardDecimal128Decoder: ScalarDecoder<Decimal128> = ScalarDecoder {
  * Standard decoding algorithm for type [ObjectId]
  */
 val StandardObjectIdDecoder: ScalarDecoder<ObjectId> = ScalarDecoder {
-    expect(BsonStringType, BsonObjectIdType)
+    expect(BsonType.String, BsonType.ObjectId)
     deterministic {
         when (it) {
             is BsonString -> {
@@ -201,6 +207,7 @@ val StandardObjectIdDecoder: ScalarDecoder<ObjectId> = ScalarDecoder {
                     decodeTo { ObjectId(it.value) }
             }
             is BsonObjectId -> decodeTo { it.value }
+            else -> {}
         }
     }
 }
@@ -219,11 +226,12 @@ val StandardIdDecoder: ScalarDecoder<Id<Any>> = StandardIdDecoder()
  */
 @Suppress("FunctionName")
 fun <T> StandardIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
-    expect(BsonObjectIdType, BsonStringType)
+    expect(BsonType.ObjectId, BsonType.String)
     deterministic {
         when (it) {
             is BsonString -> decodeTo { Id(it.value) }
             is BsonObjectId -> decodeTo { Id(it.value) }
+            else -> {}
         }
     }
 }
@@ -232,7 +240,7 @@ fun <T> StandardIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
  * Standard decoding algorithm for type [BigDecimal]
  */
 val StandardBigDecimalDecoder: ScalarDecoder<BigDecimal> = ScalarDecoder {
-    expect(BsonStringType, BsonInt32Type, BsonInt64Type, BsonDoubleType, BsonDecimal128Type)
+    expect(BsonType.String, BsonType.Int32, BsonType.Int64, BsonType.Double, BsonType.Decimal128)
     deterministic {
         when (it) {
             is BsonString -> it.value.toBigDecimalOrNull()?.let { decodeTo { it } }
@@ -240,6 +248,7 @@ val StandardBigDecimalDecoder: ScalarDecoder<BigDecimal> = ScalarDecoder {
             is BsonInt64 -> decodeTo { it.value.toBigDecimal() }
             is BsonDouble -> decodeTo { it.value.toBigDecimal() }
             is BsonDecimal128 -> decodeTo { it.value.bigDecimalValue() }
+            else -> {}
         }
     }
 }
@@ -260,12 +269,13 @@ val LenientIdDecoder: ScalarDecoder<Id<Any>> = LenientIdDecoder()
  */
 @Suppress("FunctionName")
 fun <T> LenientIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
-    expect(BsonStringType, BsonObjectIdType, BsonUndefinedType, BsonNullType)
+    expect(BsonType.String, BsonType.ObjectId, BsonType.Undefined, BsonType.Null)
     deterministic {
         when (it) {
             is BsonString -> decodeTo { Id(it.value) }
             is BsonObjectId -> decodeTo { Id(it.value) }
             is BsonUndefined, is BsonNull -> decodeTo { Id() }
+            else -> {}
         }
     }
 }

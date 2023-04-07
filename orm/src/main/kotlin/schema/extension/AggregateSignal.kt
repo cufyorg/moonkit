@@ -15,8 +15,11 @@
  */
 package org.cufy.monkt.schema.extension
 
-import org.bson.BsonNumber
 import org.cufy.bson.*
+import org.cufy.mongodb.`$count`
+import org.cufy.mongodb.`$facet`
+import org.cufy.mongodb.`$match`
+import org.cufy.mongodb.aggregate
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 
@@ -61,7 +64,7 @@ object AggregateSignalHandler : SignalHandler {
             .withIndex()
             .groupBy { (_, signal) -> signal.model }
             .map { (model, signalsWithIndex) ->
-                model.collection().aggregateSuspend({
+                model.collection().aggregate({
                     `$facet` by {
                         signalsWithIndex.forEach { (index, signal) ->
                             "$index" by signal.pipeline
@@ -112,7 +115,7 @@ fun <T : Any> OptionScope<*, *, *>.aggregate(
     model: Model<T>,
     vararg pipeline: BsonDocumentBlock
 ): SignalProperty<List<BsonDocument>> {
-    return aggregate(model, pipeline.map { document(it) })
+    return aggregate(model, pipeline.map { BsonDocument(it) })
 }
 
 /**
@@ -151,7 +154,7 @@ fun <T : Any> OptionScope<*, *, *>.find(
     model: Model<T>,
     filter: BsonDocumentBlock,
 ): SignalProperty<List<T>> {
-    return find(model, document(filter))
+    return find(model, BsonDocument(filter))
 }
 
 /**
@@ -173,9 +176,9 @@ fun <T : Any> OptionScope<*, *, *>.count(
         { `$count` by "count" }
     )
     return property.then {
-        val count = it.firstOrNull()?.let { it["count"] as BsonNumber } ?: bint32(0)
+        val count = it.firstOrNull()?.let { it["count"] as BsonNumber } ?: 0.b
 
-        count.longValue()
+        count.toLong()
     }
 }
 
@@ -193,7 +196,7 @@ fun <T : Any> OptionScope<*, *, *>.count(
     model: Model<T>,
     filter: BsonDocumentBlock
 ): SignalProperty<Long> {
-    return count(model, document(filter))
+    return count(model, BsonDocument(filter))
 }
 
 /**
@@ -230,5 +233,5 @@ fun <T : Any> OptionScope<*, *, *>.exists(
     model: Model<T>,
     filter: BsonDocumentBlock
 ): SignalProperty<Boolean> {
-    return exists(model, document(filter))
+    return exists(model, BsonDocument(filter))
 }

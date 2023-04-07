@@ -15,8 +15,8 @@
  */
 package org.cufy.monkt.schema
 
+import org.cufy.bson.BsonElement
 import org.cufy.bson.BsonType
-import org.cufy.bson.BsonValue
 import org.cufy.monkt.*
 import org.cufy.monkt.internal.*
 
@@ -32,10 +32,10 @@ interface ScalarDecoder<T> : Decoder<T> {
     val types: List<BsonType>
 
     @OptIn(AdvancedMonktApi::class)
-    override fun canDecode(bsonValue: BsonValue): Boolean
+    override fun canDecode(element: BsonElement): Boolean
 
     @OptIn(AdvancedMonktApi::class)
-    override fun decode(bsonValue: BsonValue): T
+    override fun decode(element: BsonElement): T
 }
 
 /**
@@ -67,13 +67,13 @@ interface ScalarDecoderBuilder<T> :
      * decoding is possible.
      */
     @AdvancedMonktApi("Use `canDecode()` instead")
-    val canDecodeBlocks: MutableList<(BsonValue) -> Boolean>
+    val canDecodeBlocks: MutableList<(BsonElement) -> Boolean>
 
     /**
      * The decoding block.
      */
     @AdvancedMonktApi("Use `decode()` instead")
-    var decodeBlock: ((BsonValue) -> T)? // REQUIRED
+    var decodeBlock: ((BsonElement) -> T)? // REQUIRED
 
     /**
      * Build the decoder.
@@ -134,7 +134,7 @@ fun <T> ScalarDecoderBuilder<T>.expect(
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T> ScalarDecoderBuilder<T>.canDecode(
-    block: (BsonValue) -> Boolean
+    block: (BsonElement) -> Boolean
 ) {
     this.canDecodeBlocks += block
 }
@@ -150,7 +150,7 @@ fun <T> ScalarDecoderBuilder<T>.canDecode(
     vararg types: BsonType
 ) {
     this.types += types
-    this.canDecodeBlocks += { it.bsonType in types }
+    this.canDecodeBlocks += { it.type in types }
 }
 
 // decodeBlock
@@ -162,7 +162,7 @@ fun <T> ScalarDecoderBuilder<T>.canDecode(
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T> ScalarDecoderBuilder<T>.decode(
-    block: (BsonValue) -> T
+    block: (BsonElement) -> T
 ) {
     this.decodeBlock = block
 }

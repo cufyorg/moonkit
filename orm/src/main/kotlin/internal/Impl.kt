@@ -99,8 +99,8 @@ open class ArraySchemaImpl<T>(
     }
 
     @AdvancedMonktApi
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        return bsonValue is BsonArray/* && bsonValue.all { schema.canDecode(it) }*/
+    override fun canDecode(element: BsonElement): Boolean {
+        return element is BsonArray/* && bsonValue.all { schema.canDecode(it) }*/
     }
 
     @AdvancedMonktApi
@@ -109,12 +109,13 @@ open class ArraySchemaImpl<T>(
     }
 
     @AdvancedMonktApi
-    override fun decode(bsonValue: BsonValue): List<T> {
-        bsonValue as BsonArray
+    override fun decode(element: BsonElement): List<T> {
+        element as BsonArray
+        val array = element.toMutableBsonArray()
 
         val list = mutableListOf<T>()
 
-        bsonValue.forEach { item ->
+        array.forEach { item ->
             val value = run {
                 if (schema.canDecode(item))
                     return@run schema.decode(item)
@@ -139,7 +140,7 @@ open class ArraySchemaImpl<T>(
             it(ArraySchemaCodecScope(
                 schema = this,
                 instance = list,
-                array = bsonValue
+                array = array
             ))
         }
 
@@ -147,11 +148,11 @@ open class ArraySchemaImpl<T>(
     }
 
     @AdvancedMonktApi
-    override fun encode(value: List<T>): BsonValue {
-        val array = BsonArray()
+    override fun encode(value: List<T>): BsonElement {
+        val array = MutableBsonArray()
 
         value.forEach { item ->
-            val bsonValue = run {
+            val element = run {
                 if (schema.canEncode(item))
                     return@run schema.encode(item)
 
@@ -168,7 +169,7 @@ open class ArraySchemaImpl<T>(
                 return@forEach /* Skip Encoding */
             }
 
-            array += bsonValue
+            array += element
         }
 
         onEncode?.let {
@@ -179,7 +180,7 @@ open class ArraySchemaImpl<T>(
             ))
         }
 
-        return array
+        return array.toBsonArray()
     }
 
     override fun toString(): String = "ArraySchema($schema)"
@@ -197,16 +198,16 @@ class DeterministicDecoderImpl<T>(
     val block: DeterministicDecoderBlock<T>
 ) : Decoder<T> {
     @AdvancedMonktApi
-    override fun canDecode(bsonValue: BsonValue): Boolean {
+    override fun canDecode(element: BsonElement): Boolean {
         val scope = DeterministicDecoderScope<T>()
-        scope.apply { block(bsonValue) }
+        scope.apply { block(element) }
         return scope.isDecoded
     }
 
     @AdvancedMonktApi
-    override fun decode(bsonValue: BsonValue): T {
+    override fun decode(element: BsonElement): T {
         val scope = DeterministicDecoderScope<T>()
-        scope.apply { block(bsonValue) }
+        scope.apply { block(element) }
         return scope.decodedValue
     }
 
@@ -222,15 +223,15 @@ class DeterministicDecoderImpl<T>(
 @InternalMonktApi
 data class ScalarDecoderImpl<T>(
     override val types: List<BsonType>,
-    val decodeBlock: (BsonValue) -> T,
-    val canDecodeBlock: (BsonValue) -> Boolean
+    val decodeBlock: (BsonElement) -> T,
+    val canDecodeBlock: (BsonElement) -> Boolean
 ) : ScalarDecoder<T> {
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        return canDecodeBlock(bsonValue)
+    override fun canDecode(element: BsonElement): Boolean {
+        return canDecodeBlock(element)
     }
 
-    override fun decode(bsonValue: BsonValue): T {
-        return decodeBlock(bsonValue)
+    override fun decode(element: BsonElement): T {
+        return decodeBlock(element)
     }
 
     override fun toString(): String = "ScalarDecoder(${types.joinToString(", ")})"
@@ -245,24 +246,24 @@ data class ScalarDecoderImpl<T>(
 @InternalMonktApi
 open class ScalarSchemaImpl<T>(
     override val types: List<BsonType>,
-    val canDecodeBlock: (BsonValue) -> Boolean,
-    val decodeBlock: (BsonValue) -> T,
+    val canDecodeBlock: (BsonElement) -> Boolean,
+    val decodeBlock: (BsonElement) -> T,
     val canEncodeBlock: (Any?) -> Boolean,
-    val encodeBlock: (T) -> BsonValue,
+    val encodeBlock: (T) -> BsonElement,
 ) : ScalarSchema<T> {
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        return canDecodeBlock(bsonValue)
+    override fun canDecode(element: BsonElement): Boolean {
+        return canDecodeBlock(element)
     }
 
     override fun canEncode(value: Any?): Boolean {
         return canEncodeBlock(value)
     }
 
-    override fun decode(bsonValue: BsonValue): T {
-        return decodeBlock(bsonValue)
+    override fun decode(element: BsonElement): T {
+        return decodeBlock(element)
     }
 
-    override fun encode(value: T): BsonValue {
+    override fun encode(value: T): BsonElement {
         return encodeBlock(value)
     }
 
@@ -277,29 +278,29 @@ open class ScalarSchemaImpl<T>(
  */
 @InternalMonktApi
 open class EnumSchemaImpl<T>(
-    override val values: Map<BsonValue, T>
+    override val values: Map<BsonElement, T>
 ) : EnumSchema<T> {
     @Suppress("LeakingThis")
     override val types: List<BsonType> =
-        values.keys.map { it.bsonType }.distinct()
+        values.keys.map { it.type }.distinct()
 
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        return values.containsKey(bsonValue)
+    override fun canDecode(element: BsonElement): Boolean {
+        return values.containsKey(element)
     }
 
     override fun canEncode(value: Any?): Boolean {
         return values.containsValue(value)
     }
 
-    override fun decode(bsonValue: BsonValue): T {
-        val value = values[bsonValue]
+    override fun decode(element: BsonElement): T {
+        val value = values[element]
         require(value != null) {
-            "EnumSchema.decode(...) expected one of ${values.keys} but got $bsonValue"
+            "EnumSchema.decode(...) expected one of ${values.keys} but got $element"
         }
         return value
     }
 
-    override fun encode(value: T): BsonValue {
+    override fun encode(value: T): BsonElement {
         val bsonValue = values.entries.firstOrNull { it.value == value }?.key
         require(bsonValue != null) {
             "EnumSchema.encode(...) expected one of ${values.values} but got $value"
@@ -350,8 +351,8 @@ open class NullableSchemaImpl<T>(
     }
 
     @AdvancedMonktApi
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        return bsonValue is BsonNull || schema.canDecode(bsonValue)
+    override fun canDecode(element: BsonElement): Boolean {
+        return element is BsonNull || schema.canDecode(element)
     }
 
     @AdvancedMonktApi
@@ -360,15 +361,15 @@ open class NullableSchemaImpl<T>(
     }
 
     @AdvancedMonktApi
-    override fun decode(bsonValue: BsonValue): T? {
-        return when (bsonValue) {
+    override fun decode(element: BsonElement): T? {
+        return when (element) {
             is BsonNull -> null
-            else -> schema.decode(bsonValue)
+            else -> schema.decode(element)
         }
     }
 
     @AdvancedMonktApi
-    override fun encode(value: T?): BsonValue {
+    override fun encode(value: T?): BsonElement {
         return when (value) {
             null -> bnull
             else -> schema.encode(value)
@@ -476,7 +477,7 @@ open class FieldDefinitionImpl<T : Any, M>(
     }
 
     @AdvancedMonktApi
-    override fun decode(instance: T, document: BsonDocument) {
+    override fun decode(instance: T, document: MutableBsonDocument) {
         val schema = schema
 
         val bsonValue = document[name] ?: bundefined
@@ -506,13 +507,13 @@ open class FieldDefinitionImpl<T : Any, M>(
                 instance = instance,
                 document = document,
                 value = value,
-                bsonValue = bsonValue
+                element = bsonValue
             ))
         }
     }
 
     @AdvancedMonktApi
-    override fun encode(instance: T, document: BsonDocument) {
+    override fun encode(instance: T, document: MutableBsonDocument) {
         val schema = schema
 
         val value = getter(instance)
@@ -545,7 +546,7 @@ open class FieldDefinitionImpl<T : Any, M>(
                 instance = instance,
                 document = document,
                 value = value,
-                bsonValue = bsonValue
+                element = bsonValue
             ))
         }
     }
@@ -622,8 +623,8 @@ open class ObjectSchemaImpl<T : Any>(
     }
 
     @AdvancedMonktApi
-    override fun canDecode(bsonValue: BsonValue): Boolean {
-        return bsonValue is BsonDocument
+    override fun canDecode(element: BsonElement): Boolean {
+        return element is BsonDocument
     }
 
     @AdvancedMonktApi
@@ -632,18 +633,18 @@ open class ObjectSchemaImpl<T : Any>(
     }
 
     @AdvancedMonktApi
-    override fun decode(bsonValue: BsonValue): T {
-        bsonValue as BsonDocument
+    override fun decode(element: BsonElement): T {
+        val document = (element as BsonDocument).toMutableBsonDocument()
 
         val instance = constructor()
 
-        fields.forEach { it.decode(instance, bsonValue) }
+        fields.forEach { it.decode(instance, document) }
 
         onDecode?.let {
             it(ObjectSchemaCodecScope(
                 schema = this,
                 instance = instance,
-                document = bsonValue
+                document = document
             ))
         }
 
@@ -652,7 +653,7 @@ open class ObjectSchemaImpl<T : Any>(
 
     @AdvancedMonktApi
     override fun encode(value: T): BsonDocument {
-        val document = BsonDocument()
+        val document = MutableBsonDocument()
 
         fields.forEach { it.encode(value, document) }
 
@@ -664,7 +665,7 @@ open class ObjectSchemaImpl<T : Any>(
             ))
         }
 
-        return document
+        return document.toBsonDocument()
     }
 
     override fun toString(): String = "ObjectSchema(${fields.joinToString(", ")})"

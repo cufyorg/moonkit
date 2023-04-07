@@ -15,10 +15,10 @@
  */
 package org.cufy.monkt.schema.extension
 
-import com.mongodb.client.model.UpdateOneModel
-import com.mongodb.client.model.UpdateOptions
-import com.mongodb.client.model.WriteModel
 import org.cufy.bson.*
+import org.cufy.mongodb.UpdateOneModel
+import org.cufy.mongodb.UpdateOptions
+import org.cufy.mongodb.WriteModel
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 
@@ -46,7 +46,7 @@ class WritesConfiguration {
     /**
      * The writes to be added.
      */
-    val writes: MutableList<WriteModel<BsonDocument>> = mutableListOf()
+    val writes: MutableList<WriteModel> = mutableListOf()
 }
 
 /* ============= --- Extensions --- ============= */
@@ -58,7 +58,7 @@ class WritesConfiguration {
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.write(
-    write: WriteModel<BsonDocument>
+    write: WriteModel
 ) {
     configuration.writes += write
 }
@@ -73,12 +73,12 @@ fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.write(
  * @see UpdateOneModel
  */
 fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.update(
-    update: Bson,
+    update: BsonDocument,
     options: UpdateOptions
 ) {
     val id = Document.getId(root)
-    val filter = document { "_id" by id }
-    val model = UpdateOneModel<BsonDocument>(filter, update, options)
+    val filter = BsonDocument { "_id" by id }
+    val model = UpdateOneModel(filter, update, options)
     write(model)
 }
 
@@ -92,12 +92,10 @@ fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.update(
  * @see UpdateOneModel
  */
 fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.update(
-    update: Bson,
-    block: UpdateOptionsScope.() -> Unit = {}
+    update: BsonDocument,
+    block: UpdateOptions.() -> Unit = {}
 ) {
-    var options = UpdateOptions()
-    options = options.configure(block)
-    update(update, options)
+    update(update, UpdateOptions(block))
 }
 
 /**
@@ -111,9 +109,9 @@ fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.update(
  */
 fun <T : Any, M> OptionScope<T, M, WritesConfiguration>.update(
     update: BsonDocumentBlock,
-    block: UpdateOptionsScope.() -> Unit = {}
+    block: UpdateOptions.() -> Unit = {}
 ) {
-    update(document(update), block)
+    update(BsonDocument(update), block)
 }
 
 // builder
@@ -139,7 +137,7 @@ fun <T : Any, M> WithOptionsBuilder<T, M>.writes(
 suspend fun Monkt.performWrites(
     instances: List<Any>,
     tweak: WritesTweak
-): Map<Model<*>, List<WriteModel<BsonDocument>>> {
+): Map<Model<*>, List<WriteModel>> {
     var options = instances.flatMap {
         Document.obtainOptions<WritesConfiguration>(it)
     }

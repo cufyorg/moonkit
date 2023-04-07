@@ -15,7 +15,7 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.BsonArray
+import org.cufy.bson.MutableBsonArray
 import org.cufy.monkt.*
 import org.cufy.monkt.internal.*
 
@@ -72,7 +72,7 @@ open class ArraySchemaCodecScope<T>(
     /**
      * The source array.
      */
-    val array: BsonArray
+    val array: MutableBsonArray
 )
 
 /**
@@ -135,4 +135,4 @@ fun <T> ArraySchema(
 @OptIn(AdvancedMonktApi::class)
 val <T, C> OptionScope<List<T>, List<T>, C>.arraySchema: ArraySchema<T>
     get() = declaration as? ArraySchema<T>
-        ?: error("Option was not declared in an ArraySchema")
+            ?: error("Option was not declared in an ArraySchema")

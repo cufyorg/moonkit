@@ -15,8 +15,8 @@
  */
 package org.cufy.monkt.schema.extension
 
-import com.mongodb.client.model.IndexModel
 import org.cufy.bson.*
+import org.cufy.mongodb.CreateIndexModel
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 
@@ -44,7 +44,7 @@ open class IndexesConfiguration {
     /**
      * The indexes to be added.
      */
-    val indexes: MutableList<IndexModel> = mutableListOf()
+    val indexes: MutableList<CreateIndexModel> = mutableListOf()
 }
 
 /* ============= --- Extensions --- ============= */
@@ -56,7 +56,7 @@ open class IndexesConfiguration {
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M> OptionScope<T, M, IndexesConfiguration>.index(
-    index: IndexModel
+    index: CreateIndexModel
 ) {
     configuration.indexes += index
 }
@@ -87,7 +87,7 @@ fun <T : Any, M> WithOptionsBuilder<T, M>.indexes(
 suspend fun Monkt.performIndexes(
     models: List<Model<*>>,
     tweak: IndexesTweak
-): Map<Model<*>, List<IndexModel>> {
+): Map<Model<*>, List<CreateIndexModel>> {
     var options = models.flatMap {
         it.obtainOptions<IndexesConfiguration>()
     }

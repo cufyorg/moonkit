@@ -15,7 +15,6 @@
  */
 package org.cufy.monkt.internal
 
-import org.cufy.bson.Pathname
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 

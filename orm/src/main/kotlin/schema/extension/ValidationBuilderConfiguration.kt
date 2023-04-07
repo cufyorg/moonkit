@@ -16,6 +16,8 @@
 package org.cufy.monkt.schema.extension
 
 import org.cufy.bson.Id
+import org.cufy.mongodb.count
+import org.cufy.mongodb.get
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 
@@ -189,10 +191,10 @@ fun <T : Any, M : Id<*>?> FieldDefinitionBuilder<T, M>.existsAt(
 
         val monkt = model.monkt()
 
-        val collection = monkt.database().getCollection(collectionName)
+        val collection = monkt.database()[collectionName]
 
         // TODO use signals (or remove the whole thing)
-        val count = collection.countDocumentsSuspend({ "_id" by it })
+        val count = collection.count({ "_id" by it })
 
         then { count > 0 }
     }

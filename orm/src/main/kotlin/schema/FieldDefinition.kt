@@ -16,6 +16,7 @@
 package org.cufy.monkt.schema
 
 import org.cufy.bson.*
+import org.cufy.mongodb.`$unset`
 import org.cufy.monkt.*
 import org.cufy.monkt.internal.*
 import org.cufy.monkt.schema.extension.*
@@ -91,14 +92,14 @@ interface FieldDefinition<T : Any, M> {
      * to the given [instance].
      */
     @AdvancedMonktApi("Called by monkt internally")
-    fun decode(instance: T, document: BsonDocument)
+    fun decode(instance: T, document: MutableBsonDocument)
 
     /**
      * encode this filed in the given [instance]
      * to the given [document].
      */
     @AdvancedMonktApi("Called by monkt internally")
-    fun encode(instance: T, document: BsonDocument)
+    fun encode(instance: T, document: MutableBsonDocument)
 }
 
 /**
@@ -153,7 +154,7 @@ open class FieldDefinitionCodecScope<T : Any, M>(
     /**
      * The container's source document.
      */
-    val document: BsonDocument,
+    val document: MutableBsonDocument,
     /**
      * The value.
      */
@@ -161,7 +162,7 @@ open class FieldDefinitionCodecScope<T : Any, M>(
     /**
      * The value's source bson.
      */
-    val bsonValue: BsonValue
+    val element: BsonElement
 )
 
 /**
@@ -292,7 +293,7 @@ fun <T : Any, M> FantomFieldDefinition(
 @OptIn(AdvancedMonktApi::class)
 val <T : Any, M, C> OptionScope<T, M, C>.fieldDefinition: FieldDefinition<T, M>
     get() = declaration as? FieldDefinition<T, M>
-        ?: error("Option was not declared in a FieldDefinition")
+            ?: error("Option was not declared in a FieldDefinition")
 
 //
 

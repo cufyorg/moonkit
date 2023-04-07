@@ -15,9 +15,8 @@
  */
 package org.cufy.monkt
 
-import com.mongodb.client.model.*
-import com.mongodb.reactivestreams.client.ClientSession
 import org.cufy.bson.*
+import org.cufy.mongodb.*
 import org.cufy.monkt.internal.*
 import org.cufy.monkt.schema.extension.*
 
@@ -42,8 +41,8 @@ suspend fun Monkt.initImpl(
 ) {
     require(!this.isInitialized) { "Monkt instance already initialized" }
 
-    val initializationTweak = tweak.initializationTweak
-    val indexesTweak = tweak.indexesTweak
+    val initializationTweak = tweak.init
+    val indexesTweak = tweak.indexes
     val indexOptions = tweak.indexOptions
 
     models.forEach { it.deferredMonkt.complete(this) }
@@ -53,7 +52,7 @@ suspend fun Monkt.initImpl(
     val modelIndexesTable = performIndexes(models, indexesTweak)
 
     modelIndexesTable.forEach { (model, indexes) ->
-        model.collection().createIndexesSuspend(indexes, session, indexOptions)
+        model.collection().createIndexes(indexes, indexOptions, session)
     }
 }
 
@@ -100,8 +99,8 @@ suspend fun <T : Any> Model<T>.decodeImpl(
 ): List<T> {
     val isNew = tweak.isNew
     val isDeleted = tweak.isDeleted
-    val initializationTweak = tweak.initializationTweak
-    val migrationTweak = tweak.migrationTweak
+    val initializationTweak = tweak.init
+    val migrationTweak = tweak.migration
 
     val instances = documents.map {
         Document.performDecoding(this, it)
@@ -158,7 +157,7 @@ suspend operator fun <T : Any> Model<T>.invoke(
     vararg documents: BsonDocumentBlock,
     block: DecodeTweak.() -> Unit = {}
 ): List<T> {
-    return this(documents.map { document(it) }, block)
+    return this(documents.map { BsonDocument(it) }, block)
 }
 
 /**
@@ -198,7 +197,7 @@ suspend operator fun <T : Any> Model<T>.invoke(
     document: BsonDocumentBlock = {},
     block: DecodeTweak.() -> Unit = {}
 ): T {
-    return this(document(document), block)
+    return this(BsonDocument(document), block)
 }
 
 /* ============= ----- Encode ----- ============= */
@@ -220,8 +219,8 @@ suspend fun <T : Any> Monkt.encodeImpl(
     instances: List<T>,
     tweak: EncodeTweak
 ): List<BsonDocument> {
-    val normalizationTweak = tweak.normalizationTweak
-    val validationTweak = tweak.validationTweak
+    val normalizationTweak = tweak.normalization
+    val validationTweak = tweak.validation
 
     normalizeImpl(instances, normalizationTweak)
     validateImpl(instances, validationTweak)
@@ -368,18 +367,18 @@ suspend fun <T : Document> T.encode(
  * @param tweak find operation tweaks.
  * @return a list of instances of [T] from the found documents.
  * @since 2.0.0
- * @see MonktCollection.findSuspend
+ * @see MongoCollection.find
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.findImpl(
-    filter: Bson = bdocument,
+    filter: BsonDocument = EmptyBsonDocument,
     session: ClientSession? = null,
     tweak: FindTweak
 ): List<T> {
-    val publisherBlock = tweak.publisherBlock
-    val decodeTweak = tweak.decodeTweak
+    val options = tweak.options
+    val decodeTweak = tweak.decode
 
-    val documents = collection().findSuspend(filter, session, publisherBlock)
+    val documents = collection().find(filter, options, session)
 
     return decodeImpl(documents, decodeTweak)
 }
@@ -393,11 +392,11 @@ suspend fun <T : Any> Model<T>.findImpl(
  * @param block the tweak block.
  * @return a list of instances of [T] from the found documents.
  * @since 2.0.0
- * @see MonktCollection.findSuspend
+ * @see MongoCollection.find
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.find(
-    filter: Bson = bdocument,
+    filter: BsonDocument = EmptyBsonDocument,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): List<T> {
@@ -415,14 +414,14 @@ suspend fun <T : Any> Model<T>.find(
  * @param block the tweak block.
  * @return a list of instances of [T] from the found documents.
  * @since 2.0.0
- * @see MonktCollection.findSuspend
+ * @see MongoCollection.find
  */
 suspend fun <T : Any> Model<T>.find(
     filter: BsonDocumentBlock,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): List<T> {
-    return find(document(filter), session, block)
+    return find(BsonDocument(filter), session, block)
 }
 
 /**
@@ -438,7 +437,7 @@ suspend fun <T : Any> Model<T>.find(
  * @param block the tweak block.
  * @return a list of instances of [T] from the found documents.
  * @since 2.0.0
- * @see MonktCollection.findSuspend
+ * @see MongoCollection.find
  */
 suspend fun <T : Any> Model<T>.findById(
     ids: List<Id<T>>,
@@ -461,7 +460,7 @@ suspend fun <T : Any> Model<T>.findById(
  * @param block the tweak block.
  * @return a list of instances of [T] from the found documents.
  * @since 2.0.0
- * @see MonktCollection.findSuspend
+ * @see MongoCollection.find
  */
 suspend fun <T : Any> Model<T>.findById(
     vararg ids: Id<T>,
@@ -483,18 +482,18 @@ suspend fun <T : Any> Model<T>.findById(
  * @return an instance of [T] from the found document.
  *         Or `null` if no document was found.
  * @since 2.0.0
- * @see MonktCollection.findOneSuspend
+ * @see MongoCollection.findOne
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.findOneImpl(
-    filter: Bson = bdocument,
+    filter: BsonDocument = EmptyBsonDocument,
     session: ClientSession? = null,
     tweak: FindTweak
 ): T? {
-    val publisherBlock = tweak.publisherBlock
-    val decodeTweak = tweak.decodeTweak
+    val options = tweak.options
+    val decodeTweak = tweak.decode
 
-    val document = collection().findOneSuspend(filter, session, publisherBlock)
+    val document = collection().findOne(filter, options, session)
 
     document ?: return null
 
@@ -511,11 +510,11 @@ suspend fun <T : Any> Model<T>.findOneImpl(
  * @return an instance of [T] from the found document.
  *         Or `null` if no document was found.
  * @since 2.0.0
- * @see MonktCollection.findOneSuspend
+ * @see MongoCollection.findOne
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.findOne(
-    filter: Bson = bdocument,
+    filter: BsonDocument = EmptyBsonDocument,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): T? {
@@ -534,14 +533,14 @@ suspend fun <T : Any> Model<T>.findOne(
  * @return an instance of [T] from the found document.
  *         Or `null` if no document was found.
  * @since 2.0.0
- * @see MonktCollection.findOneSuspend
+ * @see MongoCollection.findOne
  */
 suspend fun <T : Any> Model<T>.findOne(
     filter: BsonDocumentBlock,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): T? {
-    return findOne(document(filter), session, block)
+    return findOne(BsonDocument(filter), session, block)
 }
 
 /**
@@ -555,7 +554,7 @@ suspend fun <T : Any> Model<T>.findOne(
  * @return an instance of [T] from the found document.
  *         Or `null` if no document was found.
  * @since 2.0.0
- * @see MonktCollection.findOneSuspend
+ * @see MongoCollection.findOne
  */
 suspend fun <T : Any> Model<T>.findOneById(
     ids: List<Id<T>>,
@@ -576,7 +575,7 @@ suspend fun <T : Any> Model<T>.findOneById(
  * @return an instance of [T] from the found document.
  *         Or `null` if no document was found.
  * @since 2.0.0
- * @see MonktCollection.findOneSuspend
+ * @see MongoCollection.findOne
  */
 suspend fun <T : Any> Model<T>.findOneById(
     vararg ids: Id<T>,
@@ -615,9 +614,9 @@ suspend fun <T : Any> Monkt.saveImpl(
     session: ClientSession? = null,
     tweak: SaveTweak
 ) {
-    val encodeTweak = tweak.encodeTweak
-    val writesTweak = tweak.writesTweak
-    val updateOptions = tweak.updateOptions
+    val encodeTweak = tweak.encode
+    val writesTweak = tweak.writes
+    val updateOptions = tweak.options
     val bulkWriteOptions = tweak.bulkWriteOptions
 
     val documents = encodeImpl(instances, encodeTweak)
@@ -634,16 +633,16 @@ suspend fun <T : Any> Monkt.saveImpl(
         val writes = modelWritesTable[model] ?: emptyList()
 
         val updateWrites = documents.map { document ->
-            val filter = document { "_id" by document["_id"] }
-            val update = document { `$set` by document }
+            val filter = BsonDocument { "_id" by document["_id"] }
+            val update = BsonDocument { `$set` by document }
 
-            UpdateOneModel<BsonDocument>(filter, update, updateOptions)
+            UpdateOneModel(filter, update, updateOptions)
         }
 
-        model.collection().bulkWriteSuspend(
+        model.collection().bulkWrite(
             updateWrites + writes,
-            session,
-            bulkWriteOptions
+            bulkWriteOptions,
+            session
         )
     }
 
@@ -828,8 +827,8 @@ suspend fun <T : Any> Model<T>.createImpl(
     session: ClientSession? = null,
     tweak: CreateTweak
 ): List<T> {
-    val decodeTweak = tweak.decodeTweak
-    val saveTweak = tweak.saveTweak
+    val decodeTweak = tweak.decode
+    val saveTweak = tweak.save
 
     val instances = decodeImpl(documents, decodeTweak)
     monkt().saveImpl(instances, session, saveTweak)
@@ -882,7 +881,7 @@ suspend fun <T : Any> Model<T>.create(
     session: ClientSession? = null,
     block: CreateTweak.() -> Unit = {}
 ): List<T> {
-    return create(documents.map { document(it) }, session, block)
+    return create(documents.map { BsonDocument(it) }, session, block)
 }
 
 /**
@@ -929,7 +928,7 @@ suspend fun <T : Any> Model<T>.create(
     session: ClientSession? = null,
     block: CreateTweak.() -> Unit = {}
 ): T {
-    return create(document(document), session, block)
+    return create(BsonDocument(document), session, block)
 }
 
 /* ============= ----- delete ----- ============= */
@@ -956,8 +955,8 @@ suspend fun <T : Any> Monkt.deleteImpl(
     session: ClientSession? = null,
     tweak: DeleteTweak
 ) {
-    val deletionTweak = tweak.deletionTweak
-    val deleteOptions = tweak.deleteOptions
+    val deletionTweak = tweak.deletion
+    val deleteOptions = tweak.options
 
     val toDelete = performDeletion(instances, deletionTweak)
 
@@ -970,9 +969,9 @@ suspend fun <T : Any> Monkt.deleteImpl(
         }
 
     modelIdMap.forEach { (model, ids) ->
-        val filter = document { "_id" by { `$in` by ids } }
+        val filter = BsonDocument { "_id" by { `$in` by ids } }
 
-        model.collection().deleteManySuspend(filter, session, deleteOptions)
+        model.collection().deleteMany(filter, deleteOptions, session)
     }
 
     toDelete.forEach {
@@ -1155,12 +1154,12 @@ suspend fun <T : Document> T.delete(
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.deleteOneImpl(
-    filter: Bson,
+    filter: BsonDocument,
     session: ClientSession? = null,
     tweak: FindAndDeleteTweak
 ): T? {
-    val findTweak = tweak.findTweak
-    val deleteTweak = tweak.deleteTweak
+    val findTweak = tweak.find
+    val deleteTweak = tweak.delete
 
     val instance = findOneImpl(filter, session, findTweak)
 
@@ -1197,7 +1196,7 @@ suspend fun <T : Any> Model<T>.deleteOneImpl(
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.deleteOne(
-    filter: Bson,
+    filter: BsonDocument,
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): T? {
@@ -1235,7 +1234,7 @@ suspend fun <T : Any> Model<T>.deleteOne(
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): T? {
-    return deleteOne(document(filter), session, block)
+    return deleteOne(BsonDocument(filter), session, block)
 }
 
 /**
@@ -1326,12 +1325,12 @@ suspend fun <T : Any> Model<T>.deleteOneById(
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.deleteManyImpl(
-    filter: Bson,
+    filter: BsonDocument,
     session: ClientSession? = null,
     tweak: FindAndDeleteTweak
 ): List<T> {
-    val findTweak = tweak.findTweak
-    val deleteTweak = tweak.deleteTweak
+    val findTweak = tweak.find
+    val deleteTweak = tweak.delete
 
     val instances = findImpl(filter, session, findTweak)
 
@@ -1362,7 +1361,7 @@ suspend fun <T : Any> Model<T>.deleteManyImpl(
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.deleteMany(
-    filter: Bson,
+    filter: BsonDocument,
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): List<T> {
@@ -1396,7 +1395,7 @@ suspend fun <T : Any> Model<T>.deleteMany(
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): List<T> {
-    return deleteMany(document(filter), session, block)
+    return deleteMany(BsonDocument(filter), session, block)
 }
 
 /**
@@ -1817,12 +1816,12 @@ suspend fun <T : Document> T.normalize(
  * @param block the options block.
  * @return the estimated number of documents
  * @since 2.0.0
- * @see MonktCollection.estimatedDocumentCountSuspend
+ * @see MongoCollection.estimatedCount
  */
 suspend fun <T : Any> Model<T>.estimatedCount(
-    block: EstimatedDocumentCountOptionsScope.() -> Unit = {}
+    block: EstimatedCountOptions.() -> Unit = {}
 ): Long {
-    return collection().estimatedDocumentCountSuspend(block)
+    return collection().estimatedCount(block)
 }
 
 /* ============= ----- count  ----- ============= */
@@ -1839,14 +1838,14 @@ suspend fun <T : Any> Model<T>.estimatedCount(
  * @param block the options block.
  * @return the number of documents
  * @since 2.0.0
- * @see MonktCollection.countDocumentsSuspend
+ * @see MongoCollection.count
  */
 suspend fun <T : Any> Model<T>.count(
-    filter: Bson = bdocument,
+    filter: BsonDocument = EmptyBsonDocument,
     session: ClientSession? = null,
-    block: CountOptionsScope.() -> Unit = {}
+    block: CountOptions.() -> Unit = {}
 ): Long {
-    return collection().countDocumentsSuspend(filter, session, block)
+    return collection().count(filter, CountOptions(block), session)
 }
 
 /**
@@ -1861,14 +1860,14 @@ suspend fun <T : Any> Model<T>.count(
  * @param block the options block.
  * @return the number of documents
  * @since 2.0.0
- * @see MonktCollection.countDocumentsSuspend
+ * @see MongoCollection.count
  */
 suspend fun <T : Any> Model<T>.count(
     filter: BsonDocumentBlock,
     session: ClientSession? = null,
-    block: CountOptionsScope.() -> Unit = {}
+    block: CountOptions.() -> Unit = {}
 ): Long {
-    return collection().countDocumentsSuspend(filter, session, block)
+    return collection().count(filter, session, block)
 }
 
 /**
@@ -1880,12 +1879,12 @@ suspend fun <T : Any> Model<T>.count(
  * @param block the options block.
  * @return true, if any document matches the given [filter].
  * @since 2.0.0
- * @see MonktCollection.countDocumentsSuspend
+ * @see MongoCollection.count
  */
 suspend fun <T : Any> Model<T>.exists(
-    filter: Bson = bdocument,
+    filter: BsonDocument = EmptyBsonDocument,
     session: ClientSession? = null,
-    block: CountOptionsScope.() -> Unit = {}
+    block: CountOptions.() -> Unit = {}
 ): Boolean {
     return count(filter, session, block) > 0L
 }
@@ -1899,14 +1898,14 @@ suspend fun <T : Any> Model<T>.exists(
  * @param block the options block.
  * @return true, if any document matches the given [filter].
  * @since 2.0.0
- * @see MonktCollection.countDocumentsSuspend
+ * @see MongoCollection.count
  */
 suspend fun <T : Any> Model<T>.exists(
     filter: BsonDocumentBlock,
     session: ClientSession? = null,
-    block: CountOptionsScope.() -> Unit = {}
+    block: CountOptions.() -> Unit = {}
 ): Boolean {
-    return exists(document(filter), session, block)
+    return exists(BsonDocument(filter), session, block)
 }
 
 /* ============= --- aggregate  --- ============= */
@@ -1920,18 +1919,18 @@ suspend fun <T : Any> Model<T>.exists(
  * @param tweak aggregate operation tweaks.
  * @return a list of instances of [T] from the aggregation result documents.
  * @since 2.0.0
- * @see MonktCollection.aggregateSuspend
+ * @see MongoCollection.aggregate
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.aggregateImpl(
-    pipeline: List<Bson>,
+    pipeline: List<BsonDocument>,
     session: ClientSession? = null,
     tweak: AggregateTweak
 ): List<T> {
-    val publisherBlock = tweak.publisherBlock
-    val decodeTweak = tweak.decodeTweak
+    val options = tweak.options
+    val decodeTweak = tweak.decode
 
-    val documents = collection().aggregateSuspend(pipeline, session, publisherBlock)
+    val documents = collection().aggregate(pipeline, options, session)
 
     return decodeImpl(documents, decodeTweak)
 }
@@ -1945,11 +1944,11 @@ suspend fun <T : Any> Model<T>.aggregateImpl(
  * @param block the tweak block.
  * @return a list of instances of [T] from the aggregation result documents.
  * @since 2.0.0
- * @see MonktCollection.aggregateSuspend
+ * @see MongoCollection.aggregate
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.aggregate(
-    pipeline: List<Bson>,
+    pipeline: List<BsonDocument>,
     session: ClientSession? = null,
     block: AggregateTweak.() -> Unit = {}
 ): List<T> {
@@ -1967,155 +1966,14 @@ suspend fun <T : Any> Model<T>.aggregate(
  * @param block the tweak block.
  * @return a list of instances of [T] from the aggregation result documents.
  * @since 2.0.0
- * @see MonktCollection.aggregateSuspend
+ * @see MongoCollection.aggregate
  */
 suspend fun <T : Any> Model<T>.aggregate(
     vararg pipeline: BsonDocumentBlock,
     session: ClientSession? = null,
     block: AggregateTweak.() -> Unit = {}
 ): List<T> {
-    return aggregate(pipeline.map { document(it) }, session, block)
-}
-
-/**
- * Perform a bulk aggregation in all the
- * collections in [this] list.
- *
- * The order of the given [pipelines] must match
- * the order of the collections in [this] list.
- *
- * @param pipelines the pipelines foreach collection.
- * @param pipeline the pipeline operations to be
- *                 performed on the combined
- *                 documents.
- * @param tweak aggregate operation tweaks.
- * @return a list of instances of [T] from the aggregation result documents.
- * @since 2.0.0
- * @see MonktCollection.aggregate
- */
-@AdvancedMonktApi("Tweaks should be created and handled internally")
-suspend fun <T : Any> List<Model<out T>>.aggregateImpl(
-    pipelines: List<List<BsonDocument>>,
-    pipeline: List<BsonDocument> = emptyList(),
-    session: ClientSession? = null,
-    tweak: AggregateTweak
-): List<T> {
-    val publisherBlock = tweak.publisherBlock
-    val decodeTweak = tweak.decodeTweak
-
-    val documents = map { it.collection() }
-        .aggregateSuspend(pipelines, pipeline, session, publisherBlock)
-
-    return documents
-        .mapIndexed { i, (mi, d) -> Triple(mi, i, d) }
-        .groupBy { (mi, _, _) ->
-            getOrElse(mi) {
-                error("Model List Aggregation failed: Model index out of bounds: $mi")
-            }
-        }
-        .mapValues { it.value.map { (_, i, d) -> i to d } }
-        .flatMap { (m, idl) ->
-            val (il, dl) = idl.unzip()
-            m.decodeImpl(dl, decodeTweak).zip(il)
-        }
-        .sortedBy { (_, i) -> i }
-        .map { (d, _) -> d }
-}
-
-/**
- * Perform a bulk aggregation in all the
- * collections in [this] list.
- *
- * The order of the given [pipelines] must match
- * the order of the collections in [this] list.
- *
- * @param pipelines the pipelines foreach collection.
- * @param pipeline the pipeline operations to be
- *                 performed on the combined
- *                 documents.
- * @param block the tweak block.
- * @return a list of instances of [T] from the aggregation result documents.
- * @since 2.0.0
- * @see MonktCollection.aggregate
- */
-@OptIn(AdvancedMonktApi::class)
-suspend fun <T : Any> List<Model<out T>>.aggregate(
-    pipelines: List<List<BsonDocument>>,
-    pipeline: List<BsonDocument> = emptyList(),
-    session: ClientSession? = null,
-    block: AggregateTweak.() -> Unit = {}
-): List<T> {
-    val tweak = AggregateTweak()
-    tweak.apply(block)
-    return aggregateImpl(pipelines, pipeline, session, tweak)
-}
-
-/**
- * Perform a bulk aggregation in all the
- * collections in [this] list.
- *
- * The order of the given [pipelines] must match
- * the order of the collections in [this] list.
- *
- * @param pipelines the pipelines foreach collection.
- * @param pipeline the pipeline operations to be
- *                 performed on the combined
- *                 documents.
- * @param block the tweak block.
- * @return a list of instances of [T] from the aggregation result documents.
- * @since 2.0.0
- * @see MonktCollection.aggregate
- */
-suspend fun <T : Any> List<Model<out T>>.aggregate(
-    pipelines: List<BsonArrayBlock>,
-    pipeline: BsonArrayBlock = {},
-    session: ClientSession? = null,
-    block: AggregateTweak.() -> Unit = {}
-): List<T> {
-    return aggregate(
-        pipelines = pipelines.map { array(it).map { it as BsonDocument } },
-        pipeline = array(pipeline).map { it as BsonDocument },
-        session = session,
-        block = block
-    )
-}
-
-/**
- * Perform a bulk aggregation in all the
- * collections in [this] list.
- *
- * The order of the given [pipelines] must match
- * the order of the collections in [this] list.
- * It is allowed to add one additional item to be
- * the pipeline for operations to be performed on
- * the combined documents.
- *
- * @param pipelines the pipelines foreach collection
- *                 and an optional item: pipeline
- *                 operations to be performed on
- *                 the combined documents.
- * @param block the tweak block.
- * @return a list of instances of [T] from the aggregation result documents.
- * @since 2.0.0
- * @see MonktCollection.aggregate
- */
-suspend fun <T : Any> List<Model<out T>>.aggregate(
-    vararg pipelines: BsonArrayBlock,
-    session: ClientSession? = null,
-    block: AggregateTweak.() -> Unit = {}
-): List<T> {
-    val range = size..size + 1
-    require(pipelines.size in range) {
-        "List aggregation vararg pipelines size mismatch: " +
-                "expected: $range ; " +
-                "actual: ${pipelines.size}"
-    }
-    return aggregate(
-        pipelines = pipelines.take(size),
-        pipeline = pipelines.getOrElse(size) { {} },
-        session = session,
-        block = block
-    )
+    return aggregate(pipeline.map { BsonDocument(it) }, session, block)
 }
 
 /* ============= -- ensureIndex  -- ============= */
@@ -2129,15 +1987,15 @@ suspend fun <T : Any> List<Model<out T>>.aggregate(
  * @param key an object describing the index key(s), which may not be null.
  * @param block the options block for the index.
  * @since 2.0.0
- * @see MonktCollection.dropIndex
- * @see MonktCollection.createIndex
+ * @see MongoCollection.dropIndex
+ * @see MongoCollection.createIndex
  */
 suspend fun <T : Any> Model<T>.ensureIndex(
-    key: Bson,
+    key: BsonDocument,
     session: ClientSession? = null,
-    block: IndexOptionsScope.() -> Unit = {}
+    block: CreateIndexOptions.() -> Unit = {}
 ): String {
-    return collection().ensureIndexSuspend(key, session, block)
+    return collection().ensureIndex(key, CreateIndexOptions(block), session)
 }
 
 /**
@@ -2149,13 +2007,13 @@ suspend fun <T : Any> Model<T>.ensureIndex(
  * @param key an object describing the index key(s), which may not be null.
  * @param block the options block for the index.
  * @since 2.0.0
- * @see MonktCollection.dropIndex
- * @see MonktCollection.createIndex
+ * @see MongoCollection.dropIndex
+ * @see MongoCollection.createIndex
  */
 suspend fun <T : Any> Model<T>.ensureIndex(
     key: BsonDocumentBlock,
     session: ClientSession? = null,
-    block: IndexOptionsScope.() -> Unit = {}
+    block: CreateIndexOptions.() -> Unit = {}
 ): String {
-    return collection().ensureIndexSuspend(key, session, block)
+    return collection().ensureIndex(key, session, block)
 }

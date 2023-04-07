@@ -15,8 +15,8 @@
  */
 package org.cufy.monkt.internal
 
+import org.cufy.bson.BsonElement
 import org.cufy.bson.BsonType
-import org.cufy.bson.BsonValue
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 
@@ -32,10 +32,10 @@ open class ScalarDecoderBuilderImpl<T> : ScalarDecoderBuilder<T> {
     override var types: MutableList<BsonType> = mutableListOf()
 
     @AdvancedMonktApi
-    override val canDecodeBlocks: MutableList<(BsonValue) -> Boolean> = mutableListOf()
+    override val canDecodeBlocks: MutableList<(BsonElement) -> Boolean> = mutableListOf()
 
     @AdvancedMonktApi
-    override var decodeBlock: ((BsonValue) -> T)? = null
+    override var decodeBlock: ((BsonElement) -> T)? = null
 
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
@@ -47,9 +47,9 @@ open class ScalarDecoderBuilderImpl<T> : ScalarDecoderBuilder<T> {
         return ScalarDecoderImpl(
             types = types.toList(),
             decodeBlock = decodeBlock
-                ?: error("decodeBlock is required but was not provided"),
+                    ?: error("decodeBlock is required but was not provided"),
             canDecodeBlock = canDecodeBlocks.toList().let {
-                { bsonValue -> it.any { it(bsonValue) } }
+                { element -> it.any { it(element) } }
             }
         )
     }
@@ -99,7 +99,7 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
         deferred.clear()
         return ArraySchemaImpl(
             schema = schema?.value
-                ?: error("schema is required but was not provided"),
+                    ?: error("schema is required but was not provided"),
             options = options.toList(),
             staticOptions = staticOptions.toList(),
             decoders = decoders.toList(),
@@ -128,16 +128,16 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
     override var types: MutableList<BsonType> = mutableListOf()
 
     @AdvancedMonktApi
-    override var canDecodeBlocks: MutableList<(BsonValue) -> Boolean> = mutableListOf()
+    override var canDecodeBlocks: MutableList<(BsonElement) -> Boolean> = mutableListOf()
 
     @AdvancedMonktApi
-    override var decodeBlock: ((BsonValue) -> T)? = null
+    override var decodeBlock: ((BsonElement) -> T)? = null
 
     @AdvancedMonktApi
     override val canEncodeBlocks: MutableList<(Any?) -> Boolean> = mutableListOf()
 
     @AdvancedMonktApi
-    override var encodeBlock: ((T) -> BsonValue)? = null
+    override var encodeBlock: ((T) -> BsonElement)? = null
 
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
@@ -149,9 +149,9 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
         return ScalarSchemaImpl(
             types = types.toList(),
             decodeBlock = decodeBlock
-                ?: error("decodeBlock is required but was not provided"),
+                    ?: error("decodeBlock is required but was not provided"),
             encodeBlock = encodeBlock
-                ?: error("encodeBlock is required but was not provided"),
+                    ?: error("encodeBlock is required but was not provided"),
             canDecodeBlock = canDecodeBlocks.toList().let {
                 { bsonValue -> it.any { it(bsonValue) } }
             },
@@ -174,7 +174,7 @@ open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
     override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @AdvancedMonktApi
-    override val values: MutableMap<BsonValue, T> = mutableMapOf()
+    override val values: MutableMap<BsonElement, T> = mutableMapOf()
 
     @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
     override fun build(): EnumSchema<T> {
@@ -239,13 +239,13 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
         deferred.clear()
         return FieldDefinitionImpl(
             name = name
-                ?: error("name is required but was not provided"),
+                    ?: error("name is required but was not provided"),
             lazySchema = schema
-                ?: error("schema is required but was not provided"),
+                    ?: error("schema is required but was not provided"),
             getter = getter
-                ?: error("getter is required but was not provided"),
+                    ?: error("getter is required but was not provided"),
             setter = setter
-                ?: error("setter is required but was not provided"),
+                    ?: error("setter is required but was not provided"),
             options = options.toList(),
             staticOptions = staticOptions.toList(),
             decoders = decoders.toList(),
@@ -297,7 +297,7 @@ open class ObjectSchemaBuilderImpl<T : Any> : ObjectSchemaBuilder<T> {
         deferred.clear()
         return ObjectSchemaImpl(
             constructor = constructor
-                ?: error("constructor is required but was not provided"),
+                    ?: error("constructor is required but was not provided"),
             fields = fields.toList(),
             options = options.toList(),
             staticOptions = staticOptions.toList(),

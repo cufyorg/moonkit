@@ -15,9 +15,10 @@
  */
 package org.cufy.monkt.schema.extension
 
-import com.mongodb.client.model.IndexModel
-import com.mongodb.client.model.IndexOptions
 import org.cufy.bson.*
+import org.cufy.mongodb.`$type`
+import org.cufy.mongodb.CreateIndexModel
+import org.cufy.mongodb.CreateIndexOptions
 import org.cufy.monkt.*
 import org.cufy.monkt.schema.*
 import kotlin.reflect.KCallable
@@ -34,12 +35,12 @@ open class IndexesBuilderConfiguration : IndexesConfiguration() {
     /**
      * The index's keys.
      */
-    val keys: BsonDocument = BsonDocument()
+    val keys: MutableBsonDocument = MutableBsonDocument()
 
     /**
      * The index's options.
      */
-    val options: IndexOptions = IndexOptions()
+    val options: CreateIndexOptions = CreateIndexOptions()
 }
 
 /* ============= --- Extensions --- ============= */
@@ -51,9 +52,9 @@ open class IndexesBuilderConfiguration : IndexesConfiguration() {
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.options(
-    block: IndexOptionsScope.() -> Unit
+    block: CreateIndexOptions.() -> Unit
 ) {
-    configuration.options.configure(block)
+    configuration.options.apply(block)
 }
 
 /**
@@ -63,7 +64,7 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.options(
 fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.keys(
     block: BsonDocumentBlock
 ) {
-    configuration.keys.configure(block)
+    configuration.keys.apply(block)
 }
 
 //
@@ -80,15 +81,9 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.keys(
 fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
     block: BsonDocumentBlock
 ) {
-    var filter = configuration.options.partialFilterExpression
-            as? BsonDocument
-
-    if (filter == null) {
-        filter = BsonDocument()
-        configuration.options.partialFilterExpression(filter)
-    }
-
-    filter.configure(block)
+    val current = configuration.options.partialFilterExpression ?: emptyMap()
+    val merged = current + BsonDocument(block)
+    configuration.options.partialFilterExpression = merged.toBsonDocument()
 }
 
 /**
@@ -108,15 +103,8 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
     block: BsonDocumentBlock
 ) {
     filter {
-        var filter = document["$pathname"]
-                as? BsonDocument
-
-        if (filter == null) {
-            filter = BsonDocument()
-            document["$pathname"] = filter
-        }
-
-        filter.configure(block)
+        val current = this["$pathname"] as? BsonDocument ?: emptyMap()
+        this["$pathname"] = (current + BsonDocument(block)).toBsonDocument()
     }
 }
 
@@ -176,12 +164,12 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    pathname: Pathname, vararg types: BsonType, value: BsonValue = bint32(1)
+    pathname: Pathname, vararg types: BsonType, value: BsonElement = 1.b
 ) {
     keys { "$pathname" by value }
 
     if (types.isNotEmpty()) {
-        filter(pathname) { `$type` by types.map { bint32(it.value) } }
+        filter(pathname) { `$type` by types.map { it.value.b } }
     }
 }
 
@@ -201,7 +189,7 @@ fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    relativeName: String, vararg types: BsonType, value: BsonValue = bint32(1)
+    relativeName: String, vararg types: BsonType, value: BsonElement = 1.b
 ) {
     key(pathname + relativeName, *types, value = value)
 }
@@ -222,7 +210,7 @@ fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    relativeName: KCallable<*>, vararg types: BsonType, value: BsonValue = bint32(1)
+    relativeName: KCallable<*>, vararg types: BsonType, value: BsonElement = 1.b
 ) {
     key(relativeName.name, *types, value = value)
 }
@@ -242,10 +230,10 @@ fun <T : Any, M> WithOptionsBuilder<T, M>.index(
     staticOption(configuration) {
         block(it)
 
-        val keys = configuration.keys
+        val keys = configuration.keys.toBsonDocument()
         val options = configuration.options
 
-        val index = IndexModel(keys, options)
+        val index = CreateIndexModel(keys, options)
 
         @Suppress("UNCHECKED_CAST")
         this as OptionScope<Unit, Unit, IndexesConfiguration>

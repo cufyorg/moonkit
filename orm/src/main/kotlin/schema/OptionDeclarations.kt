@@ -15,7 +15,6 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.Pathname
 import org.cufy.monkt.*
 import kotlin.reflect.KProperty
 

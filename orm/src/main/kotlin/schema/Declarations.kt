@@ -15,13 +15,12 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.BsonValue
-import org.cufy.bson.Pathname
+import org.cufy.bson.BsonElement
 import org.cufy.monkt.*
 
 /**
  * An encoder is a function that converts instances
- * of type [T] into a [BsonValue].
+ * of type [T] into a [BsonElement].
  */
 fun interface Encoder<T> {
     /**
@@ -50,12 +49,12 @@ fun interface Encoder<T> {
      * @since 2.0.0
      */
     @AdvancedMonktApi
-    fun encode(value: T): BsonValue
+    fun encode(value: T): BsonElement
 }
 
 /**
  * A decoder is a function that converts a
- * [BsonValue] into an instance of type [T].
+ * [BsonElement] into an instance of type [T].
  *
  * @author LSafer
  * @since 2.0.0
@@ -63,30 +62,30 @@ fun interface Encoder<T> {
 fun interface Decoder<T> {
     /**
      * Return true if this decoder can decode the
-     * given [bsonValue].
+     * given [element].
      *
      * This function doesn't fully guarantee that
      * [encode] will succeed. It was put only to
-     * know if this decoder accepts the [bsonValue]
+     * know if this decoder accepts the [element]
      * or not.
      *
-     * @param bsonValue the value to be checked.
-     * @return true, if this decoder can decode [bsonValue].
+     * @param element the value to be checked.
+     * @return true, if this decoder can decode [element].
      * @since 2.0.0
      */
     @AdvancedMonktApi
-    fun canDecode(bsonValue: BsonValue): Boolean {
+    fun canDecode(element: BsonElement): Boolean {
         return true
     }
 
     /**
-     * Decode the given [bsonValue] to [T].
+     * Decode the given [element] to [T].
      *
-     * @param bsonValue the value to be decoded.
+     * @param element the value to be decoded.
      * @since 2.0.0
      */
     @AdvancedMonktApi
-    fun decode(bsonValue: BsonValue): T
+    fun decode(element: BsonElement): T
 }
 
 /**

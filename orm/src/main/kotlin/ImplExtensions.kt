@@ -15,8 +15,11 @@
  */
 package org.cufy.monkt
 
-import com.mongodb.reactivestreams.client.MongoClients
 import org.cufy.bson.*
+import org.cufy.mongodb.MongoClient
+import org.cufy.mongodb.MongoDatabase
+import org.cufy.mongodb.createMongoClient
+import org.cufy.mongodb.get
 import org.cufy.monkt.internal.*
 import org.cufy.monkt.schema.*
 import org.cufy.monkt.schema.extension.*
@@ -139,8 +142,12 @@ fun <T : Any> Document.Companion.performEncoding(instance: T): BsonDocument {
 
     val document = model.schema.encode(instance)
 
-    if ("_id" !in document)
-        document["_id"] = IdSchema.encode(id)
+    if ("_id" !in document) {
+        return BsonDocument {
+            byAll(document)
+            "_id" by IdSchema.encode(id)
+        }
+    }
 
     return document
 }
@@ -181,7 +188,7 @@ operator fun Monkt.plusAssign(handler: SignalHandler) {
  * @throws IllegalStateException if already connected
  */
 @OptIn(InternalMonktApi::class)
-fun Monkt.connect(client: MonktClient, database: MonktDatabase) {
+fun Monkt.connect(client: MongoClient, database: MongoDatabase) {
     require(!isConnected) { "Already Connected" }
     isConnected = true
     deferredClient.complete(client)
@@ -201,9 +208,9 @@ fun Monkt.connect(client: MonktClient, database: MonktDatabase) {
  * @since 2.0.0
  */
 fun Monkt.connect(uri: String, name: String) {
-    val client = MongoClients.create(uri)
-    val database = client.getDatabase(name)
-    connect(MonktClient(client), MonktDatabase(database))
+    val client = createMongoClient(uri)
+    val database = client[name]
+    connect(client, database)
 }
 
 /**

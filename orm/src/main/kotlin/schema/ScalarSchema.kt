@@ -15,7 +15,7 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.BsonValue
+import org.cufy.bson.BsonElement
 import org.cufy.monkt.*
 import org.cufy.monkt.internal.*
 import kotlin.reflect.typeOf
@@ -29,17 +29,17 @@ import kotlin.reflect.typeOf
 interface ScalarSchema<T> : Schema<T>, ScalarDecoder<T> {
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(AdvancedMonktApi::class)
-    override fun canDecode(bsonValue: BsonValue): Boolean
+    override fun canDecode(element: BsonElement): Boolean
 
     @OptIn(AdvancedMonktApi::class)
     override fun canEncode(value: Any?): Boolean
 
     @Suppress("UnnecessaryOptInAnnotation")
     @OptIn(AdvancedMonktApi::class)
-    override fun decode(bsonValue: BsonValue): T
+    override fun decode(element: BsonElement): T
 
     @OptIn(AdvancedMonktApi::class)
-    override fun encode(value: T): BsonValue
+    override fun encode(value: T): BsonElement
 }
 
 /**
@@ -66,7 +66,7 @@ interface ScalarSchemaBuilder<T> :
      * The wrapped encoder
      */
     @AdvancedMonktApi("Use `encode()` instead")
-    var encodeBlock: ((T) -> BsonValue)? // REQUIRED
+    var encodeBlock: ((T) -> BsonElement)? // REQUIRED
 
     /**
      * Build the schema.
@@ -114,7 +114,7 @@ fun <T> ScalarSchema(
  */
 @OptIn(AdvancedMonktApi::class)
 fun <T> ScalarSchemaBuilder<T>.encode(
-    block: (T) -> BsonValue
+    block: (T) -> BsonElement
 ) {
     this.encodeBlock = block
 }
