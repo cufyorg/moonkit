@@ -70,6 +70,21 @@ infix fun <I, O> I.encode(codec: Codec<I, O>): O {
 }
 
 /**
+ * Encode [this] value to [O] using the given [codec].
+ *
+ * @receiver the value to encode.
+ * @param codec the codec to be used.
+ * @return the encoded value.
+ * @throws CodecException if encoding failed.
+ * @since 2.0.0
+ */
+@JvmName("encodeAnyInfix")
+@CodecKeywordMarker
+infix fun <I, O> Any.encodeAny(codec: Codec<I, O>): O {
+    return encodeAny(this, codec)
+}
+
+/**
  * Decode [this] value to [I] using the given [codec].
  *
  * @receiver the value to decode.
@@ -82,6 +97,21 @@ infix fun <I, O> I.encode(codec: Codec<I, O>): O {
 @CodecKeywordMarker
 infix fun <I, O> O.decode(codec: Codec<I, O>): I {
     return decode(this, codec)
+}
+
+/**
+ * Decode [this] value to [I] using the given [codec].
+ *
+ * @receiver the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@JvmName("decodeAnyInfix")
+@CodecKeywordMarker
+infix fun <I, O> Any.decodeAny(codec: Codec<I, O>): I {
+    return decodeAny(this, codec)
 }
 
 /**
