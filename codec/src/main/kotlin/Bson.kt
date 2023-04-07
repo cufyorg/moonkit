@@ -130,6 +130,27 @@ class BsonNullableCodec<I, O : BsonElement>(
 val <I, O : BsonElement> Codec<I, O>.Nullable: BsonNullableCodec<I, O>
     get() = BsonNullableCodec(this)
 
+/**
+ * Obtain a codec that always decodes nullish
+ * values to `null` and encodes `null`
+ * to [BsonNull] and uses this codec otherwise.
+ *
+ * Nullish values includes [BsonNull] and [BsonUndefined]
+ */
+val <I, O : BsonElement> FieldCodec<I, O>.Nullable: FieldCodec<I?, BsonElement>
+    get() = FieldCodec(name, (this as Codec<I, O>).Nullable)
+
+/**
+ * Obtain a codec that always decodes nullish
+ * values to `null` and encodes `null`
+ * to [BsonNull] and uses this codec otherwise.
+ *
+ * Nullish values includes [BsonNull] and [BsonUndefined]
+ */
+@OptIn(ExperimentalCodecApi::class)
+val <I, O : BsonElement> BsonFieldCodec<I, O>.Nullable: BsonFieldCodec<I?, BsonElement>
+    get() = BsonFieldCodec(name, (this as Codec<I, O>).Nullable)
+
 /* ============= ------------------ ============= */
 
 /**
@@ -165,6 +186,23 @@ class BsonArrayCodec<I, O : BsonElement>(
  */
 val <I, O : BsonElement> Codec<I, O>.Array: BsonArrayCodec<I, O>
     get() = BsonArrayCodec(this)
+
+/**
+ * Obtain a codec for [List] and [BsonArray] that
+ * uses this codec to encode/decode each
+ * individual item.
+ */
+val <I, O : BsonElement> FieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
+    get() = FieldCodec(name, (this as Codec<I, O>).Array)
+
+/**
+ * Obtain a codec for [List] and [BsonArray] that
+ * uses this codec to encode/decode each
+ * individual item.
+ */
+@OptIn(ExperimentalCodecApi::class)
+val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
+    get() = BsonFieldCodec(name, (this as Codec<I, O>).Array)
 
 /* ============= ------------------ ============= */
 
