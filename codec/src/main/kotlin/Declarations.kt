@@ -63,6 +63,7 @@ interface Codec<I, O> {
  * @throws CodecException if encoding failed.
  * @since 2.0.0
  */
+@JvmName("encodeInfix")
 @CodecKeywordMarker
 infix fun <I, O> I.encode(codec: Codec<I, O>): O {
     return encode(this, codec)
@@ -77,6 +78,7 @@ infix fun <I, O> I.encode(codec: Codec<I, O>): O {
  * @throws CodecException if decoding failed.
  * @since 2.0.0
  */
+@JvmName("decodeInfix")
 @CodecKeywordMarker
 infix fun <I, O> O.decode(codec: Codec<I, O>): I {
     return decode(this, codec)
@@ -84,17 +86,10 @@ infix fun <I, O> O.decode(codec: Codec<I, O>): I {
 
 /**
  * Get the value of the field with the name of the
- * given [codec] and encode it using the given [codec].
- */
-operator fun <I, O> Map<String, I>.get(codec: FieldCodec<I, O>): O {
-    return encodeAny(this[codec.name], codec)
-}
-
-/**
- * Get the value of the field with the name of the
  * given [codec] and decode it using the given [codec].
  */
-operator fun <I, O> Map<String, O>.get(codec: FieldCodec<I, O>): I {
+@JvmName("operatorDecode")
+operator fun <V, I, O : V> Map<String, V>.get(codec: FieldCodec<I, in O>): I {
     return decodeAny(this[codec.name], codec)
 }
 
