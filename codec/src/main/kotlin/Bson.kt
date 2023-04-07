@@ -96,7 +96,7 @@ infix fun <I> I.encode(codec: Codec<I, BsonDocument>): BsonDocument {
  * to `null` and encodes `null` to [BsonNull] and
  * uses the given [codec] otherwise.
  *
- * Nullish values includes [BsonNull] and [BsonUndefined]
+ * Nullish values includes `null`, [BsonNull] and [BsonUndefined]
  *
  * @author LSafer
  * @since 2.0.0
@@ -115,7 +115,7 @@ class BsonNullableCodec<I, O : BsonElement>(
     @AdvancedCodecApi
     override fun decode(value: Any?) =
         when (value) {
-            BsonNull, BsonUndefined -> success(null)
+            null, BsonNull, BsonUndefined -> success(null)
             else -> codec.decode(value)
         }
 }
@@ -125,7 +125,7 @@ class BsonNullableCodec<I, O : BsonElement>(
  * values to `null` and encodes `null`
  * to [BsonNull] and uses this codec otherwise.
  *
- * Nullish values includes [BsonNull] and [BsonUndefined]
+ * Nullish values includes `null`, [BsonNull] and [BsonUndefined]
  */
 val <I, O : BsonElement> Codec<I, O>.Nullable: BsonNullableCodec<I, O>
     get() = BsonNullableCodec(this)
@@ -135,7 +135,7 @@ val <I, O : BsonElement> Codec<I, O>.Nullable: BsonNullableCodec<I, O>
  * values to `null` and encodes `null`
  * to [BsonNull] and uses this codec otherwise.
  *
- * Nullish values includes [BsonNull] and [BsonUndefined]
+ * Nullish values includes `null`, [BsonNull] and [BsonUndefined]
  */
 val <I, O : BsonElement> FieldCodec<I, O>.Nullable: FieldCodec<I?, BsonElement>
     get() = FieldCodec(name, (this as Codec<I, O>).Nullable)
@@ -145,7 +145,7 @@ val <I, O : BsonElement> FieldCodec<I, O>.Nullable: FieldCodec<I?, BsonElement>
  * values to `null` and encodes `null`
  * to [BsonNull] and uses this codec otherwise.
  *
- * Nullish values includes [BsonNull] and [BsonUndefined]
+ * Nullish values includes `null`, [BsonNull] and [BsonUndefined]
  */
 @OptIn(ExperimentalCodecApi::class)
 val <I, O : BsonElement> BsonFieldCodec<I, O>.Nullable: BsonFieldCodec<I?, BsonElement>
