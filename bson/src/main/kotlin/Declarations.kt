@@ -210,6 +210,14 @@ fun BsonArray(block: BsonArrayBlock): BsonArray {
 }
 
 /**
+ * Construct a new bson array using the given
+ * builder [block].
+ */
+fun MutableBsonArray(block: BsonArrayBlock): MutableBsonArray {
+    return MutableBsonArray().apply(block)
+}
+
+/**
  * A type-safe representation of the BSON array type.
  *
  * @see org.bson.BsonArray
@@ -232,6 +240,14 @@ fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
  */
 fun BsonDocument(content: Map<String, BsonElement> = emptyMap()): BsonDocument {
     return BsonDocumentImpl(content)
+}
+
+/**
+ * Construct a new bson document using the given
+ * builder [block].
+ */
+fun MutableBsonDocument(block: BsonDocumentBlock): MutableBsonDocument {
+    return MutableBsonDocument().apply(block)
 }
 
 /**
