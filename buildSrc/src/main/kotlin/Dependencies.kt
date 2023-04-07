@@ -1,4 +1,4 @@
-const val kotlin_version = "1.7.22"
+const val kotlin_version = "1.8.10"
 
 object Dependencies {
     object Kotlin {
