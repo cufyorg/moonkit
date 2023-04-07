@@ -16,7 +16,6 @@
 package org.cufy.codec
 
 import org.cufy.bson.BsonElement
-import java.io.Serial
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.reflect.KProperty
@@ -771,7 +770,6 @@ open class CodecException(
     writableStackTrace: Boolean = true
 ) : RuntimeException(message ?: cause?.message, cause, enableSuppression, writableStackTrace) {
     companion object {
-        @Serial
         private const val serialVersionUID: Long = -1616193939070247846L
     }
 }
