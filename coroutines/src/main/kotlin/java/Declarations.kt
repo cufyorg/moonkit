@@ -54,6 +54,9 @@ internal typealias JavaMongoDatabase =
 val JavaMongoDatabase.kt: MongoDatabase
     get() = object : MongoDatabase {
         override val java = this@kt
+
+        override fun toString() =
+            "MongoDatabase($name)"
     }
 
 //
@@ -70,6 +73,9 @@ internal typealias JavaMongoCollection =
 val JavaMongoCollection.kt: MongoCollection
     get() = object : MongoCollection {
         override val java = this@kt
+
+        override fun toString() =
+            "MongoCollection(${namespace.database}, ${namespace.collection})"
     }
 
 //
