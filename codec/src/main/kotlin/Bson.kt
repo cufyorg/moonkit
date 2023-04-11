@@ -244,6 +244,30 @@ object BsonStringCodec : Codec<String, BsonString> {
  *
  * @since 2.0.0
  */
+@Suppress("ObjectPropertyName")
+inline val `bson string` get() = BsonStringCodec
+
+/**
+ * The codec for [String] and [BsonString].
+ *
+ * @since 2.0.0
+ */
+@Suppress("ObjectPropertyName")
+inline val `bson nullable string` get() = BsonStringCodec.Nullable
+
+/**
+ * The codec for [String] and [BsonString].
+ *
+ * @since 2.0.0
+ */
+@Suppress("ObjectPropertyName")
+inline val `bson string array` get() = BsonStringCodec.Array
+
+/**
+ * The codec for [String] and [BsonString].
+ *
+ * @since 2.0.0
+ */
 @Suppress("UnusedReceiverParameter")
 val Codecs.String get() = BsonStringCodec
 
@@ -399,7 +423,7 @@ val Codecs.Decimal128 get() = BsonDecimal128Codec
  *
  * @since 2.0.0
  */
-object BigDecimalToBsonCodec : Codec<BigDecimal, BsonDecimal128> {
+object BsonBigDecimalCodec : Codec<BigDecimal, BsonDecimal128> {
     @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: BigDecimal ->
@@ -419,7 +443,7 @@ object BigDecimalToBsonCodec : Codec<BigDecimal, BsonDecimal128> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.BigDecimal get() = BigDecimalToBsonCodec
+inline val Codecs.BigDecimal get() = BsonBigDecimalCodec
 
 /* ============= ------------------ ============= */
 
@@ -457,7 +481,7 @@ val Codecs.ObjectId get() = BsonObjectIdCodec
  *
  * @since 2.0.0
  */
-object IdToBsonCodec : Codec<Id<*>, BsonElement> {
+object BsonIdCodec : Codec<Id<*>, BsonElement> {
     @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Id<*> ->
@@ -477,6 +501,14 @@ object IdToBsonCodec : Codec<Id<*>, BsonElement> {
                 ))
             }
         }
+
+    /**
+     * Return this codec casted to [T].
+     */
+    operator fun <T> invoke(): Codec<Id<T>, BsonElement> {
+        @Suppress("UNCHECKED_CAST")
+        return this as Codec<Id<T>, BsonElement>
+    }
 }
 
 /**
@@ -485,7 +517,7 @@ object IdToBsonCodec : Codec<Id<*>, BsonElement> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.Id get() = IdToBsonCodec
+inline val Codecs.Id get() = BsonIdCodec
 
 /**
  * The codec for [Id] and [BsonObjectId] or [BsonString].
@@ -493,7 +525,7 @@ val Codecs.Id get() = IdToBsonCodec
  * @param T the type of the id.
  * @since 2.0.0
  */
-@Suppress("UNCHECKED_CAST", "FunctionName")
-fun <T> Codecs.Id() = Id as Codec<Id<T>, BsonElement>
+@Suppress("UNCHECKED_CAST", "FunctionName", "UnusedReceiverParameter")
+fun <T> Codecs.Id() = BsonIdCodec<T>()
 
 /* ============= ------------------ ============= */
