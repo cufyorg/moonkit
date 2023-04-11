@@ -519,13 +519,4 @@ object BsonIdCodec : Codec<Id<*>, BsonElement> {
 @Suppress("UnusedReceiverParameter")
 inline val Codecs.Id get() = BsonIdCodec
 
-/**
- * The codec for [Id] and [BsonObjectId] or [BsonString].
- *
- * @param T the type of the id.
- * @since 2.0.0
- */
-@Suppress("UNCHECKED_CAST", "FunctionName", "UnusedReceiverParameter")
-fun <T> Codecs.Id() = BsonIdCodec<T>()
-
 /* ============= ------------------ ============= */
