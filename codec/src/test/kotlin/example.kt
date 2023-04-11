@@ -32,12 +32,34 @@ class ExampleTest {
         println(doc.java)
         assertEquals(expected, actual)
     }
+
+    @Test
+    fun `common example 2`() {
+        val id = Id<Document1>()
+        val name = "Abdullah"
+        val age = 6969
+        val birthday = 696969696969
+
+        val doc = BsonDocument {
+            Document1.Id by id
+            Document1.Name by name
+            Document1.Age by age
+            "birthday" by birthday
+        }
+
+        val fragment = Document1f2(doc)
+
+        assertEquals(id, fragment.id)
+        assertEquals(name, fragment.name)
+        assertEquals(age, fragment.age)
+        assertEquals(birthday, fragment.birthday)
+    }
 }
 
 object Document1 {
-    val Id = FieldCodec("_id") { Id<Document1>() }
-    val Name = FieldCodec("name") { String }
-    val Age = FieldCodec("age") { Int32 }
+    val Id = Codecs.Id<Document1>() at "_id"
+    val Name = Codecs.String at "name"
+    val Age = Codecs.Int32 at "age"
 }
 
 data class Document1f1(
@@ -45,6 +67,14 @@ data class Document1f1(
     val name: String,
     val age: Int
 )
+
+data class Document1f2(private val document: BsonDocument) {
+    val id by Document1.Id from document
+    val name by Document1.Name from document
+    val age by Document1.Age from document
+
+    val birthday by Codecs.Int64.Nullable at "birthday" from document
+}
 
 val Document1f1Codec = Codec {
     encodeCatching { it: Document1f1 ->
