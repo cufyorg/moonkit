@@ -17,7 +17,6 @@ package org.cufy.codec
 
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.reflect.KProperty
 
 /* ============= ------------------ ============= */
 
@@ -783,15 +782,6 @@ fun <I, O> FieldCodec(name: String, codec: Codec<I, O>): FieldCodec<I, O> {
  */
 fun <I, O> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
     return FieldCodec(name, block(Codecs))
-}
-
-/**
- * Create a new field codec with the name of the
- * given [property] and backed by [this] codec.
- */
-@Deprecated("Will be removed in the future", ReplaceWith("FieldCodec(property.name, this)"))
-operator fun <I, O> Codec<I, O>.getValue(t: Any?, property: KProperty<*>): FieldCodec<I, O> {
-    return FieldCodec(property.name, this)
 }
 
 /**
