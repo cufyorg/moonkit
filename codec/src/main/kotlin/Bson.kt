@@ -269,7 +269,7 @@ inline val `bson string array` get() = BsonStringCodec.Array
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.String get() = BsonStringCodec
+inline val Codecs.String get() = BsonStringCodec
 
 /* ============= ------------------ ============= */
 
@@ -298,7 +298,7 @@ object BsonBooleanCodec : Codec<Boolean, BsonBoolean> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.Boolean get() = BsonBooleanCodec
+inline val Codecs.Boolean get() = BsonBooleanCodec
 
 /* ============= ------------------ ============= */
 
@@ -327,7 +327,7 @@ object BsonInt32Codec : Codec<Int, BsonInt32> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.Int32 get() = BsonInt32Codec
+inline val Codecs.Int32 get() = BsonInt32Codec
 
 /* ============= ------------------ ============= */
 
@@ -356,7 +356,7 @@ object BsonInt64Codec : Codec<Long, BsonInt64> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.Int64 get() = BsonInt64Codec
+inline val Codecs.Int64 get() = BsonInt64Codec
 
 /* ============= ------------------ ============= */
 
@@ -385,7 +385,7 @@ object BsonDoubleCodec : Codec<Double, BsonDouble> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.Double get() = BsonDoubleCodec
+inline val Codecs.Double get() = BsonDoubleCodec
 
 /* ============= ------------------ ============= */
 
@@ -414,7 +414,7 @@ object BsonDecimal128Codec : Codec<Decimal128, BsonDecimal128> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.Decimal128 get() = BsonDecimal128Codec
+inline val Codecs.Decimal128 get() = BsonDecimal128Codec
 
 /* ============= ------------------ ============= */
 
@@ -472,7 +472,7 @@ object BsonObjectIdCodec : Codec<ObjectId, BsonObjectId> {
  * @since 2.0.0
  */
 @Suppress("UnusedReceiverParameter")
-val Codecs.ObjectId get() = BsonObjectIdCodec
+inline val Codecs.ObjectId get() = BsonObjectIdCodec
 
 /* ============= ------------------ ============= */
 
