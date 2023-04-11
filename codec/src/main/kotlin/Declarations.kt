@@ -122,6 +122,23 @@ operator fun <V, I, O : V> Map<String, V>.get(codec: FieldCodec<I, in O>): I {
     return decodeAny(this[codec.name], codec)
 }
 
+/**
+ * Get the value of the field with the name of the
+ * [this] codec and decode it using [this] codec.
+ *
+ * This function was made to be used in this manner:
+ *
+ * ```kotlin
+ * data class MyClass(private val document: BsonDocument) {
+ *    val field by Codecs.String at "field" from document
+ * }
+ * ```
+ */
+@CodecKeywordMarker
+infix fun <V, I, O : V> FieldCodec<I, in O>.from(map: Map<String, V>): Lazy<I> {
+    return lazy { map[this] }
+}
+
 // Encode Any
 
 /**
@@ -775,6 +792,15 @@ fun <I, O> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): FieldCodec
 @Deprecated("Will be removed in the future", ReplaceWith("FieldCodec(property.name, this)"))
 operator fun <I, O> Codec<I, O>.getValue(t: Any?, property: KProperty<*>): FieldCodec<I, O> {
     return FieldCodec(property.name, this)
+}
+
+/**
+ * Create a new field codec with the given [name]
+ * and backed by [this] codec.
+ */
+@CodecKeywordMarker
+infix fun <I, O> Codec<I, O>.at(name: String): FieldCodec<I, O> {
+    return FieldCodec(name, this)
 }
 
 /* ============= ------------------ ============= */

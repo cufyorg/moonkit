@@ -94,6 +94,15 @@ operator fun <I, O : BsonElement> Codec<I, O>.getValue(t: Any?, property: KPrope
     return FieldCodec(property.name, this)
 }
 
+/**
+ * Create a new field codec with the given [name]
+ * and backed by [this] codec.
+ */
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> Codec<I, O>.at(name: String): BsonFieldCodec<I, O> {
+    return FieldCodec(name, this)
+}
+
 /* ============= ------------------ ============= */
 
 /**
