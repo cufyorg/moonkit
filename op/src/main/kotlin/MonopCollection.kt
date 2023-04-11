@@ -481,7 +481,7 @@ fun MonopCollection.replaceOne(
     filter: BsonDocumentBlock,
     replacement: BsonDocumentBlock,
     options: ReplaceOptions.() -> Unit = {}
-) = replaceOne(BsonDocument(filter), BsonDocument(filter), ReplaceOptions(options))
+) = replaceOne(BsonDocument(filter), BsonDocument(replacement), ReplaceOptions(options))
 
 //
 
