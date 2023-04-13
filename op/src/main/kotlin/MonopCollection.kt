@@ -276,7 +276,7 @@ fun MonopCollection.updateOne(
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
-    return UpdateOneOp(this, filter, BsonArray(update), options)
+    return UpdateOneOp(this, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -428,7 +428,7 @@ fun MonopCollection.updateMany(
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateManyOp {
-    return UpdateManyOp(this, filter, BsonArray(update), options)
+    return UpdateManyOp(this, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -811,7 +811,7 @@ fun MonopCollection.findOneAndUpdate(
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
-    return FindOneAndUpdateOp(this, filter, BsonArray(update), options)
+    return FindOneAndUpdateOp(this, filter, update.toBsonArray(), options)
 }
 
 /**

@@ -195,10 +195,10 @@ sealed interface BsonElement {
 }
 
 /**
- * Return a new [BsonArray] instance backed by the given list.
+ * Construct a new empty bson array.
  */
-fun BsonArray(content: List<BsonElement> = emptyList()): BsonArray {
-    return BsonArrayImpl(content)
+fun BsonArray(): BsonArray {
+    return BsonArray(emptyList())
 }
 
 /**
@@ -206,16 +206,17 @@ fun BsonArray(content: List<BsonElement> = emptyList()): BsonArray {
  * builder [block].
  */
 fun BsonArray(block: BsonArrayBlock): BsonArray {
-    return MutableBsonArray().apply(block)
+    val content = mutableBsonListOf()
+    content.apply(block)
+    return BsonArray(content)
 }
 
 /**
- * Construct a new bson array using the given
- * builder [block].
+ * A block of code building a bson array.
+ *
+ * @since 2.0.0
  */
-fun MutableBsonArray(block: BsonArrayBlock): MutableBsonArray {
-    return MutableBsonArray().apply(block)
-}
+typealias BsonArrayBlock = MutableBsonList.() -> Unit
 
 /**
  * A type-safe representation of the BSON array type.
@@ -223,8 +224,26 @@ fun MutableBsonArray(block: BsonArrayBlock): MutableBsonArray {
  * @see org.bson.BsonArray
  * @since 2.0.0
  */
-sealed interface BsonArray : BsonElement, List<BsonElement> {
+class BsonArray internal constructor(
+    private val content: BsonList
+) : BsonElement, BsonList by content {
     override val type: BsonType get() = BsonType.Array
+
+    override fun equals(other: Any?) =
+        content == other
+
+    override fun hashCode() =
+        content.hashCode()
+
+    override fun toString() =
+        content.joinToString(",", "[", "]")
+}
+
+/**
+ * Construct a new empty bson document.
+ */
+fun BsonDocument(): BsonDocument {
+    return BsonDocument(emptyMap())
 }
 
 /**
@@ -232,23 +251,17 @@ sealed interface BsonArray : BsonElement, List<BsonElement> {
  * builder [block].
  */
 fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
-    return MutableBsonDocument().apply(block)
+    val content = mutableBsonMapOf()
+    content.apply(block)
+    return BsonDocument(content)
 }
 
 /**
- * Return a new [BsonDocument] instance backed by the given map.
+ * A block of code building a bson document.
+ *
+ * @since 2.0.0
  */
-fun BsonDocument(content: Map<String, BsonElement> = emptyMap()): BsonDocument {
-    return BsonDocumentImpl(content)
-}
-
-/**
- * Construct a new bson document using the given
- * builder [block].
- */
-fun MutableBsonDocument(block: BsonDocumentBlock): MutableBsonDocument {
-    return MutableBsonDocument().apply(block)
-}
+typealias BsonDocumentBlock = MutableBsonMap.() -> Unit
 
 /**
  * A type-safe container for a BSON document.
@@ -256,8 +269,21 @@ fun MutableBsonDocument(block: BsonDocumentBlock): MutableBsonDocument {
  * @see org.bson.BsonDocument
  * @since 2.0.0
  */
-sealed interface BsonDocument : BsonElement, Map<String, BsonElement> {
+class BsonDocument internal constructor(
+    private val content: BsonMap
+) : BsonElement, BsonMap by content {
     override val type: BsonType get() = BsonType.Document
+
+    override fun equals(other: Any?) =
+        content == other
+
+    override fun hashCode() =
+        content.hashCode()
+
+    override fun toString() =
+        content.entries.joinToString(",", "{", "}") {
+            """"${it.key}":${it.value}"""
+        }
 }
 
 /**

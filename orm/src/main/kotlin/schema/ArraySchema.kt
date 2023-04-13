@@ -15,7 +15,7 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.MutableBsonArray
+import org.cufy.bson.MutableBsonList
 import org.cufy.monkt.*
 import org.cufy.monkt.internal.*
 
@@ -72,7 +72,7 @@ open class ArraySchemaCodecScope<T>(
     /**
      * The source array.
      */
-    val array: MutableBsonArray
+    val array: MutableBsonList
 )
 
 /**

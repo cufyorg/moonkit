@@ -62,15 +62,43 @@ val bundefined = BsonUndefined
 /**
  * Construct a new bson array from this list.
  */
-fun List<BsonElement>.toBsonArray(): BsonArray {
+fun Iterable<BsonElement>.toBsonArray(): BsonArray {
     return BsonArray(toList())
 }
 
 /**
- * Construct a new mutable bson array from this list.
+ * Construct a new mutable bson list from this list.
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @see toMutableList
+ * @since 2.0.0
  */
-fun List<BsonElement>.toMutableBsonArray(): MutableBsonArray {
-    return MutableBsonArray(toMutableList())
+fun Iterable<BsonElement>.toMutableBsonList(): MutableBsonList {
+    return toMutableList().asMutableBsonList()
+}
+
+/**
+ * Obtain a mutable bson list backed by this list.
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @since 2.0.0
+ */
+fun MutableList<BsonElement>.asMutableBsonList(): MutableBsonList {
+    val content = this
+    return object : MutableBsonList, MutableList<BsonElement> by content {
+        override fun equals(other: Any?) =
+            content == other
+
+        override fun hashCode() =
+            content.hashCode()
+
+        override fun toString() =
+            content.joinToString(",", "[", "]")
+    }
 }
 
 /**
@@ -81,10 +109,40 @@ fun Map<String, BsonElement>.toBsonDocument(): BsonDocument {
 }
 
 /**
- * Construct a new mutable bson document from this map.
+ * Construct a new mutable bson map from this map.
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @see toMutableMap
+ * @since 2.0.0
  */
-fun Map<String, BsonElement>.toMutableBsonDocument(): MutableBsonDocument {
-    return MutableBsonDocument(toMutableMap())
+fun Map<String, BsonElement>.toMutableBsonMap(): MutableBsonMap {
+    return toMutableMap().asMutableBsonMap()
+}
+
+/**
+ * Obtain a mutable bson map backed by this map.
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @since 2.0.0
+ */
+fun MutableMap<String, BsonElement>.asMutableBsonMap(): MutableBsonMap {
+    val content = this
+    return object : MutableBsonMap, MutableMap<String, BsonElement> by content {
+        override fun equals(other: Any?) =
+            content == other
+
+        override fun hashCode() =
+            content.hashCode()
+
+        override fun toString() =
+            content.entries.joinToString(",", "{", "}") {
+                """"${it.key}":${it.value}"""
+            }
+    }
 }
 
 /* ============= ------------------ ============= */

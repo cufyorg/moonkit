@@ -28,7 +28,7 @@ import kotlin.Result.Companion.success
  * features that can be achieved only when the
  * target output is known to be bson.
  *
- * This implements [MutableBsonDocumentField] to enable the following syntax:
+ * This implements [MutableBsonMapField] to enable the following syntax:
  * ```kotlin
  * document {
  *      MyField by myValue
@@ -45,7 +45,7 @@ import kotlin.Result.Companion.success
  * @author LSafer
  * @since 2.0.0
  */
-interface BsonFieldCodec<I, O : BsonElement> : FieldCodec<I, O>, MutableBsonDocumentField<I> {
+interface BsonFieldCodec<I, O : BsonElement> : FieldCodec<I, O>, MutableBsonMapField<I> {
     override fun encode(value: I): BsonElement =
         encode(value, this)
 }
@@ -169,9 +169,11 @@ class BsonArrayCodec<I, O : BsonElement>(
     @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: List<*> ->
-            success(BsonArray(it.map {
-                encodeAny(it, codec)
-            }))
+            success(BsonArray {
+                it.mapTo(this) {
+                    encodeAny(it, codec)
+                }
+            })
         }
 
     @AdvancedCodecApi

@@ -35,7 +35,7 @@ open class IndexesBuilderConfiguration : IndexesConfiguration() {
     /**
      * The index's keys.
      */
-    val keys: MutableBsonDocument = MutableBsonDocument()
+    val keys: MutableBsonMap = mutableBsonMapOf()
 
     /**
      * The index's options.

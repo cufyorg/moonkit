@@ -80,7 +80,7 @@ val BsonDocument.java: JavaBsonDocument
  * Return the kotlin version of this bson element.
  */
 val JavaBsonDocument.kt: BsonDocument
-    get() = BsonDocument(mapValues { it.value.kt })
+    get() = BsonDocument { this@kt.mapValuesTo(this) { it.value.kt } }
 
 //
 
@@ -97,7 +97,7 @@ val BsonArray.java: JavaBsonArray
  * Return the kotlin version of this bson element.
  */
 val JavaBsonArray.kt: BsonArray
-    get() = BsonArray(map { it.kt })
+    get() = BsonArray { this@kt.mapTo(this) { it.kt } }
 
 //
 

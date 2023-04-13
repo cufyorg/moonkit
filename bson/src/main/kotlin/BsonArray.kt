@@ -20,56 +20,23 @@ import java.math.BigDecimal
 /* ============= ------------------ ============= */
 
 /**
- * A default implementation of [BsonArray].
+ * A list containing only items of type [BsonElement].
  *
- * @author LSafer
  * @since 2.0.0
  */
-internal class BsonArrayImpl(
-    private val content: List<BsonElement>
-) : BsonArray, List<BsonElement> by content {
-    override fun equals(other: Any?) =
-        content == other
-
-    override fun hashCode() =
-        content.hashCode()
-
-    override fun toString() =
-        content.joinToString(",", "[", "]")
-}
+typealias BsonList = List<BsonElement>
 
 /* ============= ------------------ ============= */
 
 /**
- * A block of code building a bson array.
+ * A mutable list containing only items of type [BsonElement].
+ *
+ * This interface will be replaced with a `typealias` once
+ * kotlin context receivers is stable.
  *
  * @since 2.0.0
  */
-typealias BsonArrayBlock = MutableBsonArray.() -> Unit
-
-/**
- * A mutable implementation of [BsonArray].
- *
- * @author LSafer
- * @since 2.0.0
- */
-class MutableBsonArray(
-    /**
-     * The array currently building.
-     */
-    private val content: MutableList<BsonElement> = mutableListOf()
-) : BsonArray, MutableList<BsonElement> by content {
-    /* ============= ------------------ ============= */
-
-    override fun equals(other: Any?) =
-        content == other
-
-    override fun hashCode() =
-        content.hashCode()
-
-    override fun toString() =
-        content.joinToString(",", "[", "]")
-
+interface MutableBsonList : BsonList, MutableList<BsonElement> {
     /* ============= ------------------ ============= */
 
     /**
@@ -79,8 +46,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: BsonElement?) {
-        value ?: return run { content += bnull }
-        content += value
+        value ?: return run { this += bnull }
+        this += value
     }
 
     /**
@@ -90,8 +57,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: BsonDocument?) {
-        value ?: return run { content += bnull }
-        content += value
+        value ?: return run { this += bnull }
+        this += value
     }
 
     /**
@@ -101,8 +68,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: BsonArray?) {
-        value ?: return run { content += bnull }
-        content.add(value)
+        value ?: return run { this += bnull }
+        this.add(value)
     }
 
     /* ============= ------------------ ============= */
@@ -116,8 +83,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Map<String, BsonElement>?) {
-        value ?: return run { content += bnull }
-        content += value.toBsonDocument()
+        value ?: return run { this += bnull }
+        this += value.toBsonDocument()
     }
 
     /**
@@ -129,8 +96,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: List<BsonElement>?) {
-        value ?: return run { content += bnull }
-        content.add(value.toBsonArray())
+        value ?: return run { this += bnull }
+        this.add(value.toBsonArray())
     }
 
     /**
@@ -142,8 +109,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: String?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -155,8 +122,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: ObjectId?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -168,8 +135,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Id<*>?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -179,11 +146,12 @@ class MutableBsonArray(
      *
      * The given [value] will be wrapped using [BsonArray] and [Id.b].
      */
+    @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
     fun by(value: List<Id<*>>?) {
-        value ?: return run { content += bnull }
-        content.add(value.map { it.b }.toBsonArray())
+        value ?: return run { this += bnull }
+        this.add(value.map { it.b }.toBsonArray())
     }
 
     /**
@@ -195,8 +163,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Decimal128?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -208,8 +176,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: BigDecimal?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /* ============= ------------------ ============= */
@@ -223,8 +191,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Boolean?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -236,8 +204,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Int?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -249,8 +217,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Long?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /**
@@ -262,8 +230,8 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(value: Double?) {
-        value ?: return run { content += bnull }
-        content += value.b
+        value ?: return run { this += bnull }
+        this += value.b
     }
 
     /* ============= ------------------ ============= */
@@ -273,7 +241,7 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun by(block: BsonDocumentBlock) {
-        content += BsonDocument(block)
+        this += BsonDocument(block)
     }
 
     /* ============= ------------------ ============= */
@@ -283,10 +251,38 @@ class MutableBsonArray(
      */
     @BsonConstructorMarker
     fun byAll(list: List<BsonElement>) {
-        content += list
+        this += list
     }
 
     /* ============= ------------------ ============= */
+}
+
+/**
+ * Return an empty new [MutableBsonList].
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @see mutableListOf
+ * @since 2.0.0
+ */
+fun mutableBsonListOf(): MutableBsonList {
+    return mutableListOf<BsonElement>()
+        .asMutableBsonList()
+}
+
+/**
+ * Returns a new [MutableBsonList] with the given elements.
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @see mutableListOf
+ * @since 2.0.0
+ */
+fun mutableBsonListOf(vararg elements: BsonElement): MutableBsonList {
+    return mutableListOf(*elements)
+        .asMutableBsonList()
 }
 
 /* ============= ------------------ ============= */

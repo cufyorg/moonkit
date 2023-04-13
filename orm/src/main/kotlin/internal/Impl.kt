@@ -111,7 +111,7 @@ open class ArraySchemaImpl<T>(
     @AdvancedMonktApi
     override fun decode(element: BsonElement): List<T> {
         element as BsonArray
-        val array = element.toMutableBsonArray()
+        val array = element.toMutableBsonList()
 
         val list = mutableListOf<T>()
 
@@ -149,7 +149,7 @@ open class ArraySchemaImpl<T>(
 
     @AdvancedMonktApi
     override fun encode(value: List<T>): BsonElement {
-        val array = MutableBsonArray()
+        val array = mutableBsonListOf()
 
         value.forEach { item ->
             val element = run {
@@ -477,7 +477,7 @@ open class FieldDefinitionImpl<T : Any, M>(
     }
 
     @AdvancedMonktApi
-    override fun decode(instance: T, document: MutableBsonDocument) {
+    override fun decode(instance: T, document: MutableBsonMap) {
         val schema = schema
 
         val bsonValue = document[name] ?: bundefined
@@ -513,7 +513,7 @@ open class FieldDefinitionImpl<T : Any, M>(
     }
 
     @AdvancedMonktApi
-    override fun encode(instance: T, document: MutableBsonDocument) {
+    override fun encode(instance: T, document: MutableBsonMap) {
         val schema = schema
 
         val value = getter(instance)
@@ -634,7 +634,8 @@ open class ObjectSchemaImpl<T : Any>(
 
     @AdvancedMonktApi
     override fun decode(element: BsonElement): T {
-        val document = (element as BsonDocument).toMutableBsonDocument()
+        element as BsonDocument
+        val document = element.toMutableBsonMap()
 
         val instance = constructor()
 
@@ -653,7 +654,7 @@ open class ObjectSchemaImpl<T : Any>(
 
     @AdvancedMonktApi
     override fun encode(value: T): BsonDocument {
-        val document = MutableBsonDocument()
+        val document = mutableBsonMapOf()
 
         fields.forEach { it.encode(value, document) }
 

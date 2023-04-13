@@ -92,14 +92,14 @@ interface FieldDefinition<T : Any, M> {
      * to the given [instance].
      */
     @AdvancedMonktApi("Called by monkt internally")
-    fun decode(instance: T, document: MutableBsonDocument)
+    fun decode(instance: T, document: MutableBsonMap)
 
     /**
      * encode this filed in the given [instance]
      * to the given [document].
      */
     @AdvancedMonktApi("Called by monkt internally")
-    fun encode(instance: T, document: MutableBsonDocument)
+    fun encode(instance: T, document: MutableBsonMap)
 }
 
 /**
@@ -154,7 +154,7 @@ open class FieldDefinitionCodecScope<T : Any, M>(
     /**
      * The container's source document.
      */
-    val document: MutableBsonDocument,
+    val document: MutableBsonMap,
     /**
      * The value.
      */

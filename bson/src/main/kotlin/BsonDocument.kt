@@ -21,31 +21,17 @@ import kotlin.reflect.KCallable
 /* ============= ------------------ ============= */
 
 /**
- * A default implementation of [BsonDocument].
+ * A map containing only items of type [BsonElement].
  *
- * @author LSafer
  * @since 2.0.0
  */
-internal class BsonDocumentImpl(
-    private val content: Map<String, BsonElement> = emptyMap()
-) : BsonDocument, Map<String, BsonElement> by content {
-    override fun equals(other: Any?) =
-        content == other
-
-    override fun hashCode() =
-        content.hashCode()
-
-    override fun toString() =
-        content.entries.joinToString(",", "{", "}") {
-            """"${it.key}":${it.value}"""
-        }
-}
+typealias BsonMap = Map<String, BsonElement>
 
 /* ============= ------------------ ============= */
 
 /**
  * An interface allowing custom receivers for
- * [MutableBsonDocument.by].
+ * [MutableBsonMap.by].
  *
  * This interface will be useless after context
  * receivers is released for production.
@@ -55,7 +41,7 @@ internal class BsonDocumentImpl(
  * @author LSafer
  * @since 2.0.0
  */
-interface MutableBsonDocumentField<T> {
+interface MutableBsonMapField<T> {
     /**
      * The name of the field.
      */
@@ -68,37 +54,12 @@ interface MutableBsonDocumentField<T> {
 }
 
 /**
- * A block of code building a bson document.
- *
- * @since 2.0.0
- */
-typealias BsonDocumentBlock = MutableBsonDocument.() -> Unit
-
-/**
  * A builder building a [BsonDocument].
  *
  * @author LSafer
  * @since 2.0.0
  */
-class MutableBsonDocument(
-    /**
-     * The document currently building.
-     */
-    private val content: MutableMap<String, BsonElement> = mutableMapOf()
-) : BsonDocument, MutableMap<String, BsonElement> by content {
-    /* ============= ------------------ ============= */
-
-    override fun equals(other: Any?) =
-        content == other
-
-    override fun hashCode() =
-        content.hashCode()
-
-    override fun toString() =
-        content.entries.joinToString(",", "{", "}") {
-            """"${it.key}":${it.value}"""
-        }
-
+interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /* ============= ------------------ ============= */
 
     /**
@@ -108,8 +69,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: BsonElement?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value
     }
 
     /**
@@ -131,8 +92,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: BsonDocument?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value
     }
 
     /**
@@ -154,8 +115,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: BsonArray?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value
     }
 
     /**
@@ -179,8 +140,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Map<String, BsonElement>?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.toBsonDocument()
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.toBsonDocument()
     }
 
     /**
@@ -206,8 +167,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: List<BsonElement>?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.toBsonArray()
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.toBsonArray()
     }
 
     /**
@@ -233,8 +194,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: String?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -260,8 +221,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: ObjectId?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -288,8 +249,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Id<*>?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -313,11 +274,12 @@ class MutableBsonDocument(
      *
      * The given [value] will be wrapped using [BsonArray] and [Id.b].
      */
+    @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
     infix fun String.by(value: List<Id<*>>?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.map { it.b }.toBsonArray()
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.map { it.b }.toBsonArray()
     }
 
     /**
@@ -327,6 +289,7 @@ class MutableBsonDocument(
      *
      * The given [value] will be wrapped using [BsonArray] and [Id.b].
      */
+    @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: List<Id<*>>?) {
@@ -344,8 +307,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Decimal128?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -371,8 +334,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: BigDecimal?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -398,8 +361,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Boolean?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -425,8 +388,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Int?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -452,8 +415,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Long?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -479,8 +442,8 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(value: Double?) {
-        value ?: return run { content[this] = bnull }
-        content[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = bnull }
+        this@MutableBsonMap[this] = value.b
     }
 
     /**
@@ -502,7 +465,7 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     infix fun String.by(block: BsonDocumentBlock) {
-        content[this] = BsonDocument(block)
+        this@MutableBsonMap[this] = BsonDocument(block)
     }
 
     /**
@@ -519,8 +482,8 @@ class MutableBsonDocument(
      * Set the field represented by the [receiver][this] to the given [value].
      */
     @BsonConstructorMarker
-    infix fun <T> MutableBsonDocumentField<T>.by(value: T) {
-        content[name] = encode(value) ?: bnull
+    infix fun <T> MutableBsonMapField<T>.by(value: T) {
+        this@MutableBsonMap[name] = encode(value) ?: bnull
     }
 
     /* ============= ------------------ ============= */
@@ -530,10 +493,38 @@ class MutableBsonDocument(
      */
     @BsonConstructorMarker
     fun byAll(map: Map<String, BsonElement>) {
-        this.content += map
+        this@MutableBsonMap += map
     }
 
     /* ============= ------------------ ============= */
+}
+
+/**
+ * Return an empty new [MutableBsonMap].
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @see mutableMapOf
+ * @since 2.0.0
+ */
+fun mutableBsonMapOf(): MutableBsonMap {
+    return mutableMapOf<String, BsonElement>()
+        .asMutableBsonMap()
+}
+
+/**
+ * Returns a new [MutableBsonMap] with the given pairs.
+ *
+ * This function will be obsolete once kotlin
+ * context receivers is stable.
+ *
+ * @see mutableMapOf
+ * @since 2.0.0
+ */
+fun mutableBsonMapOf(vararg pairs: Pair<String, BsonElement>): MutableBsonMap {
+    return mutableMapOf(*pairs)
+        .asMutableBsonMap()
 }
 
 /* ============= ------------------ ============= */
