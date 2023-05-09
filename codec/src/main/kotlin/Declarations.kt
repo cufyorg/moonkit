@@ -796,6 +796,17 @@ infix fun <I, O> Codec<I, O>.at(name: String): FieldCodec<I, O> {
     return FieldCodec(name, this)
 }
 
+/**
+ * Create a new field codec with the receiver name
+ * and backed by the codec from the given [block].
+ */
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+@CodecKeywordMarker
+infix fun <I, O> String.be(block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
+    return FieldCodec(this, block)
+}
+
 /* ============= ------------------ ============= */
 
 /**

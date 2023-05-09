@@ -94,6 +94,17 @@ infix fun <I, O : BsonElement> Codec<I, O>.at(name: String): BsonFieldCodec<I, O
     return FieldCodec(name, this)
 }
 
+/**
+ * Create a new field codec with the receiver name
+ * and backed by the codec from the given [block].
+ */
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
+    return FieldCodec(this, block)
+}
+
 /* ============= ------------------ ============= */
 
 /**
