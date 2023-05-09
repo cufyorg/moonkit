@@ -27,9 +27,58 @@ import org.cufy.mongodb.*
  * @author LSafer
  * @since 2.0.0
  */
-open class MonopCollection(val name: String) {
-    override fun toString(): String {
-        return "MonopCollection($name)"
+interface MonopCollection {
+    /**
+     * The collection name.
+     *
+     * @since 2.0.0
+     */
+    val name: String
+}
+
+/**
+ * A convenient class that holds bare minimal
+ * data needed for using some collection with a
+ * runtime projection representation.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface MonopCollectionOf<TProjection> : MonopCollection {
+    /**
+     * The projection constructor.
+     */
+    val projection: (BsonDocument) -> TProjection
+}
+
+/**
+ * Construct a new [MonopCollection] with the given [name].
+ *
+ * @since 2.0.0
+ */
+fun MonopCollection(name: String): MonopCollection {
+    return object : MonopCollection {
+        override val name = name
+
+        override fun toString(): String {
+            return "MonopCollection($name)"
+        }
+    }
+}
+
+/**
+ * Construct a new [MonopCollectionOf] with the given [name] and [projection].
+ *
+ * @since 2.0.0
+ */
+fun <T> MonopCollectionOf(name: String, projection: (BsonDocument) -> T): MonopCollectionOf<T> {
+    return object : MonopCollectionOf<T> {
+        override val name = name
+        override val projection = projection
+
+        override fun toString(): String {
+            return "MonopCollection($name)"
+        }
     }
 }
 

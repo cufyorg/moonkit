@@ -57,7 +57,9 @@ class ExampleTest {
     }
 }
 
-object Transaction : MonopCollection("Transaction") {
+object Transaction : MonopCollection {
+    override val name = "Transaction"
+
     val Id = FieldCodec("_id") { Id<Transaction>() }
     val From = FieldCodec("from") { String.Nullable }
     val To = FieldCodec("to") { String.Nullable }

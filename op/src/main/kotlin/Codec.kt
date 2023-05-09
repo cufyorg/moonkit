@@ -42,9 +42,8 @@ infix fun Lazy<Id<*>>.foreign(collection: MonopCollection): Lazy<Op<BsonDocument
  * the argument.
  */
 @OperationKeywordMarker
-@JvmName("foreignWithCodec")
-infix fun <T, C> Lazy<Id<*>>.foreign(collection: C): Lazy<Op<T?>> where  C : (BsonDocument) -> T, C : MonopCollection {
-    return lazy { collection.findOneById(value).mapCatching { it?.let(collection) } }
+infix fun <T> Lazy<Id<*>>.foreign(collection: MonopCollectionOf<T>): Lazy<Op<T?>> {
+    return lazy { collection.findOneById(value).mapCatching { it?.let(collection.projection) } }
 }
 
 /**
