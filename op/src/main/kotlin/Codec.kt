@@ -40,6 +40,8 @@ infix fun Lazy<Id<*>>.foreign(collection: MonopCollection): Lazy<Op<BsonDocument
  * Compose a new [Lazy] instance that uses [mapCatching]
  * on the [Op] value of [then] with the given [block] as
  * the argument.
+ *
+ * @param block the decoding block
  */
 @OperationKeywordMarker
 infix fun <T> Lazy<Op<BsonDocument?>>.decode(block: (BsonDocument) -> T): Lazy<Op<T?>> {
