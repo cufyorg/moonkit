@@ -17,6 +17,7 @@ package org.cufy.monop
 
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
+import org.cufy.codec.decode
 
 /*
 These extensions are expected to be used as follows:
@@ -43,7 +44,11 @@ infix fun Lazy<Id<*>>.foreign(collection: MonopCollection): Lazy<Op<BsonDocument
  */
 @OperationKeywordMarker
 infix fun <T> Lazy<Id<*>>.foreign(collection: MonopCollectionOf<T>): Lazy<Op<T?>> {
-    return lazy { collection.findOneById(value).mapCatching { it?.let(collection.projection) } }
+    return lazy {
+        collection.findOneById(value).mapCatching {
+            it?.let { decode(it, collection.codec) }
+        }
+    }
 }
 
 /**

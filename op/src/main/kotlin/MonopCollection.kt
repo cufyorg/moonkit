@@ -16,6 +16,9 @@
 package org.cufy.monop
 
 import org.cufy.bson.*
+import org.cufy.codec.AdvancedCodecApi
+import org.cufy.codec.Codec
+import org.cufy.codec.Codecs
 import org.cufy.mongodb.*
 
 /* ============= ------------------ ============= */
@@ -44,11 +47,17 @@ interface MonopCollection {
  * @author LSafer
  * @since 2.0.0
  */
-interface MonopCollectionOf<TProjection> : MonopCollection {
+interface MonopCollectionOf<TProjection> : MonopCollection, Codec<TProjection, BsonDocument> {
     /**
-     * The projection constructor.
+     * The projection codec.
      */
-    val projection: (BsonDocument) -> TProjection
+    val codec: Codec<TProjection, BsonDocument>
+
+    @AdvancedCodecApi
+    override fun encode(value: Any?) = codec.encode(value)
+
+    @AdvancedCodecApi
+    override fun decode(value: Any?) = codec.decode(value)
 }
 
 /**
@@ -67,14 +76,14 @@ fun MonopCollection(name: String): MonopCollection {
 }
 
 /**
- * Construct a new [MonopCollectionOf] with the given [name] and [projection].
+ * Construct a new [MonopCollectionOf] with the given [name] and [codec].
  *
  * @since 2.0.0
  */
-fun <T> MonopCollectionOf(name: String, projection: (BsonDocument) -> T): MonopCollectionOf<T> {
+fun <T> MonopCollectionOf(name: String, codec: Codecs.() -> Codec<T, BsonDocument>): MonopCollectionOf<T> {
     return object : MonopCollectionOf<T> {
         override val name = name
-        override val projection = projection
+        override val codec = Codecs(codec)
 
         override fun toString(): String {
             return "MonopCollection($name)"
