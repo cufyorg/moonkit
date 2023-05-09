@@ -524,3 +524,40 @@ object BsonIdCodec : Codec<Id<*>, BsonElement> {
 inline val Codecs.Id get() = BsonIdCodec
 
 /* ============= ------------------ ============= */
+
+/**
+ * A convenient class for creating `object` classes
+ * that holds the field codecs of a document.
+ *
+ * Expected Usage:
+ *
+ * ```kotlin
+ * object Account : CodecOf<AccountProjection> {
+ *      val codec = Codec {
+ *          encodeCatching { _: AccountProjection -> /* ... */ }
+ *          decodeCatching { _: BsonDocument -> /* ... */ }
+ *      }
+ *
+ *      val Id = "_id" be { Id }
+ *      val Name = "name" be { String }
+ *      val Age = "age" be { Int32 }
+ * }
+ * ```
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface CodecOf<TProjection> : Codec<TProjection, BsonDocument> {
+    /**
+     * The projection codec.
+     */
+    val codec: Codec<TProjection, BsonDocument>
+
+    @AdvancedCodecApi
+    override fun encode(value: Any?) = codec.encode(value)
+
+    @AdvancedCodecApi
+    override fun decode(value: Any?) = codec.decode(value)
+}
+
+/* ============= ------------------ ============= */

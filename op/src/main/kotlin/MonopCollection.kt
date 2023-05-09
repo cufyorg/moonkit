@@ -16,8 +16,8 @@
 package org.cufy.monop
 
 import org.cufy.bson.*
-import org.cufy.codec.AdvancedCodecApi
 import org.cufy.codec.Codec
+import org.cufy.codec.CodecOf
 import org.cufy.codec.Codecs
 import org.cufy.mongodb.*
 
@@ -47,18 +47,7 @@ interface MonopCollection {
  * @author LSafer
  * @since 2.0.0
  */
-interface MonopCollectionOf<TProjection> : MonopCollection, Codec<TProjection, BsonDocument> {
-    /**
-     * The projection codec.
-     */
-    val codec: Codec<TProjection, BsonDocument>
-
-    @AdvancedCodecApi
-    override fun encode(value: Any?) = codec.encode(value)
-
-    @AdvancedCodecApi
-    override fun decode(value: Any?) = codec.decode(value)
-}
+interface MonopCollectionOf<TProjection> : MonopCollection, CodecOf<TProjection>
 
 /**
  * Construct a new [MonopCollection] with the given [name].
