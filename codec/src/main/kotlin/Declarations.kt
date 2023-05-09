@@ -17,6 +17,7 @@ package org.cufy.codec
 
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
+import kotlin.experimental.ExperimentalTypeInference
 
 /* ============= ------------------ ============= */
 
@@ -780,6 +781,8 @@ fun <I, O> FieldCodec(name: String, codec: Codec<I, O>): FieldCodec<I, O> {
  * and backed by the codec returned from invoking
  * the given [block].
  */
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun <I, O> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
     return FieldCodec(name, block(Codecs))
 }

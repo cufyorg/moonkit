@@ -16,10 +16,10 @@
 package org.cufy.codec
 
 import org.cufy.bson.*
-import org.cufy.codec.*
 import java.math.BigDecimal
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
+import kotlin.experimental.ExperimentalTypeInference
 
 /* ============= ------------------ ============= */
 
@@ -78,8 +78,9 @@ fun <I, O : BsonElement> FieldCodec(name: String, codec: Codec<I, O>): BsonField
  * and backed by the codec returned from invoking
  * the given [block].
  */
+@OptIn(ExperimentalTypeInference::class, ExperimentalCodecApi::class)
+@OverloadResolutionByLambdaReturnType
 @Suppress("FunctionName")
-@OptIn(ExperimentalCodecApi::class)
 fun <I, O : BsonElement> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
     return BsonFieldCodec(name, block(Codecs))
 }
