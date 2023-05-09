@@ -275,6 +275,7 @@ fun Id<*>.toObjectIdOrNull(): ObjectId? {
 /**
  * Invoke this function with the given [block] as the argument.
  */
+@JvmName("invokeWithBsonDocumentBlock")
 operator fun <T> ((BsonDocument) -> T).invoke(block: BsonDocumentBlock): T {
     return this(BsonDocument(block))
 }
@@ -282,6 +283,7 @@ operator fun <T> ((BsonDocument) -> T).invoke(block: BsonDocumentBlock): T {
 /**
  * Invoke this function with the given [block] as the argument.
  */
+@JvmName("invokeWithBsonArrayBlock")
 operator fun <T> ((BsonArray) -> T).invoke(block: BsonArrayBlock): T {
     return this(BsonArray(block))
 }
