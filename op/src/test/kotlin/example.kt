@@ -46,9 +46,9 @@ class ExampleTest {
 
             val inputDocument = input encode TransactionFragmentCodec
 
-            Transaction.insertOne(inputDocument)()(monop)
+            Transaction.insertOne(inputDocument)(monop)
 
-            val outputDocument = Transaction.find()()(monop).single()
+            val outputDocument = Transaction.find()(monop).single()
 
             val output = outputDocument decode TransactionFragmentCodec
 
@@ -62,10 +62,6 @@ object Transaction : MonopCollection("Transaction") {
     val From = FieldCodec("from") { String.Nullable }
     val To = FieldCodec("to") { String.Nullable }
     val Value = FieldCodec("value") { BigDecimal }
-
-    override suspend fun init(monop: Monop) {
-        println("Initialized At: $this")
-    }
 }
 
 data class TransactionFragment(

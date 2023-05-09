@@ -35,12 +35,25 @@ interface Operation<T> : Deferred<T>
 
 /**
  * Execute this operation with the given [Monop]
+ * and don't await the result.
+ *
+ * @return this operation.
+ * @since 2.0.0
+ */
+fun <T> Operation<T>.enqueue(monop: Monop = Monop): Operation<T> {
+    monop.enqueue(this)
+    return this
+}
+
+/**
+ * Execute this operation with the given [Monop]
  * and await the result.
  *
+ * @return the awaited result.
  * @since 2.0.0
  */
 suspend operator fun <T> Operation<T>.invoke(monop: Monop = Monop): T {
-    monop(this)
+    monop.enqueue(this)
     return await()
 }
 
@@ -70,7 +83,7 @@ class BlockOperation<T, U>(
  * @since 2.0.0
  */
 class DeleteOneOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: DeleteOptions
 ) : Operation<DeleteResult>,
@@ -87,7 +100,7 @@ class DeleteOneOperation(
  * @since 2.0.0
  */
 class DeleteManyOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: DeleteOptions
 ) : Operation<DeleteResult>,
@@ -103,7 +116,7 @@ class DeleteManyOperation(
  * @since 2.0.0
  */
 class InsertOneOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val document: BsonDocument,
     val options: InsertOneOptions
 ) : Operation<InsertOneResult>,
@@ -119,7 +132,7 @@ class InsertOneOperation(
  * @since 2.0.0
  */
 class InsertManyOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val documents: List<BsonDocument>,
     val options: InsertManyOptions
 ) : Operation<InsertManyResult>,
@@ -136,7 +149,7 @@ class InsertManyOperation(
  * @since 2.0.0
  */
 class UpdateOneOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val update: BsonElement,
     val options: UpdateOptions
@@ -154,7 +167,7 @@ class UpdateOneOperation(
  * @since 2.0.0
  */
 class UpdateManyOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val update: BsonElement,
     val options: UpdateOptions
@@ -172,7 +185,7 @@ class UpdateManyOperation(
  * @since 2.0.0
  */
 class ReplaceOneOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val replacement: BsonDocument,
     val options: ReplaceOptions = ReplaceOptions()
@@ -189,7 +202,7 @@ class ReplaceOneOperation(
  * @since 2.0.0
  */
 class BulkWriteOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val requests: List<WriteModel>,
     val options: BulkWriteOptions
 ) : Operation<BulkWriteResult>,
@@ -206,7 +219,7 @@ class BulkWriteOperation(
  * @since 2.0.0
  */
 class CountOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: CountOptions
 ) : Operation<Long>,
@@ -222,7 +235,7 @@ class CountOperation(
  * @since 2.0.0
  */
 class EstimatedCountOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val options: EstimatedCountOptions
 ) : Operation<Long>,
     CompletableDeferred<Long>
@@ -238,7 +251,7 @@ class EstimatedCountOperation(
  * @since 2.0.0
  */
 class FindOneAndDeleteOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: FindOneAndDeleteOptions
 ) : Operation<BsonDocument?>,
@@ -255,7 +268,7 @@ class FindOneAndDeleteOperation(
  * @since 2.0.0
  */
 class FindOneAndReplaceOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val replacement: BsonDocument,
     val options: FindOneAndReplaceOptions
@@ -273,7 +286,7 @@ class FindOneAndReplaceOperation(
  * @since 2.0.0
  */
 class FindOneAndUpdateOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val update: BsonElement,
     val options: FindOneAndUpdateOptions
@@ -291,7 +304,7 @@ class FindOneAndUpdateOperation(
  * @since 2.0.0
  */
 class FindOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: FindOptions
 ) : Operation<List<BsonDocument>>,
@@ -307,7 +320,7 @@ class FindOperation(
  * @since 2.0.0
  */
 class AggregateOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val pipeline: List<BsonDocument>,
     val options: AggregateOptions
 ) : Operation<List<BsonDocument>>,
@@ -324,7 +337,7 @@ class AggregateOperation(
  * @since 2.0.0
  */
 class DistinctOperation(
-    val collection: MonopCollection,
+    val collection: String,
     val field: String,
     val filter: BsonDocument,
     val options: DistinctOptions

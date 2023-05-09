@@ -46,7 +46,7 @@ class MonopImpl : Monop {
         this.operators -= operators
     }
 
-    override operator fun invoke(operations: List<Operation<*>>) {
+    override fun enqueue(operations: List<Operation<*>>) {
         CoroutineScope(Dispatchers.IO).launch {
             deferred.await()
 

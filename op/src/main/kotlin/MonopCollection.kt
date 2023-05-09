@@ -17,7 +17,6 @@ package org.cufy.monop
 
 import org.cufy.bson.*
 import org.cufy.mongodb.*
-import java.util.*
 
 /* ============= ------------------ ============= */
 
@@ -25,40 +24,12 @@ import java.util.*
  * A convenient class that holds bare minimal
  * data needed for using some collection.
  *
- * The important parts of this class are [name]
- * which is the name of the collection and [init]
- * which is a function to be invoked when the
- * collection is about to be used.
- *
  * @author LSafer
  * @since 2.0.0
  */
 open class MonopCollection(val name: String) {
-    private var dejaVu = Collections.newSetFromMap<Monop>(WeakHashMap())
-
     override fun toString(): String {
         return "MonopCollection($name)"
-    }
-
-    /**
-     * Called only once per [monop] instance
-     * and only before this instance being used.
-     *
-     * Call [initOnce] instead.
-     */
-    protected open suspend fun init(monop: Monop) {}
-
-    /**
-     * If not initialized, initialize this
-     * instance with the given [monop].
-     *
-     * @since 2.0.0
-     */
-    suspend fun initOnce(monop: Monop) {
-        if (!dejaVu.add(monop))
-            return
-
-        init(monop)
     }
 }
 
@@ -77,7 +48,7 @@ fun MonopCollection.deleteOne(
     filter: BsonDocument,
     options: DeleteOptions = DeleteOptions()
 ): DeleteOneOp {
-    return DeleteOneOp(this, filter, options)
+    return DeleteOneOp(name, filter, options)
 }
 
 /**
@@ -143,7 +114,7 @@ fun MonopCollection.deleteOneById(
 fun MonopCollection.deleteMany(
     filter: BsonDocument,
     options: DeleteOptions = DeleteOptions()
-) = DeleteManyOp(this, filter, options)
+) = DeleteManyOp(name, filter, options)
 
 /**
  * Create a [DeleteManyOp] with the given arguments.
@@ -174,7 +145,7 @@ fun MonopCollection.insertOne(
     document: BsonDocument,
     options: InsertOneOptions = InsertOneOptions()
 ): InsertOneOp {
-    return InsertOneOp(this, document, options)
+    return InsertOneOp(name, document, options)
 }
 
 /**
@@ -206,7 +177,7 @@ fun MonopCollection.insertMany(
     documents: List<BsonDocument>,
     options: InsertManyOptions = InsertManyOptions()
 ): InsertManyOp {
-    return InsertManyOp(this, documents, options)
+    return InsertManyOp(name, documents, options)
 }
 
 /**
@@ -240,7 +211,7 @@ fun MonopCollection.updateOne(
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
-    return UpdateOneOp(this, filter, update, options)
+    return UpdateOneOp(name, filter, update, options)
 }
 
 /**
@@ -276,7 +247,7 @@ fun MonopCollection.updateOne(
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
-    return UpdateOneOp(this, filter, update.toBsonArray(), options)
+    return UpdateOneOp(name, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -392,7 +363,7 @@ fun MonopCollection.updateMany(
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
 ): UpdateManyOp {
-    return UpdateManyOp(this, filter, update, options)
+    return UpdateManyOp(name, filter, update, options)
 }
 
 /**
@@ -428,7 +399,7 @@ fun MonopCollection.updateMany(
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateManyOp {
-    return UpdateManyOp(this, filter, update.toBsonArray(), options)
+    return UpdateManyOp(name, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -464,7 +435,7 @@ fun MonopCollection.replaceOne(
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions()
 ): ReplaceOneOp {
-    return ReplaceOneOp(this, filter, replacement, options)
+    return ReplaceOneOp(name, filter, replacement, options)
 }
 
 /**
@@ -538,7 +509,7 @@ fun MonopCollection.bulkWrite(
     requests: List<WriteModel>,
     options: BulkWriteOptions = BulkWriteOptions()
 ): BulkWriteOp {
-    return BulkWriteOp(this, requests, options)
+    return BulkWriteOp(name, requests, options)
 }
 
 /**
@@ -570,7 +541,7 @@ fun MonopCollection.count(
     filter: BsonDocument = EmptyBsonDocument,
     options: CountOptions = CountOptions()
 ): CountOp {
-    return CountOp(this, filter, options)
+    return CountOp(name, filter, options)
 }
 
 /**
@@ -600,7 +571,7 @@ fun MonopCollection.count(
 fun MonopCollection.estimatedCount(
     options: EstimatedCountOptions = EstimatedCountOptions()
 ): EstimatedCountOp {
-    return EstimatedCountOp(this, options)
+    return EstimatedCountOp(name, options)
 }
 
 /**
@@ -630,7 +601,7 @@ fun MonopCollection.findOneAndDelete(
     filter: BsonDocument,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions()
 ): FindOneAndDeleteOp {
-    return FindOneAndDeleteOp(this, filter, options)
+    return FindOneAndDeleteOp(name, filter, options)
 }
 
 /**
@@ -699,7 +670,7 @@ fun MonopCollection.findOneAndReplace(
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions()
 ): FindOneAndReplaceOp {
-    return FindOneAndReplaceOp(this, filter, replacement, options)
+    return FindOneAndReplaceOp(name, filter, replacement, options)
 }
 
 /**
@@ -775,7 +746,7 @@ fun MonopCollection.findOneAndUpdate(
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
-    return FindOneAndUpdateOp(this, filter, update, options)
+    return FindOneAndUpdateOp(name, filter, update, options)
 }
 
 /**
@@ -811,7 +782,7 @@ fun MonopCollection.findOneAndUpdate(
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
-    return FindOneAndUpdateOp(this, filter, update.toBsonArray(), options)
+    return FindOneAndUpdateOp(name, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -925,7 +896,7 @@ fun MonopCollection.find(
     filter: BsonDocument = EmptyBsonDocument,
     options: FindOptions = FindOptions()
 ): FindOp {
-    return FindOp(this, filter, options)
+    return FindOp(name, filter, options)
 }
 
 /**
@@ -1027,7 +998,7 @@ fun MonopCollection.aggregate(
     pipeline: List<BsonDocument>,
     options: AggregateOptions = AggregateOptions()
 ): AggregateOp {
-    return AggregateOp(this, pipeline, options)
+    return AggregateOp(name, pipeline, options)
 }
 
 /**
@@ -1061,7 +1032,7 @@ fun MonopCollection.distinct(
     filter: BsonDocument = EmptyBsonDocument,
     options: DistinctOptions = DistinctOptions()
 ): DistinctOp {
-    return DistinctOp(this, field, filter, options)
+    return DistinctOp(name, field, filter, options)
 }
 
 /**

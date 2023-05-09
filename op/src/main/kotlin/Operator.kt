@@ -126,8 +126,6 @@ val BlockOperator = Operator {
  */
 val DeleteOneOperator = Operator {
     accept<DeleteOneOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -149,8 +147,6 @@ val DeleteOneOperator = Operator {
  */
 val DeleteManyOperator = Operator {
     accept<DeleteManyOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -172,8 +168,6 @@ val DeleteManyOperator = Operator {
  */
 val InsertOneOperator = Operator {
     accept<InsertOneOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -195,8 +189,6 @@ val InsertOneOperator = Operator {
  */
 val InsertManyOperator = Operator {
     accept<InsertManyOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -218,8 +210,6 @@ val InsertManyOperator = Operator {
  */
 val UpdateOneOperator = Operator {
     accept<UpdateOneOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -241,8 +231,6 @@ val UpdateOneOperator = Operator {
  */
 val UpdateManyOperator = Operator {
     accept<UpdateManyOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -264,8 +252,6 @@ val UpdateManyOperator = Operator {
  */
 val ReplaceOneOperator = Operator {
     accept<ReplaceOneOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -287,8 +273,6 @@ val ReplaceOneOperator = Operator {
  */
 val BulkWriteOperator = Operator {
     accept<BulkWriteOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -310,8 +294,6 @@ val BulkWriteOperator = Operator {
  */
 val CountOperator = Operator {
     accept<CountOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -333,8 +315,6 @@ val CountOperator = Operator {
  */
 val EstimatedCountOperator = Operator {
     accept<EstimatedCountOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -356,8 +336,6 @@ val EstimatedCountOperator = Operator {
  */
 val FindOneAndDeleteOperator = Operator {
     accept<FindOneAndDeleteOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -379,8 +357,6 @@ val FindOneAndDeleteOperator = Operator {
  */
 val FindOneAndReplaceOperator = Operator {
     accept<FindOneAndReplaceOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -402,8 +378,6 @@ val FindOneAndReplaceOperator = Operator {
  */
 val FindOneAndUpdateOperator = Operator {
     accept<FindOneAndUpdateOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -425,8 +399,6 @@ val FindOneAndUpdateOperator = Operator {
  */
 val FindOperator = Operator {
     accept<FindOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -448,8 +420,6 @@ val FindOperator = Operator {
  */
 val AggregateOperator = Operator {
     accept<AggregateOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {
@@ -471,8 +441,6 @@ val AggregateOperator = Operator {
  */
 val DistinctOperator = Operator {
     accept<DistinctOperation>().forEach {
-        it.collection.initOnce(monop)
-
         CoroutineScope(Dispatchers.IO).launch {
             it.completeWith(runCatching {
                 monop[it.collection].run {

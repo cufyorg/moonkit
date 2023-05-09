@@ -68,7 +68,7 @@ interface Monop {
      *
      * @since 2.0.0
      */
-    operator fun invoke(operations: List<Operation<*>>)
+    fun enqueue(operations: List<Operation<*>>)
 
     /**
      * The global monop instance.
@@ -156,8 +156,8 @@ operator fun Monop.minusAssign(operator: Operator) {
  *
  * @since 2.0.0
  */
-operator fun Monop.invoke(vararg operations: Operation<*>) {
-    this(operations.asList())
+fun Monop.enqueue(vararg operations: Operation<*>) {
+    this.enqueue(operations.asList())
 }
 
 /**
@@ -168,6 +168,16 @@ operator fun Monop.invoke(vararg operations: Operation<*>) {
  */
 operator fun Monop.get(collection: MonopCollection): MongoCollection {
     return database[collection.name]
+}
+
+/**
+ * A shortcut to get a [MongoCollection] instance
+ * from a monop instance.
+ *
+ * @since 2.0.0
+ */
+operator fun Monop.get(collection: String): MongoCollection {
+    return database[collection]
 }
 
 /* ============= ------------------ ============= */

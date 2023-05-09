@@ -42,7 +42,29 @@ interface Op<T> {
      *
      * @since 2.0.0
      */
-    operator fun invoke(): Operation<T>
+    fun createOperation(): Operation<T>
+}
+
+/**
+ * Execute a new operation with the given [Monop]
+ * and don't await the result.
+ *
+ * @return the operation.
+ * @since 2.0.0
+ */
+fun <T> Op<T>.enqueue(monop: Monop = Monop): Operation<T> {
+    return createOperation().enqueue(monop)
+}
+
+/**
+ * Execute a new operation with the given [Monop]
+ * and await the result.
+ *
+ * @return the awaited result.
+ * @since 2.0.0
+ */
+suspend operator fun <T> Op<T>.invoke(monop: Monop = Monop): T {
+    return createOperation().invoke(monop)
 }
 
 /* ============= ------------------ ============= */
@@ -57,8 +79,8 @@ data class BlockOp<T, U>(
     val dependencies: List<Op<T>>,
     val block: suspend Monop.(List<Result<T>>) -> Result<U>
 ) : Op<U> {
-    override fun invoke() =
-        BlockOperation(dependencies.map { it() }, block)
+    override fun createOperation() =
+        BlockOperation(dependencies.map { it.createOperation() }, block)
 }
 
 /**
@@ -153,11 +175,11 @@ fun <T, U> Op<T>.mapCatching(block: suspend (T) -> U): Op<U> {
  * @since 2.0.0
  */
 data class DeleteOneOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: DeleteOptions
 ) : Op<DeleteResult> {
-    override fun invoke() =
+    override fun createOperation() =
         DeleteOneOperation(collection, filter, options)
 }
 
@@ -169,11 +191,11 @@ data class DeleteOneOp(
  * @since 2.0.0
  */
 data class DeleteManyOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: DeleteOptions
 ) : Op<DeleteResult> {
-    override fun invoke() =
+    override fun createOperation() =
         DeleteManyOperation(collection, filter, options)
 }
 
@@ -185,11 +207,11 @@ data class DeleteManyOp(
  * @since 2.0.0
  */
 data class InsertOneOp(
-    val collection: MonopCollection,
+    val collection: String,
     val document: BsonDocument,
     val options: InsertOneOptions
 ) : Op<InsertOneResult> {
-    override fun invoke() =
+    override fun createOperation() =
         InsertOneOperation(collection, document, options)
 }
 
@@ -201,11 +223,11 @@ data class InsertOneOp(
  * @since 2.0.0
  */
 data class InsertManyOp(
-    val collection: MonopCollection,
+    val collection: String,
     val documents: List<BsonDocument>,
     val options: InsertManyOptions
 ) : Op<InsertManyResult> {
-    override fun invoke() =
+    override fun createOperation() =
         InsertManyOperation(collection, documents, options)
 }
 
@@ -217,12 +239,12 @@ data class InsertManyOp(
  * @since 2.0.0
  */
 data class UpdateOneOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val update: BsonElement,
     val options: UpdateOptions
 ) : Op<UpdateResult> {
-    override fun invoke() =
+    override fun createOperation() =
         UpdateOneOperation(collection, filter, update, options)
 }
 
@@ -234,12 +256,12 @@ data class UpdateOneOp(
  * @since 2.0.0
  */
 data class UpdateManyOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val update: BsonElement,
     val options: UpdateOptions
 ) : Op<UpdateResult> {
-    override fun invoke() =
+    override fun createOperation() =
         UpdateManyOperation(collection, filter, update, options)
 }
 
@@ -251,12 +273,12 @@ data class UpdateManyOp(
  * @since 2.0.0
  */
 data class ReplaceOneOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val replacement: BsonDocument,
     val options: ReplaceOptions = ReplaceOptions()
 ) : Op<UpdateResult> {
-    override fun invoke() =
+    override fun createOperation() =
         ReplaceOneOperation(collection, filter, replacement, options)
 }
 
@@ -268,11 +290,11 @@ data class ReplaceOneOp(
  * @since 2.0.0
  */
 data class BulkWriteOp(
-    val collection: MonopCollection,
+    val collection: String,
     val requests: List<WriteModel>,
     val options: BulkWriteOptions
 ) : Op<BulkWriteResult> {
-    override fun invoke() =
+    override fun createOperation() =
         BulkWriteOperation(collection, requests, options)
 }
 
@@ -284,11 +306,11 @@ data class BulkWriteOp(
  * @since 2.0.0
  */
 data class CountOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: CountOptions,
 ) : Op<Long> {
-    override fun invoke() =
+    override fun createOperation() =
         CountOperation(collection, filter, options)
 }
 
@@ -300,10 +322,10 @@ data class CountOp(
  * @since 2.0.0
  */
 data class EstimatedCountOp(
-    val collection: MonopCollection,
+    val collection: String,
     val options: EstimatedCountOptions
 ) : Op<Long> {
-    override fun invoke() =
+    override fun createOperation() =
         EstimatedCountOperation(collection, options)
 }
 
@@ -315,11 +337,11 @@ data class EstimatedCountOp(
  * @since 2.0.0
  */
 data class FindOneAndDeleteOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: FindOneAndDeleteOptions
 ) : Op<BsonDocument?> {
-    override fun invoke() =
+    override fun createOperation() =
         FindOneAndDeleteOperation(collection, filter, options)
 }
 
@@ -331,12 +353,12 @@ data class FindOneAndDeleteOp(
  * @since 2.0.0
  */
 data class FindOneAndReplaceOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val replacement: BsonDocument,
     val options: FindOneAndReplaceOptions
 ) : Op<BsonDocument?> {
-    override fun invoke() =
+    override fun createOperation() =
         FindOneAndReplaceOperation(collection, filter, replacement, options)
 }
 
@@ -348,12 +370,12 @@ data class FindOneAndReplaceOp(
  * @since 2.0.0
  */
 data class FindOneAndUpdateOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val update: BsonElement,
     val options: FindOneAndUpdateOptions
 ) : Op<BsonDocument?> {
-    override fun invoke() =
+    override fun createOperation() =
         FindOneAndUpdateOperation(collection, filter, update, options)
 }
 
@@ -365,11 +387,11 @@ data class FindOneAndUpdateOp(
  * @since 2.0.0
  */
 data class FindOp(
-    val collection: MonopCollection,
+    val collection: String,
     val filter: BsonDocument,
     val options: FindOptions
 ) : Op<List<BsonDocument>> {
-    override fun invoke() =
+    override fun createOperation() =
         FindOperation(collection, filter, options)
 }
 
@@ -381,11 +403,11 @@ data class FindOp(
  * @since 2.0.0
  */
 data class AggregateOp(
-    val collection: MonopCollection,
+    val collection: String,
     val pipeline: List<BsonDocument>,
     val options: AggregateOptions
 ) : Op<List<BsonDocument>> {
-    override fun invoke() =
+    override fun createOperation() =
         AggregateOperation(collection, pipeline, options)
 }
 
@@ -397,12 +419,12 @@ data class AggregateOp(
  * @since 2.0.0
  */
 data class DistinctOp(
-    val collection: MonopCollection,
+    val collection: String,
     val field: String,
     val filter: BsonDocument,
     val options: DistinctOptions
 ) : Op<List<BsonDocument>> {
-    override fun invoke() =
+    override fun createOperation() =
         DistinctOperation(collection, field, filter, options)
 }
 
