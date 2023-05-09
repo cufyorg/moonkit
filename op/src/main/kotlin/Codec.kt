@@ -37,6 +37,17 @@ infix fun Lazy<Id<*>>.foreign(collection: MonopCollection): Lazy<Op<BsonDocument
 }
 
 /**
+ * Compose a new [Lazy] instance that uses [findOneById]
+ * of the given [collection] with the value of [this] as
+ * the argument.
+ */
+@OperationKeywordMarker
+@JvmName("foreignWithCodec")
+infix fun <T, C> Lazy<Id<*>>.foreign(collection: C): Lazy<Op<T?>> where  C : (BsonDocument) -> T, C : MonopCollection {
+    return lazy { collection.findOneById(value).mapCatching { it?.let(collection) } }
+}
+
+/**
  * Compose a new [Lazy] instance that uses [mapCatching]
  * on the [Op] value of [then] with the given [block] as
  * the argument.
