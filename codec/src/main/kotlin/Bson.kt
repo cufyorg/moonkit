@@ -561,3 +561,23 @@ interface CodecOf<TProjection> : Codec<TProjection, BsonDocument> {
 }
 
 /* ============= ------------------ ============= */
+
+/**
+ * An interface simplifying projection implementations.
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+interface Projection {
+    /**
+     * The document of the projection.
+     */
+    val document: BsonDocument
+
+    /**
+     * Attempt to return the id of this projection.
+     */
+    val id: Id<*> get() = document["_id"] decodeAny BsonIdCodec
+}
+
+/* ============= ------------------ ============= */
