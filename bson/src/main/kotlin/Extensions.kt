@@ -271,3 +271,19 @@ fun Id<*>.toObjectIdOrNull(): ObjectId? {
 }
 
 /* ============= ------------------ ============= */
+
+/**
+ * Invoke this function with the given [block] as the argument.
+ */
+operator fun <T> ((BsonDocument) -> T).invoke(block: BsonDocumentBlock): T {
+    return this(BsonDocument(block))
+}
+
+/**
+ * Invoke this function with the given [block] as the argument.
+ */
+operator fun <T> ((BsonArray) -> T).invoke(block: BsonArrayBlock): T {
+    return this(BsonArray(block))
+}
+
+/* ============= ------------------ ============= */
