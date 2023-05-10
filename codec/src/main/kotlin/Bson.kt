@@ -535,63 +535,6 @@ inline val Codecs.Id get() = BsonIdCodec
 /* ============= ------------------ ============= */
 
 /**
- * A convenient class for creating `object` classes
- * that holds the field codecs of a document.
- *
- * Expected Usage:
- *
- * ```kotlin
- * object Account : CodecOf<AccountProjection> {
- *      val codec = Codec {
- *          encodeCatching { _: AccountProjection -> /* ... */ }
- *          decodeCatching { _: BsonDocument -> /* ... */ }
- *      }
- *
- *      val Id = "_id" be { Id }
- *      val Name = "name" be { String }
- *      val Age = "age" be { Int32 }
- * }
- * ```
- *
- * @author LSafer
- * @since 2.0.0
- */
-interface CodecOf<TProjection> : Codec<TProjection, BsonDocument> {
-    /**
-     * The projection codec.
-     */
-    val codec: Codec<TProjection, BsonDocument>
-
-    @AdvancedCodecApi
-    override fun encode(value: Any?) = codec.encode(value)
-
-    @AdvancedCodecApi
-    override fun decode(value: Any?) = codec.decode(value)
-}
-
-/* ============= ------------------ ============= */
-
-/**
- * An interface simplifying projection implementations.
- *
- * @author LSafer
- * @since 2.0.0
- */
-interface Projection {
-    /**
-     * The document of the projection.
-     */
-    val document: BsonDocument
-
-    /**
-     * Attempt to return the id of this projection.
-     */
-    val id: Id<*> get() = document["_id"] decodeAny BsonIdCodec
-}
-
-/* ============= ------------------ ============= */
-
-/**
  * A codec simplifying enum encoding.
  */
 class EnumCodec<I, O>(private val pairs: List<Pair<I, O>>) : Codec<I, O> {
