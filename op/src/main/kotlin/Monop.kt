@@ -166,7 +166,7 @@ fun Monop.enqueue(vararg operations: Operation<*>) {
  *
  * @since 2.0.0
  */
-operator fun Monop.get(collection: MonopCollection): MongoCollection {
+operator fun Monop.get(collection: OpCollection): MongoCollection {
     return database[collection.name]
 }
 

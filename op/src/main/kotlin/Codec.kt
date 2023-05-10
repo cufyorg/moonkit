@@ -17,6 +17,7 @@ package org.cufy.monop
 
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
+import org.cufy.codec.Codec
 import org.cufy.codec.decode
 
 /*
@@ -33,7 +34,7 @@ val foreign by "foreignId" be { Id } from map foreign MyCollection decode {
  * the argument.
  */
 @OperationKeywordMarker
-infix fun Lazy<Id<*>>.foreign(collection: MonopCollection): Lazy<Op<BsonDocument?>> {
+infix fun Lazy<Id<*>>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>> {
     return lazy { collection.findOneById(value) }
 }
 
@@ -42,11 +43,12 @@ infix fun Lazy<Id<*>>.foreign(collection: MonopCollection): Lazy<Op<BsonDocument
  * of the given [collection] with the value of [this] as
  * the argument.
  */
+@JvmName("foreignWithCodec")
 @OperationKeywordMarker
-infix fun <T> Lazy<Id<*>>.foreign(collection: MonopCollectionOf<T>): Lazy<Op<T?>> {
+infix fun <T, C> Lazy<Id<*>>.foreign(collection: C): Lazy<Op<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
         collection.findOneById(value).mapCatching {
-            it?.let { decode(it, collection.codec) }
+            it?.let { decode(it, collection) }
         }
     }
 }

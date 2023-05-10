@@ -16,9 +16,6 @@
 package org.cufy.monop
 
 import org.cufy.bson.*
-import org.cufy.codec.Codec
-import org.cufy.codec.CodecOf
-import org.cufy.codec.Codecs
 import org.cufy.mongodb.*
 
 /* ============= ------------------ ============= */
@@ -30,49 +27,26 @@ import org.cufy.mongodb.*
  * @author LSafer
  * @since 2.0.0
  */
-interface MonopCollection {
+interface OpCollection {
     /**
      * The collection name.
      *
      * @since 2.0.0
      */
     val name: String
+        get() = this::class.simpleName ?: error(
+            "Cannot infer collection name from ${this::class}"
+        )
 }
 
 /**
- * A convenient class that holds bare minimal
- * data needed for using some collection with a
- * runtime projection representation.
- *
- * @author LSafer
- * @since 2.0.0
- */
-interface MonopCollectionOf<TProjection> : MonopCollection, CodecOf<TProjection>
-
-/**
- * Construct a new [MonopCollection] with the given [name].
+ * Construct a new [OpCollection] with the given [name].
  *
  * @since 2.0.0
  */
-fun MonopCollection(name: String): MonopCollection {
-    return object : MonopCollection {
+fun OpCollection(name: String): OpCollection {
+    return object : OpCollection {
         override val name = name
-
-        override fun toString(): String {
-            return "MonopCollection($name)"
-        }
-    }
-}
-
-/**
- * Construct a new [MonopCollectionOf] with the given [name] and [codec].
- *
- * @since 2.0.0
- */
-fun <T> MonopCollectionOf(name: String, codec: Codecs.() -> Codec<T, BsonDocument>): MonopCollectionOf<T> {
-    return object : MonopCollectionOf<T> {
-        override val name = name
-        override val codec = Codecs(codec)
 
         override fun toString(): String {
             return "MonopCollection($name)"
@@ -91,7 +65,7 @@ fun <T> MonopCollectionOf(name: String, codec: Codecs.() -> Codec<T, BsonDocumen
  * @see MongoCollection.deleteOne
  * @since 2.0.0
  */
-fun MonopCollection.deleteOne(
+fun OpCollection.deleteOne(
     filter: BsonDocument,
     options: DeleteOptions = DeleteOptions()
 ): DeleteOneOp {
@@ -107,7 +81,7 @@ fun MonopCollection.deleteOne(
  * @see MongoCollection.deleteOne
  * @since 2.0.0
  */
-fun MonopCollection.deleteOne(
+fun OpCollection.deleteOne(
     filter: BsonDocumentBlock,
     options: DeleteOptions.() -> Unit = {}
 ) = deleteOne(BsonDocument(filter), DeleteOptions(options))
@@ -123,7 +97,7 @@ fun MonopCollection.deleteOne(
  * @see MongoCollection.deleteOne
  * @since 2.0.0
  */
-fun MonopCollection.deleteOneById(
+fun OpCollection.deleteOneById(
     id: Id<*>,
     options: DeleteOptions = DeleteOptions()
 ): DeleteOneOp {
@@ -142,7 +116,7 @@ fun MonopCollection.deleteOneById(
  * @see MongoCollection.deleteOne
  * @since 2.0.0
  */
-fun MonopCollection.deleteOneById(
+fun OpCollection.deleteOneById(
     id: Id<*>,
     options: DeleteOptions.() -> Unit
 ) = deleteOneById(id, DeleteOptions(options))
@@ -158,7 +132,7 @@ fun MonopCollection.deleteOneById(
  * @see MongoCollection.deleteMany
  * @since 2.0.0
  */
-fun MonopCollection.deleteMany(
+fun OpCollection.deleteMany(
     filter: BsonDocument,
     options: DeleteOptions = DeleteOptions()
 ) = DeleteManyOp(name, filter, options)
@@ -172,7 +146,7 @@ fun MonopCollection.deleteMany(
  * @see MongoCollection.deleteMany
  * @since 2.0.0
  */
-fun MonopCollection.deleteMany(
+fun OpCollection.deleteMany(
     filter: BsonDocumentBlock,
     options: DeleteOptions.() -> Unit = {}
 ) = deleteMany(BsonDocument(filter), DeleteOptions(options))
@@ -188,7 +162,7 @@ fun MonopCollection.deleteMany(
  * @see MongoCollection.insertOne
  * @since 2.0.0
  */
-fun MonopCollection.insertOne(
+fun OpCollection.insertOne(
     document: BsonDocument,
     options: InsertOneOptions = InsertOneOptions()
 ): InsertOneOp {
@@ -204,7 +178,7 @@ fun MonopCollection.insertOne(
  * @see MongoCollection.insertOne
  * @since 2.0.0
  */
-fun MonopCollection.insertOne(
+fun OpCollection.insertOne(
     document: BsonDocumentBlock,
     options: InsertOneOptions.() -> Unit = {}
 ) = insertOne(BsonDocument(document), InsertOneOptions(options))
@@ -220,7 +194,7 @@ fun MonopCollection.insertOne(
  * @see MongoCollection.insertMany
  * @since 2.0.0
  */
-fun MonopCollection.insertMany(
+fun OpCollection.insertMany(
     documents: List<BsonDocument>,
     options: InsertManyOptions = InsertManyOptions()
 ): InsertManyOp {
@@ -236,7 +210,7 @@ fun MonopCollection.insertMany(
  * @see MongoCollection.insertMany
  * @since 2.0.0
  */
-fun MonopCollection.insertMany(
+fun OpCollection.insertMany(
     vararg documents: BsonDocumentBlock,
     options: InsertManyOptions.() -> Unit = {}
 ) = insertMany(documents.map { BsonDocument(it) }, InsertManyOptions(options))
@@ -253,7 +227,7 @@ fun MonopCollection.insertMany(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOne(
+fun OpCollection.updateOne(
     filter: BsonDocument,
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
@@ -271,7 +245,7 @@ fun MonopCollection.updateOne(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOne(
+fun OpCollection.updateOne(
     filter: BsonDocumentBlock,
     update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
@@ -289,7 +263,7 @@ fun MonopCollection.updateOne(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOne(
+fun OpCollection.updateOne(
     filter: BsonDocument,
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
@@ -307,7 +281,7 @@ fun MonopCollection.updateOne(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOne(
+fun OpCollection.updateOne(
     filter: BsonDocumentBlock,
     vararg update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
@@ -325,7 +299,7 @@ fun MonopCollection.updateOne(
  * @see MongoCollection.updateOneById
  * @since 2.0.0
  */
-fun MonopCollection.updateOneById(
+fun OpCollection.updateOneById(
     id: Id<*>,
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
@@ -347,7 +321,7 @@ fun MonopCollection.updateOneById(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOneById(
+fun OpCollection.updateOneById(
     id: Id<*>,
     update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
@@ -365,7 +339,7 @@ fun MonopCollection.updateOneById(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOneById(
+fun OpCollection.updateOneById(
     id: Id<*>,
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
@@ -387,7 +361,7 @@ fun MonopCollection.updateOneById(
  * @see MongoCollection.updateOne
  * @since 2.0.0
  */
-fun MonopCollection.updateOneById(
+fun OpCollection.updateOneById(
     id: Id<*>,
     vararg update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
@@ -405,7 +379,7 @@ fun MonopCollection.updateOneById(
  * @see MongoCollection.updateMany
  * @since 2.0.0
  */
-fun MonopCollection.updateMany(
+fun OpCollection.updateMany(
     filter: BsonDocument,
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
@@ -423,7 +397,7 @@ fun MonopCollection.updateMany(
  * @see MongoCollection.updateMany
  * @since 2.0.0
  */
-fun MonopCollection.updateMany(
+fun OpCollection.updateMany(
     filter: BsonDocumentBlock,
     update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
@@ -441,7 +415,7 @@ fun MonopCollection.updateMany(
  * @see MongoCollection.updateMany
  * @since 2.0.0
  */
-fun MonopCollection.updateMany(
+fun OpCollection.updateMany(
     filter: BsonDocument,
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
@@ -459,7 +433,7 @@ fun MonopCollection.updateMany(
  * @see MongoCollection.updateMany
  * @since 2.0.0
  */
-fun MonopCollection.updateMany(
+fun OpCollection.updateMany(
     filter: BsonDocumentBlock,
     vararg update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
@@ -477,7 +451,7 @@ fun MonopCollection.updateMany(
  * @see MongoCollection.replaceOne
  * @since 2.0.0
  */
-fun MonopCollection.replaceOne(
+fun OpCollection.replaceOne(
     filter: BsonDocument,
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions()
@@ -495,7 +469,7 @@ fun MonopCollection.replaceOne(
  * @see MongoCollection.replaceOne
  * @since 2.0.0
  */
-fun MonopCollection.replaceOne(
+fun OpCollection.replaceOne(
     filter: BsonDocumentBlock,
     replacement: BsonDocumentBlock,
     options: ReplaceOptions.() -> Unit = {}
@@ -513,7 +487,7 @@ fun MonopCollection.replaceOne(
  * @see MongoCollection.replaceOneById
  * @since 2.0.0
  */
-fun MonopCollection.replaceOneById(
+fun OpCollection.replaceOneById(
     id: Id<*>,
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions()
@@ -535,7 +509,7 @@ fun MonopCollection.replaceOneById(
  * @see MongoCollection.replaceOneById
  * @since 2.0.0
  */
-fun MonopCollection.replaceOneById(
+fun OpCollection.replaceOneById(
     id: Id<*>,
     replacement: BsonDocumentBlock,
     options: ReplaceOptions.() -> Unit = {}
@@ -552,7 +526,7 @@ fun MonopCollection.replaceOneById(
  * @see MongoCollection.bulkWrite
  * @since 2.0.0
  */
-fun MonopCollection.bulkWrite(
+fun OpCollection.bulkWrite(
     requests: List<WriteModel>,
     options: BulkWriteOptions = BulkWriteOptions()
 ): BulkWriteOp {
@@ -568,7 +542,7 @@ fun MonopCollection.bulkWrite(
  * @see MongoCollection.bulkWrite
  * @since 2.0.0
  */
-fun MonopCollection.bulkWrite(
+fun OpCollection.bulkWrite(
     vararg requests: WriteModel,
     options: BulkWriteOptions.() -> Unit = {}
 ) = bulkWrite(requests.asList(), BulkWriteOptions(options))
@@ -584,7 +558,7 @@ fun MonopCollection.bulkWrite(
  * @see MongoCollection.count
  * @since 2.0.0
  */
-fun MonopCollection.count(
+fun OpCollection.count(
     filter: BsonDocument = EmptyBsonDocument,
     options: CountOptions = CountOptions()
 ): CountOp {
@@ -600,7 +574,7 @@ fun MonopCollection.count(
  * @see MongoCollection.count
  * @since 2.0.0
  */
-fun MonopCollection.count(
+fun OpCollection.count(
     filter: BsonDocumentBlock,
     options: CountOptions.() -> Unit = {}
 ) = count(BsonDocument(filter), CountOptions(options))
@@ -615,7 +589,7 @@ fun MonopCollection.count(
  * @see MongoCollection.estimatedCount
  * @since 2.0.0
  */
-fun MonopCollection.estimatedCount(
+fun OpCollection.estimatedCount(
     options: EstimatedCountOptions = EstimatedCountOptions()
 ): EstimatedCountOp {
     return EstimatedCountOp(name, options)
@@ -629,7 +603,7 @@ fun MonopCollection.estimatedCount(
  * @see MongoCollection.estimatedCount
  * @since 2.0.0
  */
-fun MonopCollection.estimatedCount(
+fun OpCollection.estimatedCount(
     options: EstimatedCountOptions.() -> Unit = {}
 ) = estimatedCount(EstimatedCountOptions(options))
 
@@ -644,7 +618,7 @@ fun MonopCollection.estimatedCount(
  * @see MongoCollection.findOneAndDelete
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndDelete(
+fun OpCollection.findOneAndDelete(
     filter: BsonDocument,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions()
 ): FindOneAndDeleteOp {
@@ -660,7 +634,7 @@ fun MonopCollection.findOneAndDelete(
  * @see MongoCollection.findOneAndDelete
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndDelete(
+fun OpCollection.findOneAndDelete(
     filter: BsonDocumentBlock,
     options: FindOneAndDeleteOptions.() -> Unit = {}
 ) = findOneAndDelete(BsonDocument(filter), FindOneAndDeleteOptions(options))
@@ -676,7 +650,7 @@ fun MonopCollection.findOneAndDelete(
  * @see MongoCollection.findOneByIdAndDelete
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndDelete(
+fun OpCollection.findOneByIdAndDelete(
     id: Id<*>,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions()
 ): FindOneAndDeleteOp {
@@ -695,7 +669,7 @@ fun MonopCollection.findOneByIdAndDelete(
  * @see MongoCollection.findOneByIdAndDelete
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndDelete(
+fun OpCollection.findOneByIdAndDelete(
     id: Id<*>,
     options: FindOneAndDeleteOptions.() -> Unit
 ) = findOneByIdAndDelete(id, FindOneAndDeleteOptions(options))
@@ -712,7 +686,7 @@ fun MonopCollection.findOneByIdAndDelete(
  * @see MongoCollection.findOneAndReplace
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndReplace(
+fun OpCollection.findOneAndReplace(
     filter: BsonDocument,
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions()
@@ -730,7 +704,7 @@ fun MonopCollection.findOneAndReplace(
  * @see MongoCollection.findOneAndReplace
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndReplace(
+fun OpCollection.findOneAndReplace(
     filter: BsonDocumentBlock,
     replacement: BsonDocumentBlock,
     options: FindOneAndReplaceOptions.() -> Unit = {}
@@ -748,7 +722,7 @@ fun MonopCollection.findOneAndReplace(
  * @see MongoCollection.findOneByIdAndReplace
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndReplace(
+fun OpCollection.findOneByIdAndReplace(
     id: Id<*>,
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions()
@@ -770,7 +744,7 @@ fun MonopCollection.findOneByIdAndReplace(
  * @see MongoCollection.findOneByIdAndReplace
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndReplace(
+fun OpCollection.findOneByIdAndReplace(
     id: Id<*>,
     replacement: BsonDocumentBlock,
     options: FindOneAndReplaceOptions.() -> Unit = {}
@@ -788,7 +762,7 @@ fun MonopCollection.findOneByIdAndReplace(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndUpdate(
+fun OpCollection.findOneAndUpdate(
     filter: BsonDocument,
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
@@ -806,7 +780,7 @@ fun MonopCollection.findOneAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndUpdate(
+fun OpCollection.findOneAndUpdate(
     filter: BsonDocumentBlock,
     update: BsonDocumentBlock,
     options: FindOneAndUpdateOptions.() -> Unit = {}
@@ -824,7 +798,7 @@ fun MonopCollection.findOneAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndUpdate(
+fun OpCollection.findOneAndUpdate(
     filter: BsonDocument,
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
@@ -842,7 +816,7 @@ fun MonopCollection.findOneAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneAndUpdate(
+fun OpCollection.findOneAndUpdate(
     filter: BsonDocumentBlock,
     vararg update: BsonDocumentBlock,
     options: FindOneAndUpdateOptions.() -> Unit = {}
@@ -860,7 +834,7 @@ fun MonopCollection.findOneAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndUpdate(
+fun OpCollection.findOneByIdAndUpdate(
     id: Id<*>,
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
@@ -882,7 +856,7 @@ fun MonopCollection.findOneByIdAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndUpdate(
+fun OpCollection.findOneByIdAndUpdate(
     id: Id<*>,
     update: BsonDocumentBlock,
     options: FindOneAndUpdateOptions.() -> Unit = {}
@@ -900,7 +874,7 @@ fun MonopCollection.findOneByIdAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndUpdate(
+fun OpCollection.findOneByIdAndUpdate(
     id: Id<*>,
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
@@ -922,7 +896,7 @@ fun MonopCollection.findOneByIdAndUpdate(
  * @see MongoCollection.findOneAndUpdate
  * @since 2.0.0
  */
-fun MonopCollection.findOneByIdAndUpdate(
+fun OpCollection.findOneByIdAndUpdate(
     id: Id<*>,
     vararg update: BsonDocumentBlock,
     options: FindOneAndUpdateOptions.() -> Unit = {}
@@ -939,7 +913,7 @@ fun MonopCollection.findOneByIdAndUpdate(
  * @see MongoCollection.find
  * @since 2.0.0
  */
-fun MonopCollection.find(
+fun OpCollection.find(
     filter: BsonDocument = EmptyBsonDocument,
     options: FindOptions = FindOptions()
 ): FindOp {
@@ -955,7 +929,7 @@ fun MonopCollection.find(
  * @see MongoCollection.find
  * @since 2.0.0
  */
-fun MonopCollection.find(
+fun OpCollection.find(
     filter: BsonDocumentBlock,
     options: FindOptions.() -> Unit = {}
 ) = find(BsonDocument(filter), FindOptions(options))
@@ -971,7 +945,7 @@ fun MonopCollection.find(
  * @see MongoCollection.findOne
  * @since 2.0.0
  */
-fun MonopCollection.findOne(
+fun OpCollection.findOne(
     filter: BsonDocument = EmptyBsonDocument,
     options: FindOptions = FindOptions()
 ): Op<BsonDocument?> {
@@ -990,7 +964,7 @@ fun MonopCollection.findOne(
  * @see MongoCollection.findOne
  * @since 2.0.0
  */
-fun MonopCollection.findOne(
+fun OpCollection.findOne(
     filter: BsonDocumentBlock,
     options: FindOptions.() -> Unit = {}
 ) = findOne(BsonDocument(filter), FindOptions(options))
@@ -1006,7 +980,7 @@ fun MonopCollection.findOne(
  * @see MongoCollection.findOneById
  * @since 2.0.0
  */
-fun MonopCollection.findOneById(
+fun OpCollection.findOneById(
     id: Id<*>,
     options: FindOptions = FindOptions()
 ): Op<BsonDocument?> {
@@ -1025,7 +999,7 @@ fun MonopCollection.findOneById(
  * @see MongoCollection.findOneById
  * @since 2.0.0
  */
-fun MonopCollection.findOneById(
+fun OpCollection.findOneById(
     id: Id<*>,
     options: FindOptions.() -> Unit
 ) = findOneById(id, FindOptions(options))
@@ -1041,7 +1015,7 @@ fun MonopCollection.findOneById(
  * @see MongoCollection.aggregate
  * @since 2.0.0
  */
-fun MonopCollection.aggregate(
+fun OpCollection.aggregate(
     pipeline: List<BsonDocument>,
     options: AggregateOptions = AggregateOptions()
 ): AggregateOp {
@@ -1057,7 +1031,7 @@ fun MonopCollection.aggregate(
  * @see MongoCollection.aggregate
  * @since 2.0.0
  */
-fun MonopCollection.aggregate(
+fun OpCollection.aggregate(
     vararg pipeline: BsonDocumentBlock,
     options: AggregateOptions.() -> Unit = {}
 ) = aggregate(pipeline.map { BsonDocument(it) }, AggregateOptions(options))
@@ -1074,7 +1048,7 @@ fun MonopCollection.aggregate(
  * @see MongoCollection.distinct
  * @since 2.0.0
  */
-fun MonopCollection.distinct(
+fun OpCollection.distinct(
     field: String,
     filter: BsonDocument = EmptyBsonDocument,
     options: DistinctOptions = DistinctOptions()
@@ -1092,7 +1066,7 @@ fun MonopCollection.distinct(
  * @see MongoCollection.distinct
  * @since 2.0.0
  */
-fun MonopCollection.distinct(
+fun OpCollection.distinct(
     field: String,
     filter: BsonDocumentBlock,
     options: DistinctOptions.() -> Unit = {}

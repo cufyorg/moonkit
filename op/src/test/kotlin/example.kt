@@ -57,7 +57,7 @@ class ExampleTest {
     }
 }
 
-object Transaction : MonopCollection {
+object Transaction : OpCollection {
     override val name = "Transaction"
 
     val Id = FieldCodec("_id") { Id<Transaction>() }
