@@ -89,12 +89,11 @@ infix fun <T> Lazy<Op<T>>.createOperation(monop: Monop?): Lazy<Operation<T>> {
 }
 
 @OperationKeywordMarker
-infix fun <T, C> C.lookup(block: () -> Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
-    val lazyId = block()
+infix fun <T, C> C.lookup(id: Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
-        val op: Op<T?> = when (val id = lazyId.value) {
+        val op: Op<T?> = when (val idValue = id.value) {
             null -> op { null }
-            else -> findOneById(id).map {
+            else -> findOneById(idValue).map {
                 when (it) {
                     null -> success(null)
                     else -> tryDecode(it, this@lookup)
@@ -103,4 +102,9 @@ infix fun <T, C> C.lookup(block: () -> Lazy<Id<*>?>): Lazy<Deferred<T?>> where C
         }
         op.enqueue()
     }
+}
+
+@OperationKeywordMarker
+infix fun <T, C> C.lookup(id: () -> Id<*>?): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
+    return this lookup lazy(id)
 }
