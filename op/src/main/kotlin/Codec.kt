@@ -45,8 +45,9 @@ infix fun Lazy<Id<*>>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>>
  */
 @JvmName("foreignWithCodec")
 @OperationKeywordMarker
-infix fun <T, C> Lazy<Id<*>>.foreign(collection: C): Lazy<Op<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
+infix fun <T, C> Lazy<Id<*>?>.foreign(collection: C): Lazy<Op<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
+        val value = value ?: return@lazy op { null }
         collection.findOneById(value).mapCatching {
             it?.let { decode(it, collection) }
         }
