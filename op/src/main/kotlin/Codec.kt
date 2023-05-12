@@ -15,10 +15,13 @@
  */
 package org.cufy.monop
 
+import kotlinx.coroutines.Deferred
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
 import org.cufy.codec.Codec
 import org.cufy.codec.decode
+import org.cufy.codec.tryDecode
+import kotlin.Result.Companion.success
 
 /*
 These extensions are expected to be used as follows:
@@ -82,5 +85,22 @@ infix fun <T> Lazy<Op<T>>.createOperation(monop: Monop?): Lazy<Operation<T>> {
         value.createOperation().also {
             monop?.enqueue(it)
         }
+    }
+}
+
+@OperationKeywordMarker
+infix fun <T, C> C.lookup(block: () -> Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
+    val lazyId = block()
+    return lazy {
+        val op: Op<T?> = when (val id = lazyId.value) {
+            null -> op { null }
+            else -> findOneById(id).map {
+                when (it) {
+                    null -> success(null)
+                    else -> tryDecode(it, this@lookup)
+                }
+            }
+        }
+        op.enqueue()
     }
 }
