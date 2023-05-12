@@ -34,8 +34,11 @@ val foreign by "foreignId" be { Id } from map foreign MyCollection decode {
  * the argument.
  */
 @OperationKeywordMarker
-infix fun Lazy<Id<*>>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>> {
-    return lazy { collection.findOneById(value) }
+infix fun Lazy<Id<*>?>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>> {
+    return lazy {
+        val value = value ?: return@lazy op { null }
+        collection.findOneById(value)
+    }
 }
 
 /**
