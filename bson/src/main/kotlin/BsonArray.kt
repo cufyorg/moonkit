@@ -285,4 +285,24 @@ fun mutableBsonListOf(vararg elements: BsonElement): MutableBsonList {
         .asMutableBsonList()
 }
 
+/**
+ * Create a new array from combining this array with the given [list].
+ */
+operator fun BsonArray.plus(list: BsonList): BsonArray {
+    return BsonArray {
+        byAll(this)
+        byAll(list)
+    }
+}
+
+/**
+ * Create a new array from combining this array with the given [block].
+ */
+operator fun BsonArray.plus(block: BsonArrayBlock): BsonArray {
+    return BsonArray {
+        byAll(this)
+        block()
+    }
+}
+
 /* ============= ------------------ ============= */

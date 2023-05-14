@@ -527,4 +527,24 @@ fun mutableBsonMapOf(vararg pairs: Pair<String, BsonElement>): MutableBsonMap {
         .asMutableBsonMap()
 }
 
+/**
+ * Create a new document from combining this document with the given [map].
+ */
+operator fun BsonDocument.plus(map: BsonMap): BsonDocument {
+    return BsonDocument {
+        byAll(this)
+        byAll(map)
+    }
+}
+
+/**
+ * Create a new document from combining this document with the given [block].
+ */
+operator fun BsonDocument.plus(block: BsonDocumentBlock): BsonDocument {
+    return BsonDocument {
+        byAll(this)
+        block()
+    }
+}
+
 /* ============= ------------------ ============= */
