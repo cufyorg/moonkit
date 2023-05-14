@@ -16,7 +16,9 @@
 package org.cufy.monop
 
 import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
 import org.cufy.bson.BsonElement
+import org.cufy.bson.plus
 import org.cufy.mongodb.*
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
@@ -183,6 +185,14 @@ data class DeleteOneOp(
         DeleteOneOperation(collection, filter, options)
 }
 
+fun DeleteOneOp.withFilter(filter: BsonDocumentBlock): DeleteOneOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun DeleteOneOp.withOptions(options: DeleteOptions.() -> Unit): DeleteOneOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating a [DeleteManyOperation].
  *
@@ -197,6 +207,14 @@ data class DeleteManyOp(
 ) : Op<DeleteResult> {
     override fun createOperation() =
         DeleteManyOperation(collection, filter, options)
+}
+
+fun DeleteManyOp.withFilter(filter: BsonDocumentBlock): DeleteManyOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun DeleteManyOp.withOptions(options: DeleteOptions.() -> Unit): DeleteManyOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -215,6 +233,14 @@ data class InsertOneOp(
         InsertOneOperation(collection, document, options)
 }
 
+fun InsertOneOp.withDocument(document: BsonDocumentBlock): InsertOneOp {
+    return copy(document = this.document + document)
+}
+
+fun InsertOneOp.withOptions(options: InsertOneOptions.() -> Unit): InsertOneOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating a [InsertManyOperation].
  *
@@ -229,6 +255,10 @@ data class InsertManyOp(
 ) : Op<InsertManyResult> {
     override fun createOperation() =
         InsertManyOperation(collection, documents, options)
+}
+
+fun InsertManyOp.withOptions(options: InsertManyOptions.() -> Unit): InsertManyOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -248,6 +278,14 @@ data class UpdateOneOp(
         UpdateOneOperation(collection, filter, update, options)
 }
 
+fun UpdateOneOp.withFilter(filter: BsonDocumentBlock): UpdateOneOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun UpdateOneOp.withOptions(options: UpdateOptions.() -> Unit): UpdateOneOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating a [UpdateManyOperation].
  *
@@ -263,6 +301,14 @@ data class UpdateManyOp(
 ) : Op<UpdateResult> {
     override fun createOperation() =
         UpdateManyOperation(collection, filter, update, options)
+}
+
+fun UpdateManyOp.withFilter(filter: BsonDocumentBlock): UpdateManyOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun UpdateManyOp.withOptions(options: UpdateOptions.() -> Unit): UpdateManyOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -282,6 +328,18 @@ data class ReplaceOneOp(
         ReplaceOneOperation(collection, filter, replacement, options)
 }
 
+fun ReplaceOneOp.withFilter(filter: BsonDocumentBlock): ReplaceOneOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun ReplaceOneOp.withReplacement(replacement: BsonDocumentBlock): ReplaceOneOp {
+    return copy(replacement = this.replacement + replacement)
+}
+
+fun ReplaceOneOp.withOptions(options: ReplaceOptions.() -> Unit): ReplaceOneOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating a [BulkWriteOperation].
  *
@@ -296,6 +354,10 @@ data class BulkWriteOp(
 ) : Op<BulkWriteResult> {
     override fun createOperation() =
         BulkWriteOperation(collection, requests, options)
+}
+
+fun BulkWriteOp.withOptions(options: BulkWriteOptions.() -> Unit): BulkWriteOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -314,6 +376,14 @@ data class CountOp(
         CountOperation(collection, filter, options)
 }
 
+fun CountOp.withFilter(filter: BsonDocumentBlock): CountOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun CountOp.withOptions(options: CountOptions.() -> Unit): CountOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating a [EstimatedCountOperation].
  *
@@ -327,6 +397,10 @@ data class EstimatedCountOp(
 ) : Op<Long> {
     override fun createOperation() =
         EstimatedCountOperation(collection, options)
+}
+
+fun EstimatedCountOp.withOptions(options: EstimatedCountOptions.() -> Unit): EstimatedCountOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -343,6 +417,14 @@ data class FindOneAndDeleteOp(
 ) : Op<BsonDocument?> {
     override fun createOperation() =
         FindOneAndDeleteOperation(collection, filter, options)
+}
+
+fun FindOneAndDeleteOp.withFilter(filter: BsonDocumentBlock): FindOneAndDeleteOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun FindOneAndDeleteOp.withOptions(options: FindOneAndDeleteOptions.() -> Unit): FindOneAndDeleteOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -362,6 +444,18 @@ data class FindOneAndReplaceOp(
         FindOneAndReplaceOperation(collection, filter, replacement, options)
 }
 
+fun FindOneAndReplaceOp.withFilter(filter: BsonDocumentBlock): FindOneAndReplaceOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun FindOneAndReplaceOp.withReplacement(replacement: BsonDocumentBlock): FindOneAndReplaceOp {
+    return copy(replacement = this.replacement + replacement)
+}
+
+fun FindOneAndReplaceOp.withOptions(options: FindOneAndReplaceOptions.() -> Unit): FindOneAndReplaceOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating a [FindOneAndUpdateOperation].
  *
@@ -377,6 +471,14 @@ data class FindOneAndUpdateOp(
 ) : Op<BsonDocument?> {
     override fun createOperation() =
         FindOneAndUpdateOperation(collection, filter, update, options)
+}
+
+fun FindOneAndUpdateOp.withFilter(filter: BsonDocumentBlock): FindOneAndUpdateOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun FindOneAndUpdateOp.withOptions(options: FindOneAndUpdateOptions.() -> Unit): FindOneAndUpdateOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -395,6 +497,14 @@ data class FindOp(
         FindOperation(collection, filter, options)
 }
 
+fun FindOp.withFilter(filter: BsonDocumentBlock): FindOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun FindOp.withOptions(options: FindOptions.() -> Unit): FindOp {
+    return copy(options = this.options.copy().apply(options))
+}
+
 /**
  * The recipe for creating an [AggregateOperation].
  *
@@ -409,6 +519,10 @@ data class AggregateOp(
 ) : Op<List<BsonDocument>> {
     override fun createOperation() =
         AggregateOperation(collection, pipeline, options)
+}
+
+fun AggregateOp.withOptions(options: AggregateOptions.() -> Unit): AggregateOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /**
@@ -426,6 +540,14 @@ data class DistinctOp(
 ) : Op<List<BsonDocument>> {
     override fun createOperation() =
         DistinctOperation(collection, field, filter, options)
+}
+
+fun DistinctOp.withFilter(filter: BsonDocumentBlock): DistinctOp {
+    return copy(filter = this.filter + filter)
+}
+
+fun DistinctOp.withOptions(options: DistinctOptions.() -> Unit): DistinctOp {
+    return copy(options = this.options.copy().apply(options))
 }
 
 /* ============= ------------------ ============= */
