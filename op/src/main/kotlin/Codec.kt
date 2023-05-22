@@ -17,11 +17,12 @@ package org.cufy.monop
 
 import kotlinx.coroutines.Deferred
 import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonElement
 import org.cufy.bson.Id
-import org.cufy.codec.Codec
-import org.cufy.codec.decode
-import org.cufy.codec.tryDecode
+import org.cufy.codec.*
+import org.cufy.mongodb.`$set`
 import kotlin.Result.Companion.success
+import kotlin.properties.ReadOnlyProperty
 
 /*
 These extensions are expected to be used as follows:
@@ -107,4 +108,22 @@ infix fun <T, C> C.lookup(id: Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpColl
 @OperationKeywordMarker
 infix fun <T, C> C.lookup(id: () -> Id<*>?): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return this lookup lazy(id)
+}
+
+@OperationKeywordMarker
+infix fun <I, O : BsonElement> FieldCodec<I, O>.into(
+    collection: OpCollection
+): ReadOnlyProperty<DocumentProjection, (I) -> UpdateOneOp> {
+    val field = this
+    return ReadOnlyProperty { projection, _ ->
+        val id = decodeAny(projection.element["_id"]) { Id }
+
+        return@ReadOnlyProperty { value ->
+            collection.updateOneById(id, {
+                `$set` by {
+                    field.name by encode(value, field)
+                }
+            })
+        }
+    }
 }
