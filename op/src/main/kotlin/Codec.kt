@@ -38,6 +38,7 @@ val foreign by "foreignId" be { Id } from map foreign MyCollection decode {
  * the argument.
  */
 @OperationKeywordMarker
+@ExperimentalMonopApi
 infix fun Lazy<Id<*>?>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>> {
     return lazy {
         val value = value ?: return@lazy op { null }
@@ -52,6 +53,7 @@ infix fun Lazy<Id<*>?>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>
  */
 @JvmName("foreignWithCodec")
 @OperationKeywordMarker
+@ExperimentalMonopApi
 infix fun <T, C> Lazy<Id<*>?>.foreign(collection: C): Lazy<Op<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
         val value = value ?: return@lazy op { null }
@@ -69,6 +71,7 @@ infix fun <T, C> Lazy<Id<*>?>.foreign(collection: C): Lazy<Op<T?>> where C : OpC
  * @param block the decoding block
  */
 @OperationKeywordMarker
+@ExperimentalMonopApi
 infix fun <T> Lazy<Op<BsonDocument?>>.decode(block: (BsonDocument) -> T): Lazy<Op<T?>> {
     return lazy { value.mapCatching { it?.let(block) } }
 }
@@ -81,6 +84,7 @@ infix fun <T> Lazy<Op<BsonDocument?>>.decode(block: (BsonDocument) -> T): Lazy<O
  * If the given [monop] is not null, enqueue the
  * created operation to it.
  */
+@ExperimentalMonopApi
 infix fun <T> Lazy<Op<T>>.createOperation(monop: Monop?): Lazy<Operation<T>> {
     return lazy {
         value.createOperation().also {
@@ -90,6 +94,7 @@ infix fun <T> Lazy<Op<T>>.createOperation(monop: Monop?): Lazy<Operation<T>> {
 }
 
 @OperationKeywordMarker
+@ExperimentalMonopApi
 infix fun <T, C> C.lookup(id: Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
         val op: Op<T?> = when (val idValue = id.value) {
@@ -106,11 +111,13 @@ infix fun <T, C> C.lookup(id: Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpColl
 }
 
 @OperationKeywordMarker
+@ExperimentalMonopApi
 infix fun <T, C> C.lookup(id: () -> Id<*>?): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return this lookup lazy(id)
 }
 
 @OperationKeywordMarker
+@ExperimentalMonopApi
 infix fun <I, O : BsonElement> FieldCodec<I, O>.into(
     collection: OpCollection
 ): ReadOnlyProperty<DocumentProjection, (I) -> UpdateOneOp> {

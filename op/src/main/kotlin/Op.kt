@@ -103,7 +103,6 @@ fun <T> op(block: suspend Monop.() -> T): Op<T> {
  * @param ops the dependency operations.
  * @since 2.0.0
  */
-@OperationKeywordMarker
 fun <T> opOf(ops: List<Op<T>>): BlockOp<T, List<Result<T>>> {
     return BlockOp(ops) { success(it) }
 }
@@ -114,7 +113,6 @@ fun <T> opOf(ops: List<Op<T>>): BlockOp<T, List<Result<T>>> {
  * @param ops the dependency operations.
  * @since 2.0.0
  */
-@OperationKeywordMarker
 fun <T> opOf(vararg ops: Op<T>): Op<List<Result<T>>> {
     return opOf(ops.asList())
 }

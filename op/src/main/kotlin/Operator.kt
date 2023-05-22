@@ -99,6 +99,7 @@ inline fun <reified O : Operation<*>> OperatorScope.accept(): List<O> {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val BlockOperator = Operator {
     accept<BlockOperation<Any?, Any?>>().forEach {
         enqueue(it.dependencies)
@@ -124,6 +125,7 @@ val BlockOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val DeleteOneOperator = Operator {
     accept<DeleteOneOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -145,6 +147,7 @@ val DeleteOneOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val DeleteManyOperator = Operator {
     accept<DeleteManyOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -166,6 +169,7 @@ val DeleteManyOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val InsertOneOperator = Operator {
     accept<InsertOneOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -187,6 +191,7 @@ val InsertOneOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val InsertManyOperator = Operator {
     accept<InsertManyOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -208,6 +213,7 @@ val InsertManyOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val UpdateOneOperator = Operator {
     accept<UpdateOneOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -229,6 +235,7 @@ val UpdateOneOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val UpdateManyOperator = Operator {
     accept<UpdateManyOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -250,6 +257,7 @@ val UpdateManyOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val ReplaceOneOperator = Operator {
     accept<ReplaceOneOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -271,6 +279,7 @@ val ReplaceOneOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val BulkWriteOperator = Operator {
     accept<BulkWriteOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -292,6 +301,7 @@ val BulkWriteOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val CountOperator = Operator {
     accept<CountOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -313,6 +323,7 @@ val CountOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val EstimatedCountOperator = Operator {
     accept<EstimatedCountOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -334,6 +345,7 @@ val EstimatedCountOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val FindOneAndDeleteOperator = Operator {
     accept<FindOneAndDeleteOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -355,6 +367,7 @@ val FindOneAndDeleteOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val FindOneAndReplaceOperator = Operator {
     accept<FindOneAndReplaceOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -376,6 +389,7 @@ val FindOneAndReplaceOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val FindOneAndUpdateOperator = Operator {
     accept<FindOneAndUpdateOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -397,6 +411,7 @@ val FindOneAndUpdateOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val FindOperator = Operator {
     accept<FindOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -418,6 +433,7 @@ val FindOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val AggregateOperator = Operator {
     accept<AggregateOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -439,6 +455,7 @@ val AggregateOperator = Operator {
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalMonopApi
 val DistinctOperator = Operator {
     accept<DistinctOperation>().forEach {
         CoroutineScope(Dispatchers.IO).launch {
@@ -456,6 +473,7 @@ val DistinctOperator = Operator {
 /**
  * A list of all built-in operators.
  */
+@OptIn(ExperimentalMonopApi::class)
 val DefaultOperators = listOf(
     BlockOperator,
     DeleteOneOperator,
