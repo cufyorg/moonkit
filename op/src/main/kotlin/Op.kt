@@ -165,6 +165,32 @@ fun <T, U> Op<T>.mapCatching(block: suspend (T) -> U): Op<U> {
     return tryMap { it.mapCatching { block(it) } }
 }
 
+/**
+ * Create a [BlockOp] that depends on [this] operation
+ * and executes the given [block] of code only if the
+ * value is not `null`.
+ *
+ * @param block the operation block.
+ * @author LSafer
+ * @since 2.0.0
+ */
+fun <T, U> Op<T>.mapNotNull(block: suspend (T & Any) -> Result<U>): BlockOp<T, U?> {
+    return tryMap { it.fold({ if (it == null) success(null) else block(it) }, { failure(it) }) }
+}
+
+/**
+ * Create a [BlockOp] that depends on [this] operation
+ * and executes the given [block] of code only if the
+ * value is not `null`.
+ *
+ * @param block the operation block.
+ * @author LSafer
+ * @since 2.0.0
+ */
+fun <T, U> Op<T>.mapNotNullCatching(block: suspend (T & Any) -> U): BlockOp<T, U?> {
+    return tryMap { it.mapCatching { it?.let { block(it) } } }
+}
+
 /* ============= ------------------ ============= */
 
 /**
