@@ -117,7 +117,6 @@ infix fun <I, O> Any?.decodeAny(codec: Codec<I, O>): I {
  * Get the value of the field with the name of the
  * given [codec] and decode it using the given [codec].
  */
-@JvmName("operatorDecode")
 operator fun <V, I, O : V> Map<String, V>.get(codec: FieldCodec<I, in O>): I {
     return decodeAny(this[codec.name], codec)
 }

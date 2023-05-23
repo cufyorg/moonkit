@@ -70,6 +70,7 @@ typealias DocumentProjection = Projection<BsonDocument>
  * @author LSafer
  * @since 2.0.0
  */
+@ExperimentalCodecApi
 class ProjectionCodec<I : Projection<O>, O>(
     val constructor: (O) -> I
 ) : Codec<I, O> {
@@ -121,5 +122,6 @@ class ProjectionCodec<I : Projection<O>, O>(
 /**
  * A helper function to create a codec from a projection constructor.
  */
+@ExperimentalCodecApi
 operator fun <I : Projection<O>, O> ((O) -> I).getValue(t: Any?, p: KProperty<*>) =
     ProjectionCodec(this)
