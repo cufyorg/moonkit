@@ -16,6 +16,7 @@
 package org.cufy.codec
 
 import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonElement
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.reflect.KProperty
@@ -63,6 +64,14 @@ interface Projection<O> {
 }
 
 typealias DocumentProjection = Projection<BsonDocument>
+
+/**
+ * Get the value of the field with the name of the
+ * given [codec] and decode it using the given [codec].
+ */
+operator fun <I, O : BsonElement> DocumentProjection.get(codec: FieldCodec<I, O>): I {
+    return element[codec]
+}
 
 /**
  * A codec implementation of [Projection].
