@@ -116,6 +116,22 @@ infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonF
 
 /* ============= ------------------ ============= */
 
+@OptIn(ExperimentalCodecApi::class)
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(block: (Throwable) -> I): BsonFieldCodec<I, O> {
+    val codec = this as Codec<I, O>
+    return BsonFieldCodec(name, codec catchIn block)
+}
+
+@OptIn(ExperimentalCodecApi::class)
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) -> O): BsonFieldCodec<I, O> {
+    val codec = this as Codec<I, O>
+    return BsonFieldCodec(name, codec catchOut block)
+}
+
+/* ============= ------------------ ============= */
+
 /**
  * A codec that always decodes nullish values
  * to `null` and encodes `null` to [BsonNull] and

@@ -823,6 +823,56 @@ infix fun <I, O> String.be(block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
 
 /* ============= ------------------ ============= */
 
+@CodecKeywordMarker
+infix fun <I, O> Codec<I, O>.catchIn(block: (Throwable) -> I): Codec<I, O> {
+    val codec = this
+    return object : Codec<I, O> {
+        @AdvancedCodecApi
+        override fun encode(value: Any?): Result<O> {
+            return codec.encode(value)
+        }
+
+        @AdvancedCodecApi
+        override fun decode(value: Any?): Result<I> {
+            return runCatching {
+                codec.decode(value).getOrElse(block)
+            }
+        }
+    }
+}
+
+@CodecKeywordMarker
+infix fun <I, O> Codec<I, O>.catchOut(block: (Throwable) -> O): Codec<I, O> {
+    val codec = this
+    return object : Codec<I, O> {
+        @AdvancedCodecApi
+        override fun encode(value: Any?): Result<O> {
+            return runCatching {
+                codec.encode(value).getOrElse(block)
+            }
+        }
+
+        @AdvancedCodecApi
+        override fun decode(value: Any?): Result<I> {
+            return codec.decode(value)
+        }
+    }
+}
+
+@CodecKeywordMarker
+infix fun <I, O> FieldCodec<I, O>.catchIn(block: (Throwable) -> I): FieldCodec<I, O> {
+    val codec = this as Codec<I, O>
+    return FieldCodec(name, codec catchIn block)
+}
+
+@CodecKeywordMarker
+infix fun <I, O> FieldCodec<I, O>.catchOut(block: (Throwable) -> O): FieldCodec<I, O> {
+    val codec = this as Codec<I, O>
+    return FieldCodec(name, codec catchOut block)
+}
+
+/* ============= ------------------ ============= */
+
 /**
  * Marker class for adding well-known codec shortcuts.
  */
