@@ -19,6 +19,7 @@ import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonElement
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.ExperimentalReflectionOnLambdas
@@ -71,6 +72,10 @@ typealias DocumentProjection = Projection<BsonDocument>
  */
 operator fun <I, O : BsonElement> DocumentProjection.get(codec: FieldCodec<I, O>): I {
     return element[codec]
+}
+
+operator fun <I, O : BsonElement> FieldCodec<I, O>.provideDelegate(s: Any?, p: KProperty<*>): ReadOnlyProperty<DocumentProjection, I> {
+    return ReadOnlyProperty { self, _ -> self.element[this] }
 }
 
 /**

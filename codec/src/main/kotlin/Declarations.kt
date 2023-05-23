@@ -18,6 +18,8 @@ package org.cufy.codec
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 /* ============= ------------------ ============= */
 
@@ -119,6 +121,10 @@ infix fun <I, O> Any?.decodeAny(codec: Codec<I, O>): I {
  */
 operator fun <V, I, O : V> Map<String, V>.get(codec: FieldCodec<I, in O>): I {
     return decodeAny(this[codec.name], codec)
+}
+
+operator fun <V, I, O : V> FieldCodec<I, in O>.provideDelegate(s: Any?, p: KProperty<*>): ReadOnlyProperty<Map<String, V>, I> {
+    return ReadOnlyProperty { self, _ -> self[this] }
 }
 
 /**
