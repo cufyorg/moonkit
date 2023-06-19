@@ -16,9 +16,9 @@
 package org.cufy.monop
 
 import kotlinx.coroutines.Deferred
+import org.cufy.bson.AnyId
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonElement
-import org.cufy.bson.Id
 import org.cufy.codec.*
 import org.cufy.mongodb.`$set`
 import kotlin.Result.Companion.success
@@ -39,7 +39,7 @@ val foreign by "foreignId" be { Id } from map foreign MyCollection decode {
  */
 @OperationKeywordMarker
 @ExperimentalMonopApi
-infix fun Lazy<Id<*>?>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>> {
+infix fun Lazy<AnyId?>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>> {
     return lazy {
         val value = value ?: return@lazy op { null }
         collection.findOneById(value)
@@ -54,7 +54,7 @@ infix fun Lazy<Id<*>?>.foreign(collection: OpCollection): Lazy<Op<BsonDocument?>
 @JvmName("foreignWithCodec")
 @OperationKeywordMarker
 @ExperimentalMonopApi
-infix fun <T, C> Lazy<Id<*>?>.foreign(collection: C): Lazy<Op<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
+infix fun <T, C> Lazy<AnyId?>.foreign(collection: C): Lazy<Op<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
         val value = value ?: return@lazy op { null }
         collection.findOneById(value).mapCatching {
@@ -95,7 +95,7 @@ infix fun <T> Lazy<Op<T>>.createOperation(monop: Monop?): Lazy<Operation<T>> {
 
 @OperationKeywordMarker
 @ExperimentalMonopApi
-infix fun <T, C> C.lookup(id: Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
+infix fun <T, C> C.lookup(id: Lazy<AnyId?>): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return lazy {
         val op: Op<T?> = when (val idValue = id.value) {
             null -> op { null }
@@ -112,7 +112,7 @@ infix fun <T, C> C.lookup(id: Lazy<Id<*>?>): Lazy<Deferred<T?>> where C : OpColl
 
 @OperationKeywordMarker
 @ExperimentalMonopApi
-infix fun <T, C> C.lookup(id: () -> Id<*>?): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
+infix fun <T, C> C.lookup(id: () -> AnyId?): Lazy<Deferred<T?>> where C : OpCollection, C : Codec<T, BsonDocument> {
     return this lookup lazy(id)
 }
 

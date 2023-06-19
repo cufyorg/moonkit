@@ -248,7 +248,7 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      *
      */
     @BsonConstructorMarker
-    infix fun String.by(value: Id<*>?) {
+    infix fun String.by(value: AnyId?) {
         value ?: return run { this@MutableBsonMap[this] = bnull }
         this@MutableBsonMap[this] = value.b
     }
@@ -261,7 +261,7 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      * The given [value] will be wrapped using [Id.b].
      */
     @BsonConstructorMarker
-    infix fun KCallable<*>.by(value: Id<*>?) {
+    infix fun KCallable<*>.by(value: AnyId?) {
         name by value
     }
 
@@ -277,7 +277,7 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
-    infix fun String.by(value: List<Id<*>>?) {
+    infix fun String.by(value: List<AnyId>?) {
         value ?: return run { this@MutableBsonMap[this] = bnull }
         this@MutableBsonMap[this] = value.map { it.b }.toBsonArray()
     }
@@ -292,7 +292,7 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
-    infix fun KCallable<*>.by(value: List<Id<*>>?) {
+    infix fun KCallable<*>.by(value: List<AnyId>?) {
         name by value
     }
 

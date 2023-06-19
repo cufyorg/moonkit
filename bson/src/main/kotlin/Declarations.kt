@@ -58,6 +58,14 @@ data class Id<T>(val value: String) : CharSequence by value {
 }
 
 /**
+ * A typealias for generic-less [Id].
+ *
+ * @author LSafer
+ * @since 2.0.0
+ */
+typealias AnyId = Id<out Any?>
+
+/**
  * Enumeration of the supported [BsonElement] types.
  *
  * @see org.bson.BsonType

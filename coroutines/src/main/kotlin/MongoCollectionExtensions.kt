@@ -15,10 +15,7 @@
  */
 package org.cufy.mongodb
 
-import org.cufy.bson.BsonDocument
-import org.cufy.bson.BsonDocumentBlock
-import org.cufy.bson.EmptyBsonDocument
-import org.cufy.bson.Id
+import org.cufy.bson.*
 
 /* ============= ------------------ ============= */
 
@@ -38,7 +35,7 @@ import org.cufy.bson.Id
  * @see com.mongodb.client.MongoCollection.deleteOne
  */
 suspend fun MongoCollection.deleteOneById(
-    id: Id<*>,
+    id: AnyId,
     options: DeleteOptions = DeleteOptions(),
     session: ClientSession? = null
 ): DeleteResult {
@@ -65,7 +62,7 @@ suspend fun MongoCollection.deleteOneById(
  * @see com.mongodb.client.MongoCollection.deleteOne
  */
 suspend fun MongoCollection.deleteOneById(
-    id: Id<*>,
+    id: AnyId,
     session: ClientSession? = null,
     options: DeleteOptions.() -> Unit = {}
 ) = deleteOneById(id, DeleteOptions(options), session)
@@ -86,7 +83,7 @@ suspend fun MongoCollection.deleteOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: Id<*>,
+    id: AnyId,
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions(),
     session: ClientSession? = null
@@ -113,7 +110,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: Id<*>,
+    id: AnyId,
     update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {}
@@ -138,7 +135,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: Id<*>,
+    id: AnyId,
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions(),
     session: ClientSession? = null
@@ -168,7 +165,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: Id<*>,
+    id: AnyId,
     vararg update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {}
@@ -189,7 +186,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.replaceOne
  */
 suspend fun MongoCollection.replaceOneById(
-    id: Id<*>,
+    id: AnyId,
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions(),
     session: ClientSession? = null
@@ -215,7 +212,7 @@ suspend fun MongoCollection.replaceOneById(
  * @see com.mongodb.client.MongoCollection.replaceOne
  */
 suspend fun MongoCollection.replaceOneById(
-    id: Id<*>,
+    id: AnyId,
     replacement: BsonDocumentBlock,
     session: ClientSession? = null,
     options: ReplaceOptions.() -> Unit = {}
@@ -235,7 +232,7 @@ suspend fun MongoCollection.replaceOneById(
  * @see com.mongodb.client.MongoCollection.findOneAndDelete
  */
 suspend fun MongoCollection.findOneByIdAndDelete(
-    id: Id<*>,
+    id: AnyId,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions(),
     session: ClientSession? = null
 ): BsonDocument? {
@@ -258,7 +255,7 @@ suspend fun MongoCollection.findOneByIdAndDelete(
  * @see com.mongodb.client.MongoCollection.findOneAndDelete
  */
 suspend fun MongoCollection.findOneByIdAndDelete(
-    id: Id<*>,
+    id: AnyId,
     session: ClientSession? = null,
     options: FindOneAndDeleteOptions.() -> Unit
 ) = findOneByIdAndDelete(id, FindOneAndDeleteOptions(options), session)
@@ -280,7 +277,7 @@ suspend fun MongoCollection.findOneByIdAndDelete(
  * @see com.mongodb.client.MongoCollection.findOneAndReplace
  */
 suspend fun MongoCollection.findOneByIdAndReplace(
-    id: Id<*>,
+    id: AnyId,
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions(),
     session: ClientSession? = null
@@ -308,7 +305,7 @@ suspend fun MongoCollection.findOneByIdAndReplace(
  * @see com.mongodb.client.MongoCollection.findOneAndReplace
  */
 suspend fun MongoCollection.findOneByIdAndReplace(
-    id: Id<*>,
+    id: AnyId,
     replacement: BsonDocumentBlock,
     session: ClientSession? = null,
     options: FindOneAndReplaceOptions.() -> Unit = {}
@@ -332,7 +329,7 @@ suspend fun MongoCollection.findOneByIdAndReplace(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: Id<*>,
+    id: AnyId,
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions(),
     session: ClientSession? = null
@@ -361,7 +358,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: Id<*>,
+    id: AnyId,
     update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: FindOneAndUpdateOptions.() -> Unit = {}
@@ -388,7 +385,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: Id<*>,
+    id: AnyId,
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions(),
     session: ClientSession? = null
@@ -420,7 +417,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: Id<*>,
+    id: AnyId,
     vararg update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: FindOneAndUpdateOptions.() -> Unit = {}
@@ -479,7 +476,7 @@ suspend fun MongoCollection.findOne(
  * @see MongoCollection.find
  */
 suspend fun MongoCollection.findOneById(
-    id: Id<*>,
+    id: AnyId,
     options: FindOptions = FindOptions(),
     session: ClientSession? = null
 ): BsonDocument? {
@@ -501,7 +498,7 @@ suspend fun MongoCollection.findOneById(
  * @see MongoCollection.find
  */
 suspend fun MongoCollection.findOneById(
-    id: Id<*>,
+    id: AnyId,
     session: ClientSession? = null,
     options: FindOptions.() -> Unit
 ) = findOneById(id, FindOptions(options), session)
