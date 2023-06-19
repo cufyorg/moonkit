@@ -134,7 +134,7 @@ interface MutableBsonList : BsonList, MutableList<BsonElement> {
      * The given [value] will be wrapped using [Id.b].
      */
     @BsonConstructorMarker
-    fun by(value: Id<*>?) {
+    fun by(value: AnyId?) {
         value ?: return run { this += bnull }
         this += value.b
     }
@@ -149,7 +149,7 @@ interface MutableBsonList : BsonList, MutableList<BsonElement> {
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
-    fun by(value: List<Id<*>>?) {
+    fun by(value: List<AnyId>?) {
         value ?: return run { this += bnull }
         this.add(value.map { it.b }.toBsonArray())
     }
