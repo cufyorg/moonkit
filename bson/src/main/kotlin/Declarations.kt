@@ -480,7 +480,7 @@ data class BsonRegExp(@Language("RegExp") val pattern: String, val options: Set<
  * @see org.bson.BsonObjectId
  * @since 2.0.0
  */
-data class BsonObjectId(val value: ObjectId) : BsonElement {
+data class BsonObjectId(val value: ObjectId = ObjectId()) : BsonElement {
     override val type: BsonType get() = BsonType.ObjectId
 
     override fun equals(other: Any?) =
