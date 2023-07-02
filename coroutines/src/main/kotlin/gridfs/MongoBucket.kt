@@ -25,9 +25,7 @@ import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactive.collect
-import org.cufy.bson.BsonElement
-import org.cufy.bson.BsonObjectId
-import org.cufy.bson.b
+import org.cufy.bson.*
 import org.cufy.bson.java.java
 import org.cufy.mongodb.*
 import org.cufy.mongodb.gridfs.java.JavaMongoBucket
@@ -159,7 +157,7 @@ suspend fun MongoBucket.upload(
         else -> java.uploadFromPublisher(session.java, filename, outPublisher.asPublisher(), options.java)
     }
 
-    return publisher.awaitSingle().b
+    return publisher.awaitSingle().bson
 }
 
 /**

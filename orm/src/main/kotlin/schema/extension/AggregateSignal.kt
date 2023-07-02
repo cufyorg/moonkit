@@ -15,7 +15,10 @@
  */
 package org.cufy.monkt.schema.extension
 
-import org.cufy.bson.*
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
+import org.cufy.bson.BsonNumber
+import org.cufy.bson.bson
 import org.cufy.mongodb.`$count`
 import org.cufy.mongodb.`$facet`
 import org.cufy.mongodb.`$match`
@@ -176,7 +179,7 @@ fun <T : Any> OptionScope<*, *, *>.count(
         { `$count` by "count" }
     )
     return property.then {
-        val count = it.firstOrNull()?.let { it["count"] as BsonNumber } ?: 0.b
+        val count = it.firstOrNull()?.let { it["count"] as BsonNumber } ?: 0.bson
 
         count.toLong()
     }

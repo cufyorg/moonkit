@@ -559,7 +559,7 @@ fun OpCollection.bulkWrite(
  * @since 2.0.0
  */
 fun OpCollection.count(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: CountOptions = CountOptions()
 ): CountOp {
     return CountOp(name, filter, options)
@@ -914,7 +914,7 @@ fun OpCollection.findOneByIdAndUpdate(
  * @since 2.0.0
  */
 fun OpCollection.find(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: FindOptions = FindOptions()
 ): FindOp {
     return FindOp(name, filter, options)
@@ -946,7 +946,7 @@ fun OpCollection.find(
  * @since 2.0.0
  */
 fun OpCollection.findOne(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: FindOptions = FindOptions()
 ): Op<BsonDocument?> {
     return find(
@@ -1050,7 +1050,7 @@ fun OpCollection.aggregate(
  */
 fun OpCollection.distinct(
     field: String,
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: DistinctOptions = DistinctOptions()
 ): DistinctOp {
     return DistinctOp(name, field, filter, options)

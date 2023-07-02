@@ -437,7 +437,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.unsetIf(
         if (shouldUnset) {
             update({
                 `$unset` by {
-                    "$pathname" by bnull
+                    "$pathname" by null.bson
                 }
             })
         }

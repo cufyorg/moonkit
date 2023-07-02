@@ -436,7 +436,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see MongoCollection.find
  */
 suspend fun MongoCollection.findOne(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: FindOptions = FindOptions(),
     session: ClientSession? = null
 ): BsonDocument? {

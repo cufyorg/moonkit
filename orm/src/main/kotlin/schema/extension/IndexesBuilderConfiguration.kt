@@ -164,12 +164,12 @@ fun <T : Any, M> OptionScope<T, M, IndexesBuilderConfiguration>.filter(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    pathname: Pathname, vararg types: BsonType, value: BsonElement = 1.b
+    pathname: Pathname, vararg types: BsonType, value: BsonElement = 1.bson
 ) {
     keys { "$pathname" by value }
 
     if (types.isNotEmpty()) {
-        filter(pathname) { `$type` by types.map { it.value.b } }
+        filter(pathname) { `$type` by types.map { it.value.bson } }
     }
 }
 
@@ -189,7 +189,7 @@ fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    relativeName: String, vararg types: BsonType, value: BsonElement = 1.b
+    relativeName: String, vararg types: BsonType, value: BsonElement = 1.bson
 ) {
     key(pathname + relativeName, *types, value = value)
 }
@@ -210,7 +210,7 @@ fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
  * @since 2.0.0
  */
 fun OptionScope<Unit, Unit, IndexesBuilderConfiguration>.key(
-    relativeName: KCallable<*>, vararg types: BsonType, value: BsonElement = 1.b
+    relativeName: KCallable<*>, vararg types: BsonType, value: BsonElement = 1.bson
 ) {
     key(relativeName.name, *types, value = value)
 }

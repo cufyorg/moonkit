@@ -134,7 +134,7 @@ class ExampleTest {
 
             val source0 = Model1.collection().findOne({ "_id" by instance._id })!!
 
-            assertEquals("Alpha".b, source0["value"])
+            assertEquals("Alpha".bson, source0["value"])
 
             instance.value = "Beta"
 
@@ -142,7 +142,7 @@ class ExampleTest {
 
             val source1 = Model1.collection().findOne({ "_id" by instance._id })!!
 
-            assertEquals("Alpha".b, source1["value"])
+            assertEquals("Alpha".bson, source1["value"])
         }
     }
 
