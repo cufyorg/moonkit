@@ -190,6 +190,12 @@ enum class BsonType(val value: Int) {
 /**
  * Base class for any BSON type.
  *
+ * This class is meant to be immutable.
+ * If a way to mutate an instance of this class is
+ * found. The behaviour of the instance is undefined
+ * and that way will not be guaranteed to even work
+ * in different versions.
+ *
  * @see org.bson.BsonValue
  * @since 2.0.0
  */
@@ -205,18 +211,34 @@ sealed interface BsonElement {
 /**
  * Construct a new empty bson array.
  */
-fun BsonArray(): BsonArray {
-    return BsonArray(emptyList())
+@Suppress("NOTHING_TO_INLINE")
+inline fun BsonArray(): BsonArray {
+    return BsonArray.Empty
 }
 
 /**
  * Construct a new bson array using the given
  * builder [block].
+ *
+ * **Warning: mutating the instance provided by the
+ * given [block] after the execution of this
+ * function will result to an undefined behaviour.**
  */
 fun BsonArray(block: BsonArrayBlock): BsonArray {
     val content = mutableBsonListOf()
     content.apply(block)
     return BsonArray(content)
+}
+
+/**
+ * Construct a new bson array with the given [elements].
+ *
+ * **Warning: mutating the given array [elements]
+ * after the execution of this function will result
+ * to an undefined behaviour.**
+ */
+fun BsonArray(vararg elements: BsonElement): BsonArray {
+    return BsonArray(elements.toList())
 }
 
 /**
@@ -229,12 +251,27 @@ typealias BsonArrayBlock = MutableBsonList.() -> Unit
 /**
  * A type-safe representation of the BSON array type.
  *
+ * This class is meant to be immutable.
+ * If a way to mutate an instance of this class is
+ * found. The behaviour of the instance is undefined
+ * and that way will not be guaranteed to even work
+ * in different versions.
+ *
  * @see org.bson.BsonArray
  * @since 2.0.0
  */
 class BsonArray internal constructor(
     private val content: BsonList
 ) : BsonElement, BsonList by content {
+    companion object {
+        /**
+         * A global instance of [BsonArray] that has no items.
+         *
+         * @since 2.0.0
+         */
+        val Empty = BsonArray(emptyList())
+    }
+
     override val type: BsonType get() = BsonType.Array
 
     override fun equals(other: Any?) =
@@ -250,18 +287,34 @@ class BsonArray internal constructor(
 /**
  * Construct a new empty bson document.
  */
-fun BsonDocument(): BsonDocument {
-    return BsonDocument(emptyMap())
+@Suppress("NOTHING_TO_INLINE")
+inline fun BsonDocument(): BsonDocument {
+    return BsonDocument.Empty
 }
 
 /**
  * Construct a new bson document using the given
  * builder [block].
+ *
+ * **Warning: mutating the instance provided by the
+ * given [block] after the execution of this
+ * function will result to an undefined behaviour.**
  */
 fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
     val content = mutableBsonMapOf()
     content.apply(block)
     return BsonDocument(content)
+}
+
+/**
+ * Construct a new bson document with the given [pairs].
+ *
+ * **Warning: mutating the given array [pairs]
+ * after the execution of this function will result
+ * to an undefined behaviour.**
+ */
+fun BsonDocument(vararg pairs: Pair<String, BsonElement>): BsonDocument {
+    return BsonDocument(pairs.toMap())
 }
 
 /**
@@ -274,12 +327,27 @@ typealias BsonDocumentBlock = MutableBsonMap.() -> Unit
 /**
  * A type-safe container for a BSON document.
  *
+ * This class is meant to be immutable.
+ * If a way to mutate an instance of this class is
+ * found. The behaviour of the instance is undefined
+ * and that way will not be guaranteed to even work
+ * in different versions.
+ *
  * @see org.bson.BsonDocument
  * @since 2.0.0
  */
 class BsonDocument internal constructor(
     private val content: BsonMap
 ) : BsonElement, BsonMap by content {
+    companion object {
+        /**
+         * A global instance of [BsonDocument] that has no entries.
+         *
+         * @since 2.0.0
+         */
+        val Empty = BsonDocument(emptyMap())
+    }
+
     override val type: BsonType get() = BsonType.Document
 
     override fun equals(other: Any?) =

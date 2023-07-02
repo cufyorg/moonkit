@@ -63,20 +63,64 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /* ============= ------------------ ============= */
 
     /**
+     * Static (pure) utility function to prettify
+     * creating arrays within the dsl.
+     *
+     * Usage:
+     * ```
+     * BsonDocument {
+     *     "name" by array {
+     *         by(100L)
+     *         by("item")
+     *         /* ... */
+     *     }
+     * }
+     * ```
+     *
+     * @return an array built with the given [block].
+     * @since 2.0.0
+     */
+    @BsonConstructorMarker
+    fun array(block: BsonArrayBlock) = BsonArray(block)
+
+    /**
+     * Static (pure) utility function to prettify
+     * creating arrays within the dsl.
+     *
+     * Usage:
+     * ```
+     * BsonDocument {
+     *     "name" by array(
+     *         100L.bson,
+     *         "item".bson,
+     *         /* ... */
+     *     )
+     * }
+     * ```
+     *
+     * @return an array with the given [elements].
+     * @since 2.0.0
+     */
+    @BsonConstructorMarker
+    fun array(vararg elements: BsonElement) = BsonArray(*elements)
+
+    /* ============= ------------------ ============= */
+
+    /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      */
     @BsonConstructorMarker
     infix fun String.by(value: BsonElement?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
         this@MutableBsonMap[this] = value
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: BsonElement?) {
@@ -88,18 +132,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      */
     @BsonConstructorMarker
     infix fun String.by(value: BsonDocument?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
         this@MutableBsonMap[this] = value
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: BsonDocument?) {
@@ -111,18 +155,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      */
     @BsonConstructorMarker
     infix fun String.by(value: BsonArray?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
         this@MutableBsonMap[this] = value
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: BsonArray?) {
@@ -134,20 +178,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDocument].
      */
     @BsonConstructorMarker
     infix fun String.by(value: Map<String, BsonElement>?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
         this@MutableBsonMap[this] = value.toBsonDocument()
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDocument].
      */
@@ -161,20 +205,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonArray].
      */
     @BsonConstructorMarker
     infix fun String.by(value: List<BsonElement>?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
         this@MutableBsonMap[this] = value.toBsonArray()
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonArray].
      */
@@ -188,20 +232,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonString].
      */
     @BsonConstructorMarker
     infix fun String.by(value: String?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonString].
      */
@@ -215,20 +259,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonObjectId].
      */
     @BsonConstructorMarker
     infix fun String.by(value: ObjectId?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonObjectId].
      */
@@ -242,23 +286,23 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
-     * The given [value] will be wrapped using [Id.b].
+     * The given [value] will be wrapped using [Id.bson].
      *
      */
     @BsonConstructorMarker
     infix fun String.by(value: AnyId?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
-     * The given [value] will be wrapped using [Id.b].
+     * The given [value] will be wrapped using [Id.bson].
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: AnyId?) {
@@ -270,24 +314,24 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
-     * The given [value] will be wrapped using [BsonArray] and [Id.b].
+     * The given [value] will be wrapped using [BsonArray] and [Id.bson].
      */
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
     @BsonConstructorMarker
     infix fun String.by(value: List<AnyId>?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.map { it.b }.toBsonArray()
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.map { it.bson }.toBsonArray()
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
-     * The given [value] will be wrapped using [BsonArray] and [Id.b].
+     * The given [value] will be wrapped using [BsonArray] and [Id.bson].
      */
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("byIdList")
@@ -301,20 +345,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDecimal128].
      */
     @BsonConstructorMarker
     infix fun String.by(value: Decimal128?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDecimal128].
      */
@@ -328,20 +372,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDecimal128].
      */
     @BsonConstructorMarker
     infix fun String.by(value: BigDecimal?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDecimal128].
      */
@@ -355,20 +399,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonBoolean].
      */
     @BsonConstructorMarker
     infix fun String.by(value: Boolean?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonBoolean].
      */
@@ -382,20 +426,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonInt32].
      */
     @BsonConstructorMarker
     infix fun String.by(value: Int?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonInt32].
      */
@@ -409,20 +453,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonInt64].
      */
     @BsonConstructorMarker
     infix fun String.by(value: Long?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonInt64].
      */
@@ -436,20 +480,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDouble].
      */
     @BsonConstructorMarker
     infix fun String.by(value: Double?) {
-        value ?: return run { this@MutableBsonMap[this] = bnull }
-        this@MutableBsonMap[this] = value.b
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
     }
 
     /**
      * Set the field with the name [this] to the given [value].
      *
-     * If [value] is null then [bnull] will be set instead.
+     * If [value] is null then [BsonNull] will be set instead.
      *
      * The given [value] will be wrapped with [BsonDouble].
      */
@@ -483,7 +527,7 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun <T> MutableBsonMapField<T>.by(value: T) {
-        this@MutableBsonMap[name] = encode(value) ?: bnull
+        this@MutableBsonMap[name] = encode(value) ?: null.bson
     }
 
     /* ============= ------------------ ============= */
