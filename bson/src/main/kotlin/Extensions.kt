@@ -271,9 +271,19 @@ val Boolean.b: BsonBoolean get() = BsonBoolean(this)
 inline val Int.bson: BsonInt32 get() = BsonInt32(this)
 
 /**
+ * Return a [BsonInt32] with the value of this or [BsonNull] if this is `null`.
+ */
+val Int?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
  * Return a [BsonInt64] with the value of this.
  */
 inline val Long.bson: BsonInt64 get() = BsonInt64(this)
+
+/**
+ * Return a [BsonInt64] with the value of this or [BsonNull] if this is `null`.
+ */
+val Long?.bson: BsonElement get() = this?.let { bson } ?: null.bson
 
 /**
  * Return a [BsonDouble] with the value of this.
@@ -281,9 +291,19 @@ inline val Long.bson: BsonInt64 get() = BsonInt64(this)
 inline val Double.bson: BsonDouble get() = BsonDouble(this)
 
 /**
+ * Return a [BsonDouble] with the value of this or [BsonNull] if this is `null`.
+ */
+val Double?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
  * Return a [BsonDecimal128] with the value of this.
  */
 inline val Decimal128.bson: BsonDecimal128 get() = BsonDecimal128(this)
+
+/**
+ * Return a [BsonDecimal128] with the value of this or [BsonNull] if this is `null`.
+ */
+val Decimal128?.bson: BsonElement get() = this?.let { bson } ?: null.bson
 
 /**
  * Return a [BsonDecimal128] with the value of this.
@@ -291,14 +311,29 @@ inline val Decimal128.bson: BsonDecimal128 get() = BsonDecimal128(this)
 val BigDecimal.bson: BsonDecimal128 get() = toDecimal128().bson
 
 /**
+ * Return a [BsonDecimal128] with the value of this or [BsonNull] if this is `null`.
+ */
+val BigDecimal?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
  * Return a [BsonString] with the value of this.
  */
 inline val String.bson: BsonString get() = BsonString(this)
 
 /**
+ * Return a [BsonString] with the value of this or [BsonNull] if this is `null`.
+ */
+val String?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
  * Return a [BsonObjectId] with the value of this.
  */
 inline val ObjectId.bson: BsonObjectId get() = BsonObjectId(this)
+
+/**
+ * Return a [BsonObjectId] with the value of this or [BsonNull] if this is `null`.
+ */
+val ObjectId?.bson: BsonElement get() = this?.let { bson } ?: null.bson
 
 /**
  * Return the best fitting native wrapper for
@@ -317,9 +352,25 @@ val Id<*>.bson: BsonElement
     }
 
 /**
+ * Return the best fitting native wrapper for
+ * this id.
+ * A [BsonObjectId] if it is a valid object id
+ * and a [BsonString] if it is not
+ * or [BsonNull] if this is `null`.
+ *
+ * @since 2.0.0
+ */
+val Id<*>?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
  * Return a [BsonBoolean] with the value of this.
  */
 inline val Boolean.bson: BsonBoolean get() = BsonBoolean(this)
+
+/**
+ * Return a [BsonBoolean] with the value of this or [BsonNull] if this is `null`.
+ */
+val Boolean?.bson: BsonElement get() = this?.let { bson } ?: null.bson
 
 /**
  * Return [BsonNull].
