@@ -17,8 +17,11 @@ package org.cufy.mongodb.gridfs.java
 
 import org.bson.Document
 import org.cufy.bson.java.java
+import org.cufy.mongodb.gridfs.BucketFindOptions
 import org.cufy.mongodb.gridfs.DownloadOptions
 import org.cufy.mongodb.gridfs.UploadOptions
+import org.cufy.mongodb.java.java
+import java.util.concurrent.TimeUnit
 
 /* ============= ------------------ ============= */
 
@@ -45,6 +48,25 @@ internal typealias JavaDownloadPublisher =
  */
 fun JavaDownloadPublisher.apply(options: DownloadOptions): JavaDownloadPublisher {
     options.bufferSizeBytes?.let { bufferSizeBytes(it) }
+    return this
+}
+
+/* ============= ------------------ ============= */
+
+internal typealias JavaBucketFindPublisher =
+        com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher
+
+/**
+ * Apply the given [options] to this publisher.
+ */
+fun JavaBucketFindPublisher.apply(options: BucketFindOptions): JavaBucketFindPublisher {
+    limit(options.limit)
+    skip(options.skip)
+    sort(options.sort?.java)
+    noCursorTimeout(options.noCursorTimeout)
+    maxTime(options.maxTime.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+    collation(options.collation?.java)
+    options.batchSize?.let { batchSize(it) }
     return this
 }
 

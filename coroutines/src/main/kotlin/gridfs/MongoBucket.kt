@@ -21,10 +21,8 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.reactive.asPublisher
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.*
 import org.cufy.bson.*
 import org.cufy.bson.java.java
 import org.cufy.mongodb.*
@@ -381,5 +379,130 @@ suspend fun MongoBucket.download(
     session: ClientSession? = null,
     options: DownloadOptions.() -> Unit
 ) = download(channel, filename, DownloadOptions(options), revision, session)
+
+/* ============= ------------------ ============= */
+
+/**
+ * Finds all documents in the collection that match the filter.
+ *
+ * Below is an example of filtering against the filename and some nested metadata that can also be stored along with the file data:
+ *
+ * ```kotlin
+ * find({
+ *   "filename" by "mongodb.png"
+ *   "metadata.contentType" by "image/png"
+ * })
+ * ```
+ *
+ * @param session the client session with which to associate this operation.
+ * @param filter the query filter.
+ * @return a list containing the found files.
+ * @since 2.0.0
+ * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.find
+ */
+suspend fun MongoBucket.find(
+    filter: BsonDocument = BsonDocument.Empty,
+    options: BucketFindOptions = BucketFindOptions(),
+    session: ClientSession? = null
+): List<MongoFile> {
+    val publisher = when (session) {
+        null -> java.find(filter.java)
+        else -> java.find(session.java, filter.java)
+    }
+    return publisher
+        .apply(options)
+        .asFlow()
+        .toList()
+        .map { it.kt }
+}
+
+/**
+ * Finds all documents in the collection that match the filter.
+ *
+ * Below is an example of filtering against the filename and some nested metadata that can also be stored along with the file data:
+ *
+ * ```kotlin
+ * find({
+ *   "filename" by "mongodb.png"
+ *   "metadata.contentType" by "image/png"
+ * })
+ * ```
+ *
+ * @param session the client session with which to associate this operation.
+ * @param filter the query filter.
+ * @return a list containing the found files.
+ * @since 2.0.0
+ * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.find
+ */
+suspend fun MongoBucket.find(
+    filter: BsonDocumentBlock,
+    session: ClientSession? = null,
+    options: BucketFindOptions.() -> Unit = {}
+) = find(BsonDocument(filter), BucketFindOptions(options), session)
+
+/* ============= ------------------ ============= */
+
+/**
+ * Given a [id], delete this stored file's `files`
+ * collection document and associated `chunks` from
+ * a GridFS bucket.
+ *
+ * @param session the client session with which to associate this operation.
+ * @param id the id of the file to be deleted
+ * @since 2.0.0
+ * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.delete
+ */
+suspend fun MongoBucket.delete(
+    id: BsonElement,
+    session: ClientSession? = null
+) {
+    val publisher = when (session) {
+        null -> java.delete(id.java)
+        else -> java.delete(session.java, id.java)
+    }
+    publisher.awaitFirstOrNull()
+}
+
+/* ============= ------------------ ============= */
+
+/**
+ * Renames the stored file with the specified [id].
+ *
+ * @param session the client session with which to associate this operation.
+ * @param id the id of the file in the files collection to rename
+ * @param filename the new filename for the file
+ * @since 2.0.0
+ * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.rename
+ */
+suspend fun MongoBucket.rename(
+    id: BsonElement,
+    filename: String,
+    session: ClientSession? = null
+) {
+    val publisher = when (session) {
+        null -> java.rename(id.java, filename)
+        else -> java.rename(session.java, id.java, filename)
+    }
+    publisher.awaitFirstOrNull()
+}
+
+/* ============= ------------------ ============= */
+
+/**
+ * Drops the data associated with this bucket from the database.
+ *
+ * @param session the client session with which to associate this operation.
+ * @since 2.0.0
+ * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.drop
+ */
+suspend fun MongoBucket.drop(
+    session: ClientSession? = null
+) {
+    val publisher = when (session) {
+        null -> java.drop()
+        else -> java.drop(session.java)
+    }
+    publisher.awaitFirstOrNull()
+}
 
 /* ============= ------------------ ============= */
