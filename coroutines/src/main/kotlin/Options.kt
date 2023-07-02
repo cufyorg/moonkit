@@ -1785,3 +1785,44 @@ data class ClientSessionOptions(
 )
 
 /* ============= ------------------ ============= */
+
+/**
+ * Create a new options instance from the given [block].
+ */
+fun TextSearchOptions(
+    block: TextSearchOptions.() -> Unit
+) = TextSearchOptions().apply(block)
+
+/**
+ * Text search options.
+ *
+ * @see com.mongodb.client.model.TextSearchOptions
+ * @author LSafer
+ * @since 2.0.0
+ */
+data class TextSearchOptions(
+    /**
+     * Set the language for the text search.
+     *
+     * @see com.mongodb.client.model.TextSearchOptions.language
+     * @since 2.0.0
+     */
+    var language: String? = null,
+    /**
+     * Set the case-sensitive flag for the text search.
+     *
+     * @see com.mongodb.client.model.TextSearchOptions.caseSensitive
+     * @since 2.0.0
+     */
+    var caseSensitive: Boolean? = null,
+    /**
+     * Set the diacritic-sensitive flag for the text search.
+     *
+     * @see com.mongodb.client.model.TextSearchOptions.diacriticSensitive
+     * @since 2.0.0
+     *
+     */
+    var diacriticSensitive: Boolean? = null
+)
+
+/* ============= ------------------ ============= */
