@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
 import org.cufy.codec.*
+import org.cufy.mongodb.SET
 import org.cufy.mongodb.drop
 import org.cufy.monop.*
 import org.junit.jupiter.api.*
@@ -13,21 +14,21 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExampleTest {
-    lateinit var monop: Monop
+    lateinit var client: OpClient
 
     @BeforeEach
     fun before() {
         runBlocking {
             val connectionString = "mongodb://localhost"
             val name = "monop-example-test-${randomUUID()}"
-            monop = Monop(connectionString, name)
+            client = createOpClient(connectionString, name)
         }
     }
 
     @AfterEach
     fun after() {
         runBlocking {
-            monop.database.drop()
+            client.defaultDatabase()!!.drop()
         }
     }
 
@@ -43,9 +44,9 @@ class ExampleTest {
 
             val inputDocument = input encode TransactionFragmentCodec
 
-            Transaction.insertOne(inputDocument)(monop)
+            Transaction.insertOne(inputDocument)(client)
 
-            val outputDocument = Transaction.find()(monop).single()
+            val outputDocument = Transaction.find()(client).single()
 
             val output = outputDocument decode TransactionFragmentCodec
 
@@ -63,15 +64,17 @@ class ExampleTest {
                 Transaction.Value by BigDecimal.ONE
             }
 
-            Transaction.insertOne(document1)(monop)
+            Transaction.insertOne(document1)(client)
 
             val projection1 = TransactionProjection(document1)
 
             assertEquals(BigDecimal.ONE, projection1.value)
 
-            projection1.changeValue(BigDecimal.TEN)(monop)
+            Transaction.updateOneById(id, {
+                SET { Transaction.Value by BigDecimal.TEN }
+            })(client)
 
-            val document2 = Transaction.findOneById(id)(monop)!!
+            val document2 = Transaction.findOneById(id)(client)!!
 
             val projection2 = TransactionProjection(document2)
 
@@ -82,7 +85,10 @@ class ExampleTest {
 
 object Transaction : OpCollection, DocumentCodecOf<TransactionProjection> {
     override val name = "Transaction"
-    override val codec by ::TransactionProjection
+    override val codec = Codec {
+        encodeCatching { it: TransactionProjection -> it.element }
+        decodeCatching { it: BsonDocument -> TransactionProjection(it) }
+    }
 
     val Id = FieldCodec("_id") { Id<Transaction>() }
     val From = FieldCodec("from") { String.Nullable }
@@ -92,7 +98,6 @@ object Transaction : OpCollection, DocumentCodecOf<TransactionProjection> {
 
 class TransactionProjection(override val element: BsonDocument) : DocumentProjection {
     val value by Transaction.Value from element
-    val changeValue by Transaction.Value into Transaction
 }
 
 data class TransactionFragment(

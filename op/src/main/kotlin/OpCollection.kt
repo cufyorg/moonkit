@@ -15,7 +15,10 @@
  */
 package org.cufy.monop
 
-import org.cufy.bson.*
+import org.cufy.bson.AnyId
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
+import org.cufy.bson.toBsonArray
 import org.cufy.mongodb.*
 
 /* ============= ------------------ ============= */
@@ -29,29 +32,68 @@ import org.cufy.mongodb.*
  */
 interface OpCollection {
     /**
+     * The name of the database of the collection
+     * to operate on.
+     * Set to `null` to use [OpClient.defaultDatabase].
+     *
+     * @since 2.0.0
+     */
+    val database: String? get() = null
+
+    /**
      * The collection name.
      *
      * @since 2.0.0
      */
-    val name: String
-        get() = this::class.simpleName ?: error(
-            "Cannot infer collection name from ${this::class}"
-        )
+    val name: String get() = inferName()
 }
 
+private fun OpCollection.inferName(): String {
+    return this::class.simpleName ?: error("Cannot infer collection name for $this")
+}
+
+private fun OpCollection.inferToString(): String {
+    return "OpCollection($database, $name)"
+}
+
+/* ============= ------------------ ============= */
+
 /**
- * Construct a new [OpCollection] with the given [name].
+ * Construct a new [OpCollection] with the given [name] and [database].
  *
  * @since 2.0.0
  */
-fun OpCollection(name: String): OpCollection {
+fun OpCollection(name: String, database: String? = null): OpCollection {
     return object : OpCollection {
+        override val database = database
         override val name = name
 
-        override fun toString(): String {
-            return "MonopCollection($name)"
-        }
+        override fun toString() = inferToString()
     }
+}
+
+/* ============= ------------------ ============= */
+
+/**
+ * Return a [MongoCollection] instance corresponding
+ * to this collection using the given [client].
+ */
+suspend fun OpCollection.get(client: OpClient = OpClient): MongoCollection {
+    val database = client.databaseOrDefaultDatabase(database)
+    // if this.database is null yet no default database is set
+    database ?: error("Collection requires default database yet default database not set.")
+    return database[name]
+}
+
+/**
+ * Create an [Op] that executes the given [block]
+ * with a [MongoCollection] corresponding to this
+ * collection.
+ *
+ * @since 2.0.0
+ */
+fun <T> OpCollection.op(block: suspend MongoCollection.() -> T): Op<T> {
+    return CollectionOp(name, database, block)
 }
 
 /* ============= ------------------ ============= */
@@ -69,7 +111,7 @@ fun OpCollection.deleteOne(
     filter: BsonDocument,
     options: DeleteOptions = DeleteOptions()
 ): DeleteOneOp {
-    return DeleteOneOp(name, filter, options)
+    return DeleteOneOp(database, name, filter, options)
 }
 
 /**
@@ -135,7 +177,7 @@ fun OpCollection.deleteOneById(
 fun OpCollection.deleteMany(
     filter: BsonDocument,
     options: DeleteOptions = DeleteOptions()
-) = DeleteManyOp(name, filter, options)
+) = DeleteManyOp(database, name, filter, options)
 
 /**
  * Create a [DeleteManyOp] with the given arguments.
@@ -166,7 +208,7 @@ fun OpCollection.insertOne(
     document: BsonDocument,
     options: InsertOneOptions = InsertOneOptions()
 ): InsertOneOp {
-    return InsertOneOp(name, document, options)
+    return InsertOneOp(database, name, document, options)
 }
 
 /**
@@ -198,7 +240,7 @@ fun OpCollection.insertMany(
     documents: List<BsonDocument>,
     options: InsertManyOptions = InsertManyOptions()
 ): InsertManyOp {
-    return InsertManyOp(name, documents, options)
+    return InsertManyOp(database, name, documents, options)
 }
 
 /**
@@ -232,7 +274,7 @@ fun OpCollection.updateOne(
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
-    return UpdateOneOp(name, filter, update, options)
+    return UpdateOneOp(database, name, filter, update, options)
 }
 
 /**
@@ -268,7 +310,7 @@ fun OpCollection.updateOne(
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
-    return UpdateOneOp(name, filter, update.toBsonArray(), options)
+    return UpdateOneOp(database, name, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -384,7 +426,7 @@ fun OpCollection.updateMany(
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
 ): UpdateManyOp {
-    return UpdateManyOp(name, filter, update, options)
+    return UpdateManyOp(database, name, filter, update, options)
 }
 
 /**
@@ -420,7 +462,7 @@ fun OpCollection.updateMany(
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateManyOp {
-    return UpdateManyOp(name, filter, update.toBsonArray(), options)
+    return UpdateManyOp(database, name, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -456,7 +498,7 @@ fun OpCollection.replaceOne(
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions()
 ): ReplaceOneOp {
-    return ReplaceOneOp(name, filter, replacement, options)
+    return ReplaceOneOp(database, name, filter, replacement, options)
 }
 
 /**
@@ -530,7 +572,7 @@ fun OpCollection.bulkWrite(
     requests: List<WriteModel>,
     options: BulkWriteOptions = BulkWriteOptions()
 ): BulkWriteOp {
-    return BulkWriteOp(name, requests, options)
+    return BulkWriteOp(database, name, requests, options)
 }
 
 /**
@@ -562,7 +604,7 @@ fun OpCollection.count(
     filter: BsonDocument = BsonDocument.Empty,
     options: CountOptions = CountOptions()
 ): CountOp {
-    return CountOp(name, filter, options)
+    return CountOp(database, name, filter, options)
 }
 
 /**
@@ -592,7 +634,7 @@ fun OpCollection.count(
 fun OpCollection.estimatedCount(
     options: EstimatedCountOptions = EstimatedCountOptions()
 ): EstimatedCountOp {
-    return EstimatedCountOp(name, options)
+    return EstimatedCountOp(database, name, options)
 }
 
 /**
@@ -622,7 +664,7 @@ fun OpCollection.findOneAndDelete(
     filter: BsonDocument,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions()
 ): FindOneAndDeleteOp {
-    return FindOneAndDeleteOp(name, filter, options)
+    return FindOneAndDeleteOp(database, name, filter, options)
 }
 
 /**
@@ -691,7 +733,7 @@ fun OpCollection.findOneAndReplace(
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions()
 ): FindOneAndReplaceOp {
-    return FindOneAndReplaceOp(name, filter, replacement, options)
+    return FindOneAndReplaceOp(database, name, filter, replacement, options)
 }
 
 /**
@@ -767,7 +809,7 @@ fun OpCollection.findOneAndUpdate(
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
-    return FindOneAndUpdateOp(name, filter, update, options)
+    return FindOneAndUpdateOp(database, name, filter, update, options)
 }
 
 /**
@@ -803,7 +845,7 @@ fun OpCollection.findOneAndUpdate(
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
-    return FindOneAndUpdateOp(name, filter, update.toBsonArray(), options)
+    return FindOneAndUpdateOp(database, name, filter, update.toBsonArray(), options)
 }
 
 /**
@@ -917,7 +959,7 @@ fun OpCollection.find(
     filter: BsonDocument = BsonDocument.Empty,
     options: FindOptions = FindOptions()
 ): FindOp {
-    return FindOp(name, filter, options)
+    return FindOp(database, name, filter, options)
 }
 
 /**
@@ -1019,7 +1061,7 @@ fun OpCollection.aggregate(
     pipeline: List<BsonDocument>,
     options: AggregateOptions = AggregateOptions()
 ): AggregateOp {
-    return AggregateOp(name, pipeline, options)
+    return AggregateOp(database, name, pipeline, options)
 }
 
 /**
@@ -1053,7 +1095,7 @@ fun OpCollection.distinct(
     filter: BsonDocument = BsonDocument.Empty,
     options: DistinctOptions = DistinctOptions()
 ): DistinctOp {
-    return DistinctOp(name, field, filter, options)
+    return DistinctOp(database, name, field, filter, options)
 }
 
 /**

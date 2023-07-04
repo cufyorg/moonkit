@@ -15,456 +15,63 @@
  */
 package org.cufy.monop
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.completeWith
-import kotlinx.coroutines.launch
-import org.cufy.mongodb.*
-
 /* ============= ------------------ ============= */
 
 /**
- * A function that can execute some operations in
- * an [OperatorScope].
+ * A function that can be used to execute multiple
+ * [Operation] instances in the background.
+ *
+ * Can be used to override default execution
+ * strategies. Like transforming multiple read or
+ * write operations into a single bulk read or write
+ * operation.
+ *
+ * @author LSafer
+ * @since 2.0.0
  */
 fun interface Operator {
     /**
-     * Execute the operation on the [receiver][this] scope.
+     * Execute all the given [operations] (non-suspending).
+     * Return a list containing operations this
+     * operator cannot execute and new operations
+     * to be executed.
      *
-     * DO NOT CALL DIRECTLY
+     * This function should only suspend for required
+     * values of the operator itself and not for the
+     * execution of the given [operations].
      *
+     * For example: awaiting the database instance
+     * to be available is allowed. Meanwhile,
+     * awaiting creating an index or inserting a
+     * document should be done in the background.
+     *
+     * **DO NOT CALL DIRECTLY**
+     *
+     * @receiver the client to be used for the execution.
+     * @param operations the operations to be executed.
+     * @return more operations to execute.
      * @since 2.0.0
      */
-    suspend operator fun OperatorScope.invoke()
+    suspend operator fun OpClient.invoke(operations: Set<Operation<*>>): Set<Operation<*>>
 }
 
 /**
- * A stateful instance that holds a set of
- * operations to be completed with a set of
- * [Operator]s.
+ * Create an [Operator] instance that only accepts
+ * operations of type [T] and returns any operation
+ * that is not of type [T] to be processed by a
+ * different operator.
  *
- * @author LSafer
+ * @param block the operation block. (has [Operator.invoke] semantics)
  * @since 2.0.0
  */
-interface OperatorScope {
-    /**
-     * The monop instance.
-     *
-     * @since 2.0.0
-     */
-    val monop: Monop
-
-    /**
-     * Add the given [operations] to the queue.
-     *
-     * @since 2.0.0
-     */
-    fun enqueue(operations: List<Operation<*>>)
-
-    /**
-     * Get and remove the operations that matches
-     * the given [predicate] from the queue.
-     *
-     * @since 2.0.0
-     */
-    fun accept(predicate: (Operation<*>) -> Boolean): List<Operation<*>>
-}
-
-/**
- * Add the given [operations] to the queue.
- *
- * @since 2.0.0
- */
-fun OperatorScope.enqueue(vararg operations: Operation<*>) {
-    enqueue(operations.asList())
-}
-
-/**
- * Get and remove the operations that are
- * instances of type [O] from the queue.
- *
- * @since 2.0.0
- */
-inline fun <reified O : Operation<*>> OperatorScope.accept(): List<O> {
-    @Suppress("UNCHECKED_CAST")
-    return accept { it is O } as List<O>
-}
-
-/* ============= ------------------ ============= */
-
-/**
- * An operator performing operations of type [BlockOperation]
- * in parallel.
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val BlockOperator = Operator {
-    accept<BlockOperation<Any?, Any?>>().forEach {
-        enqueue(it.dependencies)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val values = it.dependencies.map {
-                runCatching { it.await() }
-            }
-
-            val out = it.block(monop, values)
-
-            it.completeWith(out)
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [DeleteOneOperation]
- * in parallel using [MongoCollection.deleteOne]
- *
- * This operator supports all the options in [DeleteOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val DeleteOneOperator = Operator {
-    accept<DeleteOneOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    deleteOne(it.filter, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [DeleteManyOperation]
- * in parallel using [MongoCollection.deleteMany]
- *
- * This operator supports all the options in [DeleteOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val DeleteManyOperator = Operator {
-    accept<DeleteManyOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    deleteMany(it.filter, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [InsertOneOperation]
- * in parallel using [MongoCollection.insertOne].
- *
- * This operator supports all the options in [InsertOneOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val InsertOneOperator = Operator {
-    accept<InsertOneOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    insertOne(it.document, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [InsertManyOperation]
- * in parallel using [MongoCollection.insertMany]
- *
- * This operator supports all the options in [InsertManyOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val InsertManyOperator = Operator {
-    accept<InsertManyOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    insertMany(it.documents, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [UpdateOneOperation]
- * in parallel using [MongoCollection.updateOne]
- *
- * This operator supports all the options in [UpdateOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val UpdateOneOperator = Operator {
-    accept<UpdateOneOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    updateOne(it.filter, it.update, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [UpdateManyOperation]
- * in parallel using [MongoCollection.updateMany]
- *
- * This operator supports all the options in [UpdateOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val UpdateManyOperator = Operator {
-    accept<UpdateManyOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    updateMany(it.filter, it.update, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [ReplaceOneOperator]
- * in parallel using [MongoCollection.replaceOne]
- *
- * This operator supports all the options in [ReplaceOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val ReplaceOneOperator = Operator {
-    accept<ReplaceOneOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    replaceOne(it.filter, it.replacement, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [BulkWriteOperation]
- * in parallel using [MongoCollection.bulkWrite]
- *
- * This operator supports all the options in [BulkWriteOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val BulkWriteOperator = Operator {
-    accept<BulkWriteOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    bulkWrite(it.requests, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [CountOperation]
- * in parallel using [MongoCollection.count]
- *
- * This operator supports all the options in [CountOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val CountOperator = Operator {
-    accept<CountOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    count(it.filter, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [EstimatedCountOperation]
- * in parallel using [MongoCollection.estimatedCount]
- *
- * This operator supports all the options in [EstimatedCountOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val EstimatedCountOperator = Operator {
-    accept<EstimatedCountOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    estimatedCount(it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [FindOneAndDeleteOperation]
- * in parallel using [MongoCollection.findOneAndDelete]
- *
- * This operator supports all the options in [FindOneAndDeleteOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val FindOneAndDeleteOperator = Operator {
-    accept<FindOneAndDeleteOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    findOneAndDelete(it.filter, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [FindOneAndReplaceOperation]
- * in parallel using [MongoCollection.findOneAndReplace]
- *
- * This operator supports all the options in [FindOneAndReplaceOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val FindOneAndReplaceOperator = Operator {
-    accept<FindOneAndReplaceOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    findOneAndReplace(it.filter, it.replacement, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [FindOneAndUpdateOperation]
- * in parallel using [MongoCollection.findOneAndUpdate]
- *
- * This operator supports all the options in [FindOneAndUpdateOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val FindOneAndUpdateOperator = Operator {
-    accept<FindOneAndUpdateOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    findOneAndUpdate(it.filter, it.update, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [FindOperation]
- * in parallel using [MongoCollection.find]
- *
- * This operator supports all the options in [FindOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val FindOperator = Operator {
-    accept<FindOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    find(it.filter, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [AggregateOperation]
- * in parallel using [MongoCollection.aggregate]
- *
- * This operator supports all the options in [AggregateOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val AggregateOperator = Operator {
-    accept<AggregateOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    aggregate(it.pipeline, it.options)
-                }
-            })
-        }
-    }
-}
-
-/**
- * An operator performing operations of type [DistinctOperation]
- * in parallel using [MongoCollection.distinct]
- *
- * This operator supports all the options in [DistinctOptions].
- *
- * @author LSafer
- * @since 2.0.0
- */
-@ExperimentalMonopApi
-val DistinctOperator = Operator {
-    accept<DistinctOperation>().forEach {
-        CoroutineScope(Dispatchers.IO).launch {
-            it.completeWith(runCatching {
-                monop[it.collection].run {
-                    distinct(it.field, it.filter, it.options)
-                }
-            })
-        }
+inline fun <reified T : Operation<*>> createOperatorForType(
+    crossinline block: suspend OpClient.(Set<T>) -> Iterable<Operation<*>>
+): Operator {
+    return Operator { operations ->
+        val remaining = mutableSetOf<Operation<*>>()
+        val matching = mutableSetOf<T>()
+        operations.forEach { if (it is T) matching.add(it) else remaining.add(it) }
+        remaining + block(this, matching)
     }
 }
 
@@ -476,22 +83,8 @@ val DistinctOperator = Operator {
 @OptIn(ExperimentalMonopApi::class)
 val DefaultOperators = listOf(
     BlockOperator,
-    DeleteOneOperator,
-    DeleteManyOperator,
-    InsertOneOperator,
-    InsertManyOperator,
-    UpdateOneOperator,
-    UpdateManyOperator,
-    ReplaceOneOperator,
-    BulkWriteOperator,
-    CountOperator,
-    EstimatedCountOperator,
-    FindOneAndDeleteOperator,
-    FindOneAndReplaceOperator,
-    FindOneAndUpdateOperator,
-    FindOperator,
-    AggregateOperator,
-    DistinctOperator
+    CollectionOperator,
+    DatabaseOperator
 )
 
 /* ============= ------------------ ============= */
