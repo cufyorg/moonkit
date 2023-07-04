@@ -127,6 +127,16 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: BsonElement?) {
+        name by value
+    }
+
     //
 
     /**
@@ -150,6 +160,16 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: BsonDocument?) {
+        name by value
+    }
+
     //
 
     /**
@@ -170,6 +190,16 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: BsonArray?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: BsonArray?) {
         name by value
     }
 
@@ -200,6 +230,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDocument].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Map<String, BsonElement>?) {
+        name by value
+    }
+
     //
 
     /**
@@ -224,6 +266,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: List<BsonElement>?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonArray].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: List<BsonElement>?) {
         name by value
     }
 
@@ -254,6 +308,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonString].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: String?) {
+        name by value
+    }
+
     //
 
     /**
@@ -278,6 +344,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: ObjectId?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonObjectId].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: ObjectId?) {
         name by value
     }
 
@@ -306,6 +384,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: AnyId?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped using [Id.bson].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: AnyId?) {
         name by value
     }
 
@@ -340,6 +430,20 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped using [BsonArray] and [Id.bson].
+     */
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("byIdList")
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: List<AnyId>?) {
+        name by value
+    }
+
     //
 
     /**
@@ -364,6 +468,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: Decimal128?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDecimal128].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Decimal128?) {
         name by value
     }
 
@@ -394,6 +510,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDecimal128].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: BigDecimal?) {
+        name by value
+    }
+
     /* ============= ------------------ ============= */
 
     /**
@@ -418,6 +546,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: Boolean?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonBoolean].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Boolean?) {
         name by value
     }
 
@@ -448,6 +588,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonInt32].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Int?) {
+        name by value
+    }
+
     //
 
     /**
@@ -472,6 +624,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(value: Long?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonInt64].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Long?) {
         name by value
     }
 
@@ -502,6 +666,18 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
         name by value
     }
 
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDouble].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Double?) {
+        name by value
+    }
+
     /* ============= ------------------ ============= */
 
     /**
@@ -517,6 +693,14 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun KCallable<*>.by(block: BsonDocumentBlock) {
+        name by block
+    }
+
+    /**
+     * Set the field with the name [this] to the value from invoking the given [block]
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(block: BsonDocumentBlock) {
         name by block
     }
 
