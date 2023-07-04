@@ -360,6 +360,7 @@ val Id<*>.bson: BsonElement
  *
  * @since 2.0.0
  */
+@get:JvmName("bsonNullable")
 val Id<*>?.bson: BsonElement get() = this?.let { bson } ?: null.bson
 
 /**
