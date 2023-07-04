@@ -1826,3 +1826,48 @@ data class TextSearchOptions(
 )
 
 /* ============= ------------------ ============= */
+
+/**
+ * Create a new options instance from the given [block].
+ */
+fun PushOptions(
+    block: PushOptions.() -> Unit
+) = PushOptions().apply(block)
+
+/**
+ * Push options.
+ *
+ * @see com.mongodb.client.model.PushOptions
+ * @author LSafer
+ * @since 2.0.0
+ */
+data class PushOptions(
+    /**
+     * Sets the position at which to add the pushed values in the array.
+     *
+     * @see com.mongodb.client.model.PushOptions.position
+     * @since 2.0.0
+     */
+    var position: Int? = null,
+    /**
+     * Sets the limit on the number of array elements allowed.
+     *
+     * @see com.mongodb.client.model.PushOptions.slice
+     * @since 2.0.0
+     */
+    var slice: Int? = null,
+    /**
+     * Sets the sort direction for sorting array elements.
+     *
+     * Set to a number for sorting array elements that are not documents.
+     *
+     * Set to a document for sorting array elements that are documents.
+     *
+     * @see com.mongodb.client.model.PushOptions.sort
+     * @see com.mongodb.client.model.PushOptions.sortDocument
+     * @since 2.0.0
+     */
+    var sort: BsonElement? = null
+)
+
+/* ============= ------------------ ============= */
