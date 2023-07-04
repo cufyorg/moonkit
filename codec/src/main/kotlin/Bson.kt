@@ -514,7 +514,7 @@ object BsonIdCodec : Codec<Id<*>, BsonElement> {
     @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Id<*> ->
-            success(it.b)
+            success(it.bson)
         }
 
     @AdvancedCodecApi

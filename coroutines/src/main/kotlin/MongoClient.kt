@@ -21,7 +21,6 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitSingle
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonDocumentBlock
-import org.cufy.bson.EmptyBsonDocument
 import org.cufy.bson.java.java
 import org.cufy.bson.java.kt
 import org.cufy.mongodb.java.JavaMongoClient
@@ -125,7 +124,7 @@ suspend fun MongoClient.listDatabaseNames(
  * @see com.mongodb.reactivestreams.client.MongoClient.listDatabases
  */
 suspend fun MongoClient.listDatabases(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: ListDatabasesOptions = ListDatabasesOptions(),
     session: ClientSession? = null
 ): List<BsonDocument> {

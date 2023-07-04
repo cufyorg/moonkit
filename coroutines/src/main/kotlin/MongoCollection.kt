@@ -19,7 +19,10 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
-import org.cufy.bson.*
+import org.cufy.bson.BsonArray
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
+import org.cufy.bson.BsonElement
 import org.cufy.bson.java.java
 import org.cufy.bson.java.kt
 import org.cufy.mongodb.java.JavaMongoCollection
@@ -634,7 +637,7 @@ suspend fun MongoCollection.bulkWrite(
  * @see com.mongodb.client.MongoCollection.countDocuments
  */
 suspend fun MongoCollection.count(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: CountOptions = CountOptions(),
     session: ClientSession? = null
 ): Long {
@@ -941,7 +944,7 @@ suspend fun MongoCollection.findOneAndUpdate(
  * @see com.mongodb.client.MongoCollection.find
  */
 suspend fun MongoCollection.find(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: FindOptions = FindOptions(),
     session: ClientSession? = null
 ): List<BsonDocument> {
@@ -1034,7 +1037,7 @@ suspend fun MongoCollection.aggregate(
  */
 suspend fun MongoCollection.distinct(
     field: String,
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: DistinctOptions = DistinctOptions(),
     session: ClientSession? = null
 ): List<BsonDocument> {

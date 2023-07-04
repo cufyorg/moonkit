@@ -16,6 +16,8 @@
 package org.cufy.mongodb.gridfs
 
 import org.cufy.bson.BsonDocument
+import org.cufy.mongodb.Collation
+import kotlin.time.Duration
 
 /* ============= ------------------ ============= */
 
@@ -84,6 +86,81 @@ data class DownloadOptions(
      * @return this
      */
     var bufferSizeBytes: Int? = null,
+)
+
+/* ============= ------------------ ============= */
+
+/**
+ * Create a new options instance from the given [block].
+ */
+fun BucketFindOptions(
+    block: BucketFindOptions.() -> Unit
+) = BucketFindOptions().apply(block)
+
+/**
+ * The options that can be applied to a bucket find operation.
+ *
+ * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher
+ * @author LSafer
+ * @since 2.0.0
+ */
+data class BucketFindOptions(
+    /**
+     * Sets the limit to apply.
+     *
+     * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher.limit
+     * @since 2.0.0
+     */
+    var limit: Int = 0,
+    /**
+     * Sets the number of documents to skip.
+     *
+     * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher.skip
+     * @since 2.0.0
+     */
+    var skip: Int = 0,
+    /**
+     * Sets the sort criteria to apply to the query.
+     *
+     * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher.sort
+     * @since 2.0.0
+     */
+    var sort: BsonDocument? = null,
+    /**
+     * The server normally times out idle cursors after an inactivity period (10 minutes)
+     * to prevent excess memory use. Set this option to prevent that.
+     *
+     * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher.noCursorTimeout
+     * @since 2.0.0
+     */
+    var noCursorTimeout: Boolean = false,
+    /**
+     * Sets the maximum execution time on the server for this operation.
+     *
+     * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher.maxTime
+     * @since 2.0.0
+     */
+    var maxTime: Duration = Duration.ZERO,
+    /**
+     * Sets the collation options
+     *
+     * A null value represents the server default.
+     *
+     * @see com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher.collation
+     * @since 2.0.0
+     */
+    var collation: Collation? = null,
+    /**
+     * Sets the number of documents to return per batch.
+     *
+     * Overrides the value for setting the batch
+     * size, allowing for fine-grained control
+     * over the underlying cursor.
+     *
+     * @see com.mongodb.reactivestreams.client.FindPublisher.batchSize
+     * @since 2.0.0
+     */
+    var batchSize: Int? = null,
 )
 
 /* ============= ------------------ ============= */

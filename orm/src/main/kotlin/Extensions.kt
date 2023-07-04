@@ -15,9 +15,10 @@
  */
 package org.cufy.monkt
 
-import org.cufy.bson.*
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
+import org.cufy.bson.Id
 import org.cufy.mongodb.*
-import org.cufy.monkt.internal.*
 import org.cufy.monkt.schema.extension.*
 
 /*==================================================
@@ -371,7 +372,7 @@ suspend fun <T : Document> T.encode(
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.findImpl(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     session: ClientSession? = null,
     tweak: FindTweak
 ): List<T> {
@@ -396,7 +397,7 @@ suspend fun <T : Any> Model<T>.findImpl(
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.find(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): List<T> {
@@ -486,7 +487,7 @@ suspend fun <T : Any> Model<T>.findById(
  */
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun <T : Any> Model<T>.findOneImpl(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     session: ClientSession? = null,
     tweak: FindTweak
 ): T? {
@@ -514,7 +515,7 @@ suspend fun <T : Any> Model<T>.findOneImpl(
  */
 @OptIn(AdvancedMonktApi::class)
 suspend fun <T : Any> Model<T>.findOne(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): T? {
@@ -1841,7 +1842,7 @@ suspend fun <T : Any> Model<T>.estimatedCount(
  * @see MongoCollection.count
  */
 suspend fun <T : Any> Model<T>.count(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     session: ClientSession? = null,
     block: CountOptions.() -> Unit = {}
 ): Long {
@@ -1882,7 +1883,7 @@ suspend fun <T : Any> Model<T>.count(
  * @see MongoCollection.count
  */
 suspend fun <T : Any> Model<T>.exists(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     session: ClientSession? = null,
     block: CountOptions.() -> Unit = {}
 ): Boolean {

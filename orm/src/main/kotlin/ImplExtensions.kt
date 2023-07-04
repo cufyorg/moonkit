@@ -15,14 +15,14 @@
  */
 package org.cufy.monkt
 
-import org.cufy.bson.*
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonUndefined
 import org.cufy.mongodb.MongoClient
 import org.cufy.mongodb.MongoDatabase
 import org.cufy.mongodb.createMongoClient
 import org.cufy.mongodb.get
 import org.cufy.monkt.internal.*
 import org.cufy.monkt.schema.*
-import org.cufy.monkt.schema.extension.*
 
 /*==================================================
 ================ Options Operations ================
@@ -119,7 +119,7 @@ suspend fun Monkt.performOption(options: List<OptionData<*, *, *>>) {
 fun <T : Any> Document.Companion.performDecoding(model: Model<T>, document: BsonDocument): T {
     val instance = model.schema.decode(document)
 
-    val bsonId = document["_id"] ?: bundefined
+    val bsonId = document["_id"] ?: BsonUndefined
     val id = LenientIdDecoder.decode(bsonId)
 
     Document.setId(instance, id)

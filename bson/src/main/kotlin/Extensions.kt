@@ -24,36 +24,60 @@ import java.math.BigDecimal
  *
  * @since 2.0.0
  */
-val EmptyBsonArray = BsonArray()
+@Deprecated("Use BsonArray.Empty instead", ReplaceWith(
+    "BsonArray.Empty",
+    "org.cufy.bson.BsonArray"
+))
+val EmptyBsonArray = BsonArray.Empty
 
 /**
  * A global instance of [BsonDocument] that has no entries.
  *
  * @since 2.0.0
  */
-val EmptyBsonDocument = BsonDocument()
+@Deprecated("Use BsonDocument.Empty instead", ReplaceWith(
+    "BsonDocument.Empty",
+    "org.cufy.bson.BsonDocument"
+))
+val EmptyBsonDocument = BsonDocument.Empty
 
 /**
  * The global instance of bson true.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "true.bson",
+    "org.cufy.bson.bson"
+))
 @BsonKeywordMarker
 val btrue = BsonBoolean.True
 
 /**
  * The global instance of bson false.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "false.bson",
+    "org.cufy.bson.bson"
+))
 @BsonKeywordMarker
 val bfalse = BsonBoolean.False
 
 /**
  * The global instance of bson null.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "null.bson",
+    "org.cufy.bson.bson"
+))
 @BsonKeywordMarker
 val bnull = BsonNull
 
 /**
  * A global instance of bson undefined.
  */
+@Deprecated("Use Unit.bson instead", ReplaceWith(
+    "Unit.bson",
+    "org.cufy.bson.bson"
+))
 @BsonKeywordMarker
 val bundefined = BsonUndefined
 
@@ -150,36 +174,64 @@ fun MutableMap<String, BsonElement>.asMutableBsonMap(): MutableBsonMap {
 /**
  * Return a [BsonInt32] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val Int.b: BsonInt32 get() = BsonInt32(this)
 
 /**
  * Return a [BsonInt64] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val Long.b: BsonInt64 get() = BsonInt64(this)
 
 /**
  * Return a [BsonDouble] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val Double.b: BsonDouble get() = BsonDouble(this)
 
 /**
  * Return a [BsonDecimal128] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val Decimal128.b: BsonDecimal128 get() = BsonDecimal128(this)
 
 /**
  * Return a [BsonDecimal128] with the value of this.
  */
-val BigDecimal.b: BsonDecimal128 get() = toDecimal128().b
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
+val BigDecimal.b: BsonDecimal128 get() = toDecimal128().bson
 
 /**
  * Return a [BsonString] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val String.b: BsonString get() = BsonString(this)
 
 /**
  * Return a [BsonObjectId] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val ObjectId.b: BsonObjectId get() = BsonObjectId(this)
 
 /**
@@ -190,6 +242,10 @@ val ObjectId.b: BsonObjectId get() = BsonObjectId(this)
  *
  * @since 2.0.0
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val Id<*>.b: BsonElement
     get() {
         if (ObjectId.isValid(value))
@@ -201,7 +257,147 @@ val Id<*>.b: BsonElement
 /**
  * Return a [BsonBoolean] with the value of this.
  */
+@Deprecated("Use .bson extension instead", ReplaceWith(
+    "this.bson",
+    "org.cufy.bson.bson"
+))
 val Boolean.b: BsonBoolean get() = BsonBoolean(this)
+
+/* ============= ------------------ ============= */
+
+/**
+ * Return a [BsonInt32] with the value of this.
+ */
+inline val Int.bson: BsonInt32 get() = BsonInt32(this)
+
+/**
+ * Return a [BsonInt32] with the value of this or [BsonNull] if this is `null`.
+ */
+val Int?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonInt64] with the value of this.
+ */
+inline val Long.bson: BsonInt64 get() = BsonInt64(this)
+
+/**
+ * Return a [BsonInt64] with the value of this or [BsonNull] if this is `null`.
+ */
+val Long?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonDouble] with the value of this.
+ */
+inline val Double.bson: BsonDouble get() = BsonDouble(this)
+
+/**
+ * Return a [BsonDouble] with the value of this or [BsonNull] if this is `null`.
+ */
+val Double?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonDecimal128] with the value of this.
+ */
+inline val Decimal128.bson: BsonDecimal128 get() = BsonDecimal128(this)
+
+/**
+ * Return a [BsonDecimal128] with the value of this or [BsonNull] if this is `null`.
+ */
+val Decimal128?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonDecimal128] with the value of this.
+ */
+val BigDecimal.bson: BsonDecimal128 get() = toDecimal128().bson
+
+/**
+ * Return a [BsonDecimal128] with the value of this or [BsonNull] if this is `null`.
+ */
+val BigDecimal?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonString] with the value of this.
+ */
+inline val String.bson: BsonString get() = BsonString(this)
+
+/**
+ * Return a [BsonString] with the value of this or [BsonNull] if this is `null`.
+ */
+val String?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonObjectId] with the value of this.
+ */
+inline val ObjectId.bson: BsonObjectId get() = BsonObjectId(this)
+
+/**
+ * Return a [BsonObjectId] with the value of this or [BsonNull] if this is `null`.
+ */
+val ObjectId?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return the best fitting native wrapper for
+ * this id.
+ * A [BsonObjectId] if it is a valid object id
+ * and a [BsonString] if it is not.
+ *
+ * @since 2.0.0
+ */
+val Id<*>.bson: BsonElement
+    get() {
+        if (ObjectId.isValid(value))
+            return BsonObjectId(ObjectId(value))
+
+        return BsonString(value)
+    }
+
+/**
+ * Return the best fitting native wrapper for
+ * this id.
+ * A [BsonObjectId] if it is a valid object id
+ * and a [BsonString] if it is not
+ * or [BsonNull] if this is `null`.
+ *
+ * @since 2.0.0
+ */
+@get:JvmName("bsonNullable")
+val Id<*>?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonBoolean] with the value of this.
+ */
+inline val Boolean.bson: BsonBoolean get() = BsonBoolean(this)
+
+/**
+ * Return a [BsonBoolean] with the value of this or [BsonNull] if this is `null`.
+ */
+val Boolean?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return [BsonNull].
+ *
+ * Usage:
+ * ```kotlin
+ * null.bson
+ * ```
+ *
+ * @since 2.0.0
+ */
+@Suppress("UnusedReceiverParameter")
+inline val Nothing?.bson: BsonNull get() = BsonNull
+
+/**
+ * Return [BsonUndefined].
+ *
+ * Usage:
+ * ```kotlin
+ * Unit.bson
+ * ```
+ *
+ * @since 2.0.0
+ */
+@Suppress("UnusedReceiverParameter")
+inline val Unit.bson: BsonUndefined get() = BsonUndefined
 
 /* ============= ------------------ ============= */
 
@@ -275,6 +471,8 @@ fun Id<*>.toObjectIdOrNull(): ObjectId? {
 /**
  * Invoke this function with the given [block] as the argument.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("Use Constructor(BsonDocument { }) instead")
 @JvmName("invokeWithBsonDocumentBlock")
 operator fun <T> ((BsonDocument) -> T).invoke(block: BsonDocumentBlock): T {
     return this(BsonDocument(block))
@@ -283,6 +481,8 @@ operator fun <T> ((BsonDocument) -> T).invoke(block: BsonDocumentBlock): T {
 /**
  * Invoke this function with the given [block] as the argument.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("Use Constructor(BsonArray { }) instead")
 @JvmName("invokeWithBsonArrayBlock")
 operator fun <T> ((BsonArray) -> T).invoke(block: BsonArrayBlock): T {
     return this(BsonArray(block))

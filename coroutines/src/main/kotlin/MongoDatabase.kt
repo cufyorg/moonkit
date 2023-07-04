@@ -20,7 +20,6 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonDocumentBlock
-import org.cufy.bson.EmptyBsonDocument
 import org.cufy.bson.java.java
 import org.cufy.bson.java.kt
 import org.cufy.mongodb.java.JavaMongoDatabase
@@ -184,7 +183,7 @@ suspend fun MongoDatabase.listCollectionNames(
  * @see com.mongodb.client.MongoDatabase.listCollectionNames
  */
 suspend fun MongoDatabase.listCollections(
-    filter: BsonDocument = EmptyBsonDocument,
+    filter: BsonDocument = BsonDocument.Empty,
     options: ListCollectionsOptions = ListCollectionsOptions(),
     session: ClientSession? = null
 ): List<BsonDocument> {

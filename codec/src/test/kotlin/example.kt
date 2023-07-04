@@ -2,7 +2,7 @@ package org.cufy.monkt.codec
 
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
-import org.cufy.bson.b
+import org.cufy.bson.bson
 import org.cufy.bson.java.java
 import org.cufy.codec.*
 import org.junit.jupiter.api.Test
@@ -58,7 +58,7 @@ class ExampleTest {
 
     @Test
     fun `catchIn actually uses the fallback value`() {
-        val nameSource = "Hello World".b
+        val nameSource = "Hello World".bson
         val codec = Codecs.Int32 catchIn { 0 }
 
         val name = nameSource decodeAny codec

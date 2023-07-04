@@ -371,7 +371,7 @@ open class NullableSchemaImpl<T>(
     @AdvancedMonktApi
     override fun encode(value: T?): BsonElement {
         return when (value) {
-            null -> bnull
+            null -> null.bson
             else -> schema.encode(value)
         }
     }
@@ -480,7 +480,7 @@ open class FieldDefinitionImpl<T : Any, M>(
     override fun decode(instance: T, document: MutableBsonMap) {
         val schema = schema
 
-        val bsonValue = document[name] ?: bundefined
+        val bsonValue = document[name] ?: BsonUndefined
 
         val value = run {
             if (schema.canDecode(bsonValue))
