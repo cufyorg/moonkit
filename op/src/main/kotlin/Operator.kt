@@ -15,6 +15,8 @@
  */
 package org.cufy.monop
 
+import org.cufy.monop.gridfs.BucketOperator
+
 /* ============= ------------------ ============= */
 
 /**
@@ -84,7 +86,8 @@ inline fun <reified T : Operation<*>> createOperatorForType(
 val DefaultOperators = listOf(
     BlockOperator,
     CollectionOperator,
-    DatabaseOperator
+    DatabaseOperator,
+    BucketOperator,
 )
 
 /* ============= ------------------ ============= */
