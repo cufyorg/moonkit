@@ -40,16 +40,23 @@ import java.nio.ByteBuffer
  * This interface implements [kotlinx.coroutines.Job]
  * which represents the background download job.
  *
- * @param T the result of the download job
  * @author LSafer
  * @since 2.0.0
  */
-interface MongoDownload<T> : Deferred<T>, AutoCloseable {
+interface MongoDownload : Deferred<Unit>, AutoCloseable {
     /**
      * The preferred download buffer size as set in the
      * [DownloadOptions].
      */
     val bufferSizeBytes: Int
+
+    /**
+     * The file data. Can be awaited without the
+     * need to await the whole job.
+     *
+     * @since 2.0.0
+     */
+    val file: Deferred<MongoFile>
 
     /**
      * Close the download channel.
@@ -73,9 +80,10 @@ interface MongoDownload<T> : Deferred<T>, AutoCloseable {
      * @return the download results.
      * @since 2.0.0
      */
-    suspend fun closeAndAwait(): T {
+    suspend fun closeAndAwait(): MongoFile {
         close()
-        return await()
+        await()
+        return file.await()
     }
 
     /**
@@ -117,7 +125,7 @@ interface MongoDownload<T> : Deferred<T>, AutoCloseable {
  *
  * @since 2.0.0
  */
-fun MongoDownload<*>.asInputStream(): InputStream {
+fun MongoDownload.asInputStream(): InputStream {
     return MongoDownloadInputStream(this)
 }
 
@@ -129,7 +137,7 @@ fun MongoDownload<*>.asInputStream(): InputStream {
  * @return the number of bytes sent.
  * @since 2.0.0
  */
-suspend fun MongoDownload<*>.writeTo(channel: SendChannel<ByteBuffer>): Long {
+suspend fun MongoDownload.writeTo(channel: SendChannel<ByteBuffer>): Long {
     var transferred = 0L
 
     while (true) {
@@ -152,7 +160,7 @@ suspend fun MongoDownload<*>.writeTo(channel: SendChannel<ByteBuffer>): Long {
  * @return the number of bytes written.
  * @since 2.0.0
  */
-suspend fun MongoDownload<*>.writeTo(stream: OutputStream): Long {
+suspend fun MongoDownload.writeTo(stream: OutputStream): Long {
     var transferred = 0L
     val buffer = ByteArray(bufferSizeBytes)
 
@@ -176,7 +184,7 @@ suspend fun MongoDownload<*>.writeTo(stream: OutputStream): Long {
  * @return the number of bytes written.
  * @since 2.0.0
  */
-suspend fun MongoDownload<*>.writeTo(file: File): Long {
+suspend fun MongoDownload.writeTo(file: File): Long {
     return file.outputStream().use { writeTo(it) }
 }
 
@@ -189,7 +197,7 @@ suspend fun MongoDownload<*>.writeTo(file: File): Long {
  * @return the number of bytes written.
  * @since 2.0.0
  */
-suspend fun MongoDownload<*>.writeTo(upload: MongoUpload<*>): Long {
+suspend fun MongoDownload.writeTo(upload: MongoUpload): Long {
     var transferred = 0L
     while (true) {
         val buffer = read()

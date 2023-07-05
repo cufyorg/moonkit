@@ -20,17 +20,19 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.getOrElse
 import kotlinx.coroutines.runBlocking
 import org.cufy.mongodb.gridfs.MongoDownload
+import org.cufy.mongodb.gridfs.MongoFile
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.min
 
-internal class MongoDownloadImpl<T>(
-    job: Deferred<T>,
+internal class MongoDownloadImpl(
+    job: Deferred<Unit>,
+    override val file: Deferred<MongoFile>,
     private val channel: ReceiveChannel<ByteBuffer>,
     override val bufferSizeBytes: Int,
     val onClose: () -> Unit
-) : MongoDownload<T>, Deferred<T> by job {
+) : MongoDownload, Deferred<Unit> by job {
     override fun close() {
         leftover.set(null)
         onClose()
@@ -66,7 +68,7 @@ internal class MongoDownloadImpl<T>(
     }
 }
 
-internal class MongoDownloadInputStream(private val descriptor: MongoDownload<*>) : InputStream() {
+internal class MongoDownloadInputStream(private val descriptor: MongoDownload) : InputStream() {
     override fun read(): Int {
         val bytes = ByteArray(1)
         runBlocking { descriptor.read(bytes) }

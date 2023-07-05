@@ -15,15 +15,26 @@
  */
 package org.cufy.mongodb.gridfs
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedSendChannelException
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactive.collect
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
 import org.cufy.bson.BsonElement
-import org.cufy.bson.BsonObjectId
+import org.cufy.bson.java.kt
 import org.cufy.mongodb.ClientSession
 import org.cufy.mongodb.gridfs.internal.MongoDownloadImpl
 import org.cufy.mongodb.gridfs.internal.MongoUploadImpl
+import org.cufy.mongodb.gridfs.internal.downloadToPublisher0
+import org.cufy.mongodb.gridfs.internal.uploadFromPublisher0
+import org.cufy.mongodb.gridfs.java.kt
 import java.nio.ByteBuffer
 
 /*
@@ -44,6 +55,7 @@ over the same functions in `MongoBucket.kt`
  *
  * @param session the client session with which to associate this operation.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -51,18 +63,27 @@ over the same functions in `MongoBucket.kt`
  */
 suspend fun MongoBucket.asyncUpload(
     filename: String,
+    metadata: BsonDocument = BsonDocument.Empty,
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
-): MongoUpload<BsonObjectId> {
+): MongoUpload {
     val chunkSize = options.chunkSizeBytes ?: chunkSizeBytes
     val channel = Channel<ByteBuffer>()
-    val job = CoroutineScope(Dispatchers.IO).async {
-        upload(channel, filename, options, session)
+    val idJob = CompletableDeferred<BsonElement>()
+    val job = CoroutineScope(Dispatchers.IO).async<Unit> {
+        val publisher = java.uploadFromPublisher0(channel.receiveAsFlow(), filename, metadata, options, session)
+        idJob.complete(publisher.id.kt)
+        publisher.awaitFirstOrNull()
     }
 
-    job.invokeOnCompletion { channel.close() }
+    job.invokeOnCompletion { error ->
+        channel.close()
+        error?.let {
+            idJob.completeExceptionally(it)
+        }
+    }
 
-    return MongoUploadImpl(job, channel, chunkSize) {
+    return MongoUploadImpl(job, idJob, channel, chunkSize) {
         // no need to close the job.
         // the job already depends on the channel
         channel.close()
@@ -80,6 +101,7 @@ suspend fun MongoBucket.asyncUpload(
  *
  * @param session the client session with which to associate this operation.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -87,9 +109,10 @@ suspend fun MongoBucket.asyncUpload(
  */
 suspend fun MongoBucket.asyncUpload(
     filename: String,
+    metadata: BsonDocumentBlock,
     session: ClientSession? = null,
-    options: UploadOptions.() -> Unit
-) = asyncUpload(filename, UploadOptions(options), session)
+    options: UploadOptions.() -> Unit = {}
+) = asyncUpload(filename, BsonDocument(metadata), UploadOptions(options), session)
 
 //
 
@@ -105,6 +128,7 @@ suspend fun MongoBucket.asyncUpload(
  * @param session the client session with which to associate this operation.
  * @param id       the custom id value of the file.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -113,18 +137,24 @@ suspend fun MongoBucket.asyncUpload(
 suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
+    metadata: BsonDocument = BsonDocument.Empty,
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
-): MongoUpload<Unit> {
+): MongoUpload {
     val chunkSize = options.chunkSizeBytes ?: chunkSizeBytes
     val channel = Channel<ByteBuffer>()
-    val job = CoroutineScope(Dispatchers.IO).async {
-        upload(channel, filename, id, options, session)
+    val idJob = CompletableDeferred(id)
+    val job = CoroutineScope(Dispatchers.IO).async<Unit> {
+        val publisher = java.uploadFromPublisher0(channel.receiveAsFlow(), filename, id, metadata, options, session)
+        publisher.awaitFirstOrNull()
     }
 
-    job.invokeOnCompletion { channel.close() }
+    job.invokeOnCompletion {
+        channel.close()
+        // no need to notify idJob
+    }
 
-    return MongoUploadImpl(job, channel, chunkSize) {
+    return MongoUploadImpl(job, idJob, channel, chunkSize) {
         // no need to close the job.
         // the job already depends on the channel
         channel.close()
@@ -143,6 +173,7 @@ suspend fun MongoBucket.asyncUpload(
  * @param session the client session with which to associate this operation.
  * @param id       the custom id value of the file.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -151,9 +182,10 @@ suspend fun MongoBucket.asyncUpload(
 suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
+    metadata: BsonDocumentBlock,
     session: ClientSession? = null,
-    options: UploadOptions.() -> Unit
-) = asyncUpload(filename, id, UploadOptions(options), session)
+    options: UploadOptions.() -> Unit = {}
+) = asyncUpload(filename, id, BsonDocument(metadata), UploadOptions(options), session)
 
 /* ============= ------------------ ============= */
 
@@ -177,16 +209,28 @@ suspend fun MongoBucket.asyncDownload(
     id: BsonElement,
     options: DownloadOptions = DownloadOptions(),
     session: ClientSession? = null
-): MongoDownload<MongoFile> {
+): MongoDownload {
     val chunkSize = options.bufferSizeBytes ?: chunkSizeBytes
     val channel = Channel<ByteBuffer>()
+    val fileJob = CompletableDeferred<MongoFile>()
     val job = CoroutineScope(Dispatchers.IO).async {
-        download(channel, id, options, session)
+        val publisher = java.downloadToPublisher0(id, options, session)
+        fileJob.complete(publisher.gridFSFile.awaitSingle().kt)
+        try {
+            publisher.collect { channel.send(it) }
+        } catch (_: ClosedSendChannelException) {
+            // it is completely ok to close mid-download
+        }
     }
 
-    job.invokeOnCompletion { channel.close() }
+    job.invokeOnCompletion { error ->
+        channel.close()
+        error?.let {
+            fileJob.completeExceptionally(it)
+        }
+    }
 
-    return MongoDownloadImpl(job, channel, chunkSize) {
+    return MongoDownloadImpl(job, fileJob, channel, chunkSize) {
         // no need to close the job.
         // the job already depends on the channel
         channel.cancel()
@@ -239,16 +283,28 @@ suspend fun MongoBucket.asyncDownload(
     options: DownloadOptions = DownloadOptions(),
     revision: FileRevision = FileRevision.Latest,
     session: ClientSession? = null
-): MongoDownload<MongoFile> {
+): MongoDownload {
     val chunkSize = options.bufferSizeBytes ?: chunkSizeBytes
     val channel = Channel<ByteBuffer>()
+    val fileJob = CompletableDeferred<MongoFile>()
     val job = CoroutineScope(Dispatchers.IO).async {
-        download(channel, filename, options, revision, session)
+        val publisher = java.downloadToPublisher0(filename, options, revision, session)
+        fileJob.complete(publisher.gridFSFile.awaitSingle().kt)
+        try {
+            publisher.collect { channel.send(it) }
+        } catch (_: ClosedSendChannelException) {
+            // it is completely ok to close mid-download
+        }
     }
 
-    job.invokeOnCompletion { channel.close() }
+    job.invokeOnCompletion { error ->
+        channel.close()
+        error?.let {
+            fileJob.completeExceptionally(error)
+        }
+    }
 
-    return MongoDownloadImpl(job, channel, chunkSize) {
+    return MongoDownloadImpl(job, fileJob, channel, chunkSize) {
         // no need to close the job.
         // the job already depends on the channel
         channel.cancel()

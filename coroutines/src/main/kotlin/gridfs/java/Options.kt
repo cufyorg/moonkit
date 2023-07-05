@@ -15,7 +15,6 @@
  */
 package org.cufy.mongodb.gridfs.java
 
-import org.bson.Document
 import org.cufy.bson.java.java
 import org.cufy.mongodb.gridfs.BucketFindOptions
 import org.cufy.mongodb.gridfs.DownloadOptions
@@ -35,7 +34,6 @@ val UploadOptions.java: JavaUploadOptions
     get() {
         return JavaUploadOptions()
             .chunkSizeBytes(chunkSizeBytes)
-            .metadata(metadata?.java?.let { Document(it) })
     }
 
 /* ============= ------------------ ============= */

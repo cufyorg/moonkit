@@ -44,14 +44,7 @@ data class UploadOptions(
      * @see com.mongodb.client.gridfs.model.GridFSUploadOptions.chunkSizeBytes
      * @since 2.0.0
      */
-    var chunkSizeBytes: Int? = null,
-    /**
-     * Returns any user provided data for the `metadata` field of the files collection document.
-     *
-     * @see com.mongodb.client.gridfs.model.GridFSUploadOptions.metadata
-     * @since 2.0.0
-     */
-    var metadata: BsonDocument? = null
+    var chunkSizeBytes: Int? = null
 )
 
 /* ============= ------------------ ============= */

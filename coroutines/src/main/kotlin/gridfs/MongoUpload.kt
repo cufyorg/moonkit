@@ -19,6 +19,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
+import org.cufy.bson.BsonElement
 import org.cufy.mongodb.gridfs.internal.MongoUploadOutputStream
 import java.io.File
 import java.io.InputStream
@@ -41,11 +42,10 @@ import java.nio.ByteBuffer
  * This interface implements [kotlinx.coroutines.Job]
  * which represents the background upload job.
  *
- * @param T the result of the upload job.
  * @author LSafer
  * @since 2.0.0
  */
-interface MongoUpload<T> : Deferred<T>, AutoCloseable {
+interface MongoUpload : Deferred<Unit>, AutoCloseable {
     /**
      * True, if the upload is closed for writing.
      */
@@ -56,6 +56,13 @@ interface MongoUpload<T> : Deferred<T>, AutoCloseable {
      * [UploadOptions].
      */
     val chunkSizeBytes: Int
+
+    /**
+     * The id of the uploaded file.
+     *
+     * @since 2.0.0
+     */
+    val id: Deferred<BsonElement>
 
     /**
      * Close the upload channel.
@@ -79,9 +86,10 @@ interface MongoUpload<T> : Deferred<T>, AutoCloseable {
      * @return the upload results.
      * @since 2.0.0
      */
-    suspend fun closeAndAwait(): T {
+    suspend fun closeAndAwait(): BsonElement {
         close()
-        return await()
+        await()
+        return id.await()
     }
 
     /**
@@ -123,7 +131,7 @@ interface MongoUpload<T> : Deferred<T>, AutoCloseable {
  *
  * @since 2.0.0
  */
-fun MongoUpload<*>.asOutputStream(): OutputStream {
+fun MongoUpload.asOutputStream(): OutputStream {
     return MongoUploadOutputStream(this)
 }
 
@@ -136,7 +144,7 @@ fun MongoUpload<*>.asOutputStream(): OutputStream {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
-suspend fun MongoUpload<*>.writeFrom(flow: Flow<ByteBuffer>): Long {
+suspend fun MongoUpload.writeFrom(flow: Flow<ByteBuffer>): Long {
     var transferred = 0L
 
     flow.collect {
@@ -159,7 +167,7 @@ suspend fun MongoUpload<*>.writeFrom(flow: Flow<ByteBuffer>): Long {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
-suspend fun MongoUpload<*>.writeFrom(channel: ReceiveChannel<ByteBuffer>): Long {
+suspend fun MongoUpload.writeFrom(channel: ReceiveChannel<ByteBuffer>): Long {
     var transferred = 0L
 
     channel.consumeEach {
@@ -180,7 +188,7 @@ suspend fun MongoUpload<*>.writeFrom(channel: ReceiveChannel<ByteBuffer>): Long 
  * @return how many bytes have been written.
  * @since 2.0.0
  */
-suspend fun MongoUpload<*>.writeFrom(stream: InputStream): Long {
+suspend fun MongoUpload.writeFrom(stream: InputStream): Long {
     var transferred = 0L
     val buffer = ByteArray(chunkSizeBytes)
 
@@ -203,6 +211,6 @@ suspend fun MongoUpload<*>.writeFrom(stream: InputStream): Long {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
-suspend fun MongoUpload<*>.writeFrom(file: File): Long {
+suspend fun MongoUpload.writeFrom(file: File): Long {
     return file.inputStream().use { writeFrom(it) }
 }
