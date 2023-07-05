@@ -19,16 +19,18 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
+import org.cufy.bson.BsonElement
 import org.cufy.mongodb.gridfs.MongoUpload
 import java.io.OutputStream
 import java.nio.ByteBuffer
 
-internal class MongoUploadImpl<T>(
-    job: Deferred<T>,
+internal class MongoUploadImpl(
+    job: Deferred<Unit>,
+    override val id: Deferred<BsonElement>,
     private val channel: SendChannel<ByteBuffer>,
     override val chunkSizeBytes: Int,
     private val onClose: () -> Unit
-) : MongoUpload<T>, Deferred<T> by job {
+) : MongoUpload, Deferred<Unit> by job {
     @OptIn(ExperimentalCoroutinesApi::class)
     override val isClosedForWrite get() = channel.isClosedForSend
     override fun close() = onClose()
@@ -53,7 +55,7 @@ internal class MongoUploadImpl<T>(
     }
 }
 
-internal class MongoUploadOutputStream(private val descriptor: MongoUpload<*>) : OutputStream() {
+internal class MongoUploadOutputStream(private val descriptor: MongoUpload) : OutputStream() {
     override fun write(b: Int) {
         val buffer = ByteArray(1)
         buffer[0] = b.toByte()

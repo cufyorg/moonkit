@@ -15,21 +15,23 @@
  */
 package org.cufy.mongodb.gridfs
 
-import com.mongodb.client.gridfs.model.GridFSDownloadOptions
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.*
-import org.bson.Document
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactive.collect
 import org.cufy.bson.*
 import org.cufy.bson.java.java
 import org.cufy.mongodb.*
+import org.cufy.mongodb.gridfs.internal.downloadToPublisher0
+import org.cufy.mongodb.gridfs.internal.uploadFromPublisher0
 import org.cufy.mongodb.gridfs.java.JavaMongoBucket
 import org.cufy.mongodb.gridfs.java.apply
-import org.cufy.mongodb.gridfs.java.java
 import org.cufy.mongodb.gridfs.java.kt
 import org.cufy.mongodb.java.kt
 import java.nio.ByteBuffer
@@ -152,13 +154,7 @@ suspend fun MongoBucket.upload(
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
 ): BsonObjectId {
-    val opts = options.java.metadata(Document(metadata.java))
-    val outPublisher = channel.receiveAsFlow()
-    val publisher = when (session) {
-        null -> java.uploadFromPublisher(filename, outPublisher.asPublisher(), opts)
-        else -> java.uploadFromPublisher(session.java, filename, outPublisher.asPublisher(), opts)
-    }
-
+    val publisher = java.uploadFromPublisher0(channel.receiveAsFlow(), filename, metadata, options, session)
     return publisher.awaitSingle().bson
 }
 
@@ -224,13 +220,7 @@ suspend fun MongoBucket.upload(
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
 ) {
-    val opts = options.java.metadata(Document(metadata.java))
-    val flow = channel.receiveAsFlow()
-
-    val publisher = when (session) {
-        null -> java.uploadFromPublisher(id.java, filename, flow.asPublisher(), opts)
-        else -> java.uploadFromPublisher(session.java, id.java, filename, flow.asPublisher(), opts)
-    }
+    val publisher = java.uploadFromPublisher0(channel.receiveAsFlow(), filename, id, metadata, options, session)
 
     publisher.awaitFirstOrNull()
 }
@@ -290,11 +280,7 @@ suspend fun MongoBucket.download(
     options: DownloadOptions = DownloadOptions(),
     session: ClientSession? = null
 ): MongoFile {
-    val publisher = when (session) {
-        null -> java.downloadToPublisher(id.java)
-        else -> java.downloadToPublisher(session.java, id.java)
-    }
-    publisher.apply(options)
+    val publisher = java.downloadToPublisher0(id, options, session)
     try {
         publisher.collect { channel.send(it) }
     } catch (_: ClosedSendChannelException) {
@@ -352,12 +338,7 @@ suspend fun MongoBucket.download(
     revision: FileRevision = FileRevision.Latest,
     session: ClientSession? = null
 ): MongoFile {
-    val opts = GridFSDownloadOptions().revision(revision.value)
-    val publisher = when (session) {
-        null -> java.downloadToPublisher(filename, opts)
-        else -> java.downloadToPublisher(session.java, filename, opts)
-    }
-    publisher.apply(options)
+    val publisher = java.downloadToPublisher0(filename, options, revision, session)
     try {
         publisher.collect { channel.send(it) }
     } catch (_: ClosedSendChannelException) {
