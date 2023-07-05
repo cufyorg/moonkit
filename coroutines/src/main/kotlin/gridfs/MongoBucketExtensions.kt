@@ -19,6 +19,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
 import org.cufy.bson.BsonElement
 import org.cufy.bson.BsonObjectId
 import org.cufy.mongodb.ClientSession
@@ -44,6 +46,7 @@ over the same functions in `MongoBucket.kt`
  *
  * @param session the client session with which to associate this operation.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -51,13 +54,14 @@ over the same functions in `MongoBucket.kt`
  */
 suspend fun MongoBucket.asyncUpload(
     filename: String,
+    metadata: BsonDocument = BsonDocument.Empty,
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
 ): MongoUpload<BsonObjectId> {
     val chunkSize = options.chunkSizeBytes ?: chunkSizeBytes
     val channel = Channel<ByteBuffer>()
     val job = CoroutineScope(Dispatchers.IO).async {
-        upload(channel, filename, options, session)
+        upload(channel, filename, metadata, options, session)
     }
 
     job.invokeOnCompletion { channel.close() }
@@ -80,6 +84,7 @@ suspend fun MongoBucket.asyncUpload(
  *
  * @param session the client session with which to associate this operation.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -87,9 +92,10 @@ suspend fun MongoBucket.asyncUpload(
  */
 suspend fun MongoBucket.asyncUpload(
     filename: String,
+    metadata: BsonDocumentBlock,
     session: ClientSession? = null,
-    options: UploadOptions.() -> Unit
-) = asyncUpload(filename, UploadOptions(options), session)
+    options: UploadOptions.() -> Unit = {}
+) = asyncUpload(filename, BsonDocument(metadata), UploadOptions(options), session)
 
 //
 
@@ -105,6 +111,7 @@ suspend fun MongoBucket.asyncUpload(
  * @param session the client session with which to associate this operation.
  * @param id       the custom id value of the file.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -113,13 +120,14 @@ suspend fun MongoBucket.asyncUpload(
 suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
+    metadata: BsonDocument = BsonDocument.Empty,
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
 ): MongoUpload<Unit> {
     val chunkSize = options.chunkSizeBytes ?: chunkSizeBytes
     val channel = Channel<ByteBuffer>()
     val job = CoroutineScope(Dispatchers.IO).async {
-        upload(channel, filename, id, options, session)
+        upload(channel, filename, id, metadata, options, session)
     }
 
     job.invokeOnCompletion { channel.close() }
@@ -143,6 +151,7 @@ suspend fun MongoBucket.asyncUpload(
  * @param session the client session with which to associate this operation.
  * @param id       the custom id value of the file.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param options  the upload options.
  * @return an upload instance to complete the upload process.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -151,9 +160,10 @@ suspend fun MongoBucket.asyncUpload(
 suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
+    metadata: BsonDocumentBlock,
     session: ClientSession? = null,
-    options: UploadOptions.() -> Unit
-) = asyncUpload(filename, id, UploadOptions(options), session)
+    options: UploadOptions.() -> Unit = {}
+) = asyncUpload(filename, id, BsonDocument(metadata), UploadOptions(options), session)
 
 /* ============= ------------------ ============= */
 

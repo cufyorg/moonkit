@@ -23,6 +23,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.*
+import org.bson.Document
 import org.cufy.bson.*
 import org.cufy.bson.java.java
 import org.cufy.mongodb.*
@@ -137,6 +138,7 @@ val MongoBucket.readConcern: ReadConcern
  *
  * @param session the client session with which to associate this operation.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param channel the channel providing the file data.
  * @param options the upload options.
  * @return the id of the uploaded file.
@@ -146,13 +148,15 @@ val MongoBucket.readConcern: ReadConcern
 suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
+    metadata: BsonDocument = BsonDocument.Empty,
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
 ): BsonObjectId {
+    val opts = options.java.metadata(Document(metadata.java))
     val outPublisher = channel.receiveAsFlow()
     val publisher = when (session) {
-        null -> java.uploadFromPublisher(filename, outPublisher.asPublisher(), options.java)
-        else -> java.uploadFromPublisher(session.java, filename, outPublisher.asPublisher(), options.java)
+        null -> java.uploadFromPublisher(filename, outPublisher.asPublisher(), opts)
+        else -> java.uploadFromPublisher(session.java, filename, outPublisher.asPublisher(), opts)
     }
 
     return publisher.awaitSingle().bson
@@ -173,6 +177,7 @@ suspend fun MongoBucket.upload(
  *
  * @param session the client session with which to associate this operation.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param channel the channel providing the file data.
  * @param options  the upload options.
  * @return the id of the uploaded file.
@@ -182,9 +187,10 @@ suspend fun MongoBucket.upload(
 suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
+    metadata: BsonDocumentBlock,
     session: ClientSession? = null,
-    options: UploadOptions.() -> Unit
-) = upload(channel, filename, UploadOptions(options), session)
+    options: UploadOptions.() -> Unit = {}
+) = upload(channel, filename, BsonDocument(metadata), UploadOptions(options), session)
 
 //
 
@@ -204,6 +210,7 @@ suspend fun MongoBucket.upload(
  * @param session the client session with which to associate this operation.
  * @param id       the custom id value of the file.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param channel the channel providing the file data.
  * @param options  the upload options.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -213,14 +220,16 @@ suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
     id: BsonElement,
+    metadata: BsonDocument = BsonDocument.Empty,
     options: UploadOptions = UploadOptions(),
     session: ClientSession? = null
 ) {
+    val opts = options.java.metadata(Document(metadata.java))
     val flow = channel.receiveAsFlow()
 
     val publisher = when (session) {
-        null -> java.uploadFromPublisher(id.java, filename, flow.asPublisher(), options.java)
-        else -> java.uploadFromPublisher(session.java, id.java, filename, flow.asPublisher(), options.java)
+        null -> java.uploadFromPublisher(id.java, filename, flow.asPublisher(), opts)
+        else -> java.uploadFromPublisher(session.java, id.java, filename, flow.asPublisher(), opts)
     }
 
     publisher.awaitFirstOrNull()
@@ -242,6 +251,7 @@ suspend fun MongoBucket.upload(
  * @param session the client session with which to associate this operation.
  * @param id       the custom id value of the file.
  * @param filename the filename.
+ * @param metadata user provided data for the `metadata` field of the files collection document.
  * @param channel the channel providing the file data.
  * @param options  the upload options.
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
@@ -251,9 +261,10 @@ suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
     id: BsonElement,
+    metadata: BsonDocumentBlock,
     session: ClientSession? = null,
-    options: UploadOptions.() -> Unit
-) = upload(channel, filename, id, UploadOptions(options), session)
+    options: UploadOptions.() -> Unit = {}
+) = upload(channel, filename, id, BsonDocument(metadata), UploadOptions(options), session)
 
 /* ============= ------------------ ============= */
 
