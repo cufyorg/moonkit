@@ -58,14 +58,19 @@ internal class OpClientImpl(
                 if (round.isEmpty()) return
             }
 
+            val nextQueue = round.toMutableSet()
+
             // cancel **old** un-executed operations
-            queue.forEach {
-                if (it in round) {
-                    it.cancel("Operation Not Supported: $it")
+            nextQueue.iterator().apply {
+                forEach {
+                    if (it in queue) {
+                        it.cancel("Operation Not Supported: $it")
+                        remove()
+                    }
                 }
             }
 
-            queue = round
+            queue = nextQueue
         }
     }
 }
