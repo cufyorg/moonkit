@@ -32,6 +32,7 @@ import org.cufy.bson.*
  * @see com.mongodb.client.model.Updates.set
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.SET(block: BsonDocumentBlock) {
     `$set` by block
 }
@@ -47,6 +48,7 @@ fun MutableBsonMap.SET(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.set
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.SET(block: BsonDocumentBlock) {
     by { SET(block) }
 }
@@ -64,6 +66,7 @@ fun MutableBsonList.SET(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.set
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.SET(name: String, value: BsonElement) {
     `$set` by { name by value }
 }
@@ -79,6 +82,7 @@ fun MutableBsonMap.SET(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.set
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.SET(name: String, value: BsonElement) {
     by { SET(name, value) }
 }
@@ -96,6 +100,7 @@ fun MutableBsonList.SET(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.unset
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.UNSET(block: BsonDocumentBlock) {
     `$unset` by block
 }
@@ -111,6 +116,7 @@ fun MutableBsonMap.UNSET(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.unset
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.UNSET(block: BsonDocumentBlock) {
     by { UNSET(block) }
 }
@@ -128,6 +134,7 @@ fun MutableBsonList.UNSET(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.unset
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.UNSET(name: String, value: BsonElement) {
     `$unset` by { name by value }
 }
@@ -143,6 +150,7 @@ fun MutableBsonMap.UNSET(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.unset
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.UNSET(name: String, value: BsonElement) {
     by { UNSET(name, value) }
 }
@@ -160,6 +168,7 @@ fun MutableBsonList.UNSET(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.setOnInsert
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.SET_ON_INSERT(block: BsonDocumentBlock) {
     `$setOnInsert` by block
 }
@@ -175,6 +184,7 @@ fun MutableBsonMap.SET_ON_INSERT(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.setOnInsert
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.SET_ON_INSERT(block: BsonDocumentBlock) {
     by { SET_ON_INSERT(block) }
 }
@@ -192,6 +202,7 @@ fun MutableBsonList.SET_ON_INSERT(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.setOnInsert
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.SET_ON_INSERT(name: String, value: BsonElement) {
     `$setOnInsert` by { name by value }
 }
@@ -207,6 +218,7 @@ fun MutableBsonMap.SET_ON_INSERT(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.setOnInsert
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.SET_ON_INSERT(name: String, value: BsonElement) {
     by { SET_ON_INSERT(name, value) }
 }
@@ -224,6 +236,7 @@ fun MutableBsonList.SET_ON_INSERT(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.rename
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.RENAME(name: String, value: String) {
     `$rename` by { name by value }
 }
@@ -239,6 +252,7 @@ fun MutableBsonMap.RENAME(name: String, value: String) {
  * @see com.mongodb.client.model.Updates.rename
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.RENAME(name: String, value: String) {
     by { RENAME(name, value) }
 }
@@ -256,6 +270,7 @@ fun MutableBsonList.RENAME(name: String, value: String) {
  * @see com.mongodb.client.model.Updates.inc
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.INC(name: String, value: BsonNumber) {
     `$inc` by { name by value }
 }
@@ -271,6 +286,7 @@ fun MutableBsonMap.INC(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.inc
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.INC(name: String, value: BsonNumber) {
     by { INC(name, value) }
 }
@@ -288,6 +304,7 @@ fun MutableBsonList.INC(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.mul
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.MUL(name: String, value: BsonNumber) {
     `$mul` by { name by value }
 }
@@ -303,6 +320,7 @@ fun MutableBsonMap.MUL(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.mul
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.MUL(name: String, value: BsonNumber) {
     by { MUL(name, value) }
 }
@@ -320,6 +338,7 @@ fun MutableBsonList.MUL(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.min
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.MIN(name: String, value: BsonNumber) {
     `$min` by { name by value }
 }
@@ -335,6 +354,7 @@ fun MutableBsonMap.MIN(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.min
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.MIN(name: String, value: BsonNumber) {
     by { MIN(name, value) }
 }
@@ -352,6 +372,7 @@ fun MutableBsonList.MIN(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.max
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.MAX(name: String, value: BsonNumber) {
     `$max` by { name by value }
 }
@@ -367,6 +388,7 @@ fun MutableBsonMap.MAX(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.max
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.MAX(name: String, value: BsonNumber) {
     by { MAX(name, value) }
 }
@@ -384,6 +406,7 @@ fun MutableBsonList.MAX(name: String, value: BsonNumber) {
  * @see com.mongodb.client.model.Updates.currentDate
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.CURRENT_DATE(name: String) {
     `$currentDate` by { name by true }
 }
@@ -399,6 +422,7 @@ fun MutableBsonMap.CURRENT_DATE(name: String) {
  * @see com.mongodb.client.model.Updates.currentDate
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.CURRENT_DATE(name: String) {
     by { CURRENT_DATE(name) }
 }
@@ -416,6 +440,7 @@ fun MutableBsonList.CURRENT_DATE(name: String) {
  * @see com.mongodb.client.model.Updates.currentTimestamp
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.CURRENT_TIMESTAMP(name: String) {
     `$currentDate` by { name by { `$type` by "timestamp" } }
 }
@@ -431,6 +456,7 @@ fun MutableBsonMap.CURRENT_TIMESTAMP(name: String) {
  * @see com.mongodb.client.model.Updates.currentTimestamp
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.CURRENT_TIMESTAMP(name: String) {
     by { CURRENT_TIMESTAMP(name) }
 }
@@ -448,6 +474,7 @@ fun MutableBsonList.CURRENT_TIMESTAMP(name: String) {
  * @see com.mongodb.client.model.Updates.addToSet
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.ADD_TO_SET(block: BsonDocumentBlock) {
     `$addToSet` by block
 }
@@ -463,6 +490,7 @@ fun MutableBsonMap.ADD_TO_SET(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.addToSet
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.ADD_TO_SET(block: BsonDocumentBlock) {
     by { ADD_TO_SET(block) }
 }
@@ -480,6 +508,7 @@ fun MutableBsonList.ADD_TO_SET(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.addToSet
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.ADD_TO_SET(name: String, value: BsonElement) {
     `$addToSet` by { name by value }
 }
@@ -495,6 +524,7 @@ fun MutableBsonMap.ADD_TO_SET(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.addToSet
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.ADD_TO_SET(name: String, value: BsonElement) {
     by { ADD_TO_SET(name, value) }
 }
@@ -512,6 +542,7 @@ fun MutableBsonList.ADD_TO_SET(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.addEachToSet
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
     `$addToSet` by { name by { `$each` by array(block) } }
 }
@@ -527,6 +558,7 @@ fun MutableBsonMap.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
  * @see com.mongodb.client.model.Updates.addEachToSet
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
     by { ADD_EACH_TO_SET(name, block) }
 }
@@ -544,6 +576,7 @@ fun MutableBsonList.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
  * @see com.mongodb.client.model.Updates.push
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.PUSH(block: BsonDocumentBlock) {
     `$push` by block
 }
@@ -559,6 +592,7 @@ fun MutableBsonMap.PUSH(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.push
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.PUSH(block: BsonDocumentBlock) {
     by { PUSH(block) }
 }
@@ -576,6 +610,7 @@ fun MutableBsonList.PUSH(block: BsonDocumentBlock) {
  * @see com.mongodb.client.model.Updates.push
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.PUSH(name: String, value: BsonElement) {
     `$push` by { name by value }
 }
@@ -591,6 +626,7 @@ fun MutableBsonMap.PUSH(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.push
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.PUSH(name: String, value: BsonElement) {
     by { PUSH(name, value) }
 }
@@ -608,6 +644,7 @@ fun MutableBsonList.PUSH(name: String, value: BsonElement) {
  * @see com.mongodb.client.model.Updates.pushEach
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions = PushOptions(), block: BsonArrayBlock) {
     `$push` by {
         name by {
@@ -630,6 +667,7 @@ fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions = PushOptions(),
  * @see com.mongodb.client.model.Updates.pushEach
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.PUSH_EACH(name: String, options: PushOptions = PushOptions(), block: BsonArrayBlock) {
     by { PUSH_EACH(name, options, block) }
 }
@@ -647,6 +685,7 @@ fun MutableBsonList.PUSH_EACH(name: String, options: PushOptions = PushOptions()
  * @see com.mongodb.client.model.Updates.pushEach
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions.() -> Unit, block: BsonArrayBlock) {
     PUSH_EACH(name, PushOptions(options), block)
 }
@@ -662,6 +701,7 @@ fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions.() -> Unit, bloc
  * @see com.mongodb.client.model.Updates.pushEach
  */
 @BsonConstructorMarker
+@ExperimentalMongodbApi
 fun MutableBsonList.PUSH_EACH(name: String, options: PushOptions.() -> Unit, block: BsonArrayBlock) {
     by { PUSH_EACH(name, options, block) }
 }
