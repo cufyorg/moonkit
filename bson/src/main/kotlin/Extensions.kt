@@ -466,6 +466,74 @@ fun Id<*>.toObjectIdOrNull(): ObjectId? {
     return null
 }
 
+/**
+ * Return an [ObjectId] with the value of this.
+ *
+ * @throws IllegalArgumentException if the string is not a valid hex string representation of an ObjectId.
+ * @since 2.0.0
+ */
+fun String.toObjectId(): ObjectId {
+    return ObjectId(this)
+}
+
+/**
+ * Return an [ObjectId] with the value of this.
+ * Or `null` if the value is not a valid [ObjectId].
+ *
+ * @since 2.0.0
+ */
+fun String.toObjectIdOrNull(): ObjectId? {
+    if (ObjectId.isValid(this))
+        return ObjectId(this)
+
+    return null
+}
+
+/**
+ * Return an [Id] instance from the value of this.
+ */
+fun <T> String.toId(): Id<T> {
+    return Id(this)
+}
+
+/**
+ * Return an [AnyId] instance from the value of this.
+ */
+@JvmName("toAnyId")
+fun String.toId(): AnyId {
+    return AnyId(this)
+}
+
+/**
+ * Return an [Id] instance from the value of this.
+ */
+fun <T> ObjectId.toId(): Id<T> {
+    return Id(this)
+}
+
+/**
+ * Return an [AnyId] instance from the value of this.
+ */
+@JvmName("toAnyId")
+fun ObjectId.toId(): AnyId {
+    return AnyId(this)
+}
+
+/**
+ * Cast this [Id] to an id of [T].
+ */
+fun <T> AnyId.toId(): Id<T> {
+    return Id(this)
+}
+
+/**
+ * Cast this [Id] to [AnyId].
+ */
+@JvmName("toAnyId")
+fun AnyId.toId(): AnyId {
+    return AnyId(this)
+}
+
 /* ============= ------------------ ============= */
 
 /**
