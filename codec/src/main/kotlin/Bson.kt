@@ -201,9 +201,24 @@ val <I, O : BsonElement> BsonFieldCodec<I, O>.Nullable: BsonFieldCodec<I?, BsonE
  * @throws CodecException if decoding failed.
  * @since 2.0.0
  */
-@JvmName("decodeInfix")
+@JvmName("decodeInfixNullish")
 @CodecKeywordMarker
 infix fun <I, O : BsonElement> O?.decode(codec: BsonNullableCodec<I, O>): I? {
+    return decode(this, codec)
+}
+
+/**
+ * Decode [this] value to [I] using the given [codec].
+ *
+ * @receiver the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@JvmName("decodeInfixNullable")
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> O.decode(codec: BsonNullableCodec<I, O>): I? {
     return decode(this, codec)
 }
 
@@ -215,22 +230,24 @@ infix fun <I, O : BsonElement> O?.decode(codec: BsonNullableCodec<I, O>): I? {
  * @return the decoding result.
  * @since 2.0.0
  */
+@JvmName("tryDecodeNullish")
 @CodecMarker
-fun <I, O : BsonElement> tryDecode(value: O?, codec: Codec<I, O>): Result<I> {
+fun <I, O : BsonElement> tryDecode(value: O?, codec: BsonNullableCodec<I, O>): Result<I?> {
     return tryDecodeAny(value, codec)
 }
 
 /**
- * Decode the given [value] to [O] using the codec returned by [block].
+ * Decode the given [value] to [O] using the given [codec].
  *
  * @param value the value to decode.
- * @param block a function invoked immediately to obtain the codec.
+ * @param codec the codec to be used.
  * @return the decoding result.
  * @since 2.0.0
  */
+@JvmName("tryDecodeNullable")
 @CodecMarker
-fun <I, O : BsonElement> tryDecode(value: O?, block: Codecs.() -> Codec<I, O>): Result<I> {
-    return tryDecodeAny(value, block(Codecs))
+fun <I, O : BsonElement> tryDecode(value: O, codec: BsonNullableCodec<I, O>): Result<I?> {
+    return tryDecodeAny(value, codec)
 }
 
 /**
@@ -242,23 +259,25 @@ fun <I, O : BsonElement> tryDecode(value: O?, block: Codecs.() -> Codec<I, O>): 
  * @throws CodecException if decoding failed.
  * @since 2.0.0
  */
+@JvmName("decodeNullish")
 @CodecMarker
-fun <I, O : BsonElement> decode(value: O?, codec: Codec<I, O>): I {
+fun <I, O : BsonElement> decode(value: O?, codec: BsonNullableCodec<I, O>): I? {
     return decodeAny(value, codec)
 }
 
 /**
- * Decode the given [value] to [O] using the codec returned by [block].
+ * Decode the given [value] to [O] using the given [codec].
  *
  * @param value the value to decode.
- * @param block a function invoked immediately to obtain the codec.
+ * @param codec the codec to be used.
  * @return the decoded value.
  * @throws CodecException if decoding failed.
  * @since 2.0.0
  */
+@JvmName("decodeNullable")
 @CodecMarker
-fun <I, O : BsonElement> decode(value: O?, block: Codecs.() -> Codec<I, O>): I {
-    return decodeAny(value, block(Codecs))
+fun <I, O : BsonElement> decode(value: O, codec: BsonNullableCodec<I, O>): I? {
+    return decodeAny(value, codec)
 }
 
 /* ============= ------------------ ============= */
