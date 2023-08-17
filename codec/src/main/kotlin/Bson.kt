@@ -192,6 +192,75 @@ val <I, O : BsonElement> FieldCodec<I, O>.Nullable: FieldCodec<I?, BsonElement>
 val <I, O : BsonElement> BsonFieldCodec<I, O>.Nullable: BsonFieldCodec<I?, BsonElement>
     get() = BsonFieldCodec(name, (this as Codec<I, O>).Nullable)
 
+/**
+ * Decode [this] value to [I] using the given [codec].
+ *
+ * @receiver the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@JvmName("decodeInfix")
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> O?.decode(codec: BsonNullableCodec<I, O>): I? {
+    return decode(this, codec)
+}
+
+/**
+ * Decode the given [value] to [O] using the given [codec].
+ *
+ * @param value the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoding result.
+ * @since 2.0.0
+ */
+@CodecMarker
+fun <I, O : BsonElement> tryDecode(value: O?, codec: Codec<I, O>): Result<I> {
+    return tryDecodeAny(value, codec)
+}
+
+/**
+ * Decode the given [value] to [O] using the codec returned by [block].
+ *
+ * @param value the value to decode.
+ * @param block a function invoked immediately to obtain the codec.
+ * @return the decoding result.
+ * @since 2.0.0
+ */
+@CodecMarker
+fun <I, O : BsonElement> tryDecode(value: O?, block: Codecs.() -> Codec<I, O>): Result<I> {
+    return tryDecodeAny(value, block(Codecs))
+}
+
+/**
+ * Decode the given [value] to [O] using the given [codec].
+ *
+ * @param value the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@CodecMarker
+fun <I, O : BsonElement> decode(value: O?, codec: Codec<I, O>): I {
+    return decodeAny(value, codec)
+}
+
+/**
+ * Decode the given [value] to [O] using the codec returned by [block].
+ *
+ * @param value the value to decode.
+ * @param block a function invoked immediately to obtain the codec.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@CodecMarker
+fun <I, O : BsonElement> decode(value: O?, block: Codecs.() -> Codec<I, O>): I {
+    return decodeAny(value, block(Codecs))
+}
+
 /* ============= ------------------ ============= */
 
 /**
