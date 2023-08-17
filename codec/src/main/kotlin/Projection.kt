@@ -16,6 +16,7 @@
 package org.cufy.codec
 
 import org.cufy.bson.BsonDocument
+import org.cufy.bson.BsonDocumentBlock
 import org.cufy.bson.BsonElement
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
@@ -76,6 +77,10 @@ operator fun <I, O : BsonElement> DocumentProjection.get(codec: FieldCodec<I, O>
 
 operator fun <I, O : BsonElement> FieldCodec<I, O>.provideDelegate(s: Any?, p: KProperty<*>): ReadOnlyProperty<DocumentProjection, I> {
     return ReadOnlyProperty { self, _ -> self.element[this] }
+}
+
+operator fun <I> DocumentCodecOf<I>.invoke(block: BsonDocumentBlock): I {
+    return decode(BsonDocument(block), this)
 }
 
 /**
