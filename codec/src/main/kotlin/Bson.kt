@@ -274,6 +274,10 @@ object BsonStringCodec : Codec<String, BsonString> {
  * @since 2.0.0
  */
 @Suppress("ObjectPropertyName")
+@Deprecated(
+    "Codecs.String instead",
+    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
+)
 inline val `bson string` get() = BsonStringCodec
 
 /**
@@ -282,6 +286,10 @@ inline val `bson string` get() = BsonStringCodec
  * @since 2.0.0
  */
 @Suppress("ObjectPropertyName")
+@Deprecated(
+    "Codecs.String.Nullable instead",
+    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
+)
 inline val `bson nullable string` get() = BsonStringCodec.Nullable
 
 /**
@@ -290,6 +298,10 @@ inline val `bson nullable string` get() = BsonStringCodec.Nullable
  * @since 2.0.0
  */
 @Suppress("ObjectPropertyName")
+@Deprecated(
+    "Codecs.String.Array instead",
+    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
+)
 inline val `bson string array` get() = BsonStringCodec.Array
 
 /**
