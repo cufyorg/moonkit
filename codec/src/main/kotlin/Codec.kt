@@ -1,5 +1,5 @@
 /*
- *	Copyright 2023 cufy.org
+ *	Copyright 2023 cufy.org and meemer.com
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -14,12 +14,6 @@
  *	limitations under the License.
  */
 package org.cufy.codec
-
-import kotlin.Result.Companion.failure
-import kotlin.Result.Companion.success
-import kotlin.experimental.ExperimentalTypeInference
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
 /* ============= ------------------ ============= */
 
@@ -55,96 +49,41 @@ interface Codec<I, O> {
     fun decode(value: Any?): Result<I>
 }
 
-// Cast
+/* ============= ------------------ ============= */
 
-/**
- * Encode [this] value to [O] using the given [codec].
- *
- * @receiver the value to encode.
- * @param codec the codec to be used.
- * @return the encoded value.
- * @throws CodecException if encoding failed.
- * @since 2.0.0
- */
-@JvmName("encodeInfix")
 @CodecKeywordMarker
-infix fun <I, O> I.encode(codec: Codec<I, O>): O {
-    return encode(this, codec)
+infix fun <I, O> Codec<I, O>.catchIn(block: (Throwable) -> I): Codec<I, O> {
+    val codec = this
+    return object : Codec<I, O> {
+        override fun encode(value: Any?): Result<O> {
+            return codec.encode(value)
+        }
+
+        override fun decode(value: Any?): Result<I> {
+            return runCatching {
+                codec.decode(value).getOrElse(block)
+            }
+        }
+    }
 }
 
-/**
- * Encode [this] value to [O] using the given [codec].
- *
- * @receiver the value to encode.
- * @param codec the codec to be used.
- * @return the encoded value.
- * @throws CodecException if encoding failed.
- * @since 2.0.0
- */
-@JvmName("encodeAnyInfix")
 @CodecKeywordMarker
-infix fun <I, O> Any?.encodeAny(codec: Codec<I, O>): O {
-    return encodeAny(this, codec)
+infix fun <I, O> Codec<I, O>.catchOut(block: (Throwable) -> O): Codec<I, O> {
+    val codec = this
+    return object : Codec<I, O> {
+        override fun encode(value: Any?): Result<O> {
+            return runCatching {
+                codec.encode(value).getOrElse(block)
+            }
+        }
+
+        override fun decode(value: Any?): Result<I> {
+            return codec.decode(value)
+        }
+    }
 }
 
-/**
- * Decode [this] value to [I] using the given [codec].
- *
- * @receiver the value to decode.
- * @param codec the codec to be used.
- * @return the decoded value.
- * @throws CodecException if decoding failed.
- * @since 2.0.0
- */
-@JvmName("decodeInfix")
-@CodecKeywordMarker
-infix fun <I, O> O.decode(codec: Codec<I, O>): I {
-    return decode(this, codec)
-}
-
-/**
- * Decode [this] value to [I] using the given [codec].
- *
- * @receiver the value to decode.
- * @param codec the codec to be used.
- * @return the decoded value.
- * @throws CodecException if decoding failed.
- * @since 2.0.0
- */
-@JvmName("decodeAnyInfix")
-@CodecKeywordMarker
-infix fun <I, O> Any?.decodeAny(codec: Codec<I, O>): I {
-    return decodeAny(this, codec)
-}
-
-/**
- * Get the value of the field with the name of the
- * given [codec] and decode it using the given [codec].
- */
-operator fun <V, I, O : V> Map<String, V>.get(codec: FieldCodec<I, in O>): I {
-    return decodeAny(this[codec.name], codec)
-}
-
-operator fun <V, I, O : V> FieldCodec<I, in O>.provideDelegate(s: Any?, p: KProperty<*>): ReadOnlyProperty<Map<String, V>, I> {
-    return ReadOnlyProperty { self, _ -> self[this] }
-}
-
-/**
- * Get the value of the field with the name of the
- * [this] codec and decode it using [this] codec.
- *
- * This function was made to be used in this manner:
- *
- * ```kotlin
- * data class MyClass(private val document: BsonDocument) {
- *    val field by Codecs.String at "field" from document
- * }
- * ```
- */
-@CodecKeywordMarker
-infix fun <V, I, O : V> FieldCodec<I, in O>.from(map: Map<String, V>): Lazy<I> {
-    return lazy { map[this] }
-}
+/* ============= ------------------ ============= */
 
 // Encode Any
 
@@ -261,6 +200,40 @@ fun <I, O> encode(value: I, block: Codecs.() -> Codec<I, O>): O {
     return encodeAny(value, block(Codecs))
 }
 
+// Encode Infix
+
+/**
+ * Encode [this] value to [O] using the given [codec].
+ *
+ * @receiver the value to encode.
+ * @param codec the codec to be used.
+ * @return the encoded value.
+ * @throws CodecException if encoding failed.
+ * @since 2.0.0
+ */
+@JvmName("encodeInfix")
+@CodecKeywordMarker
+infix fun <I, O> I.encode(codec: Codec<I, O>): O {
+    return encode(this, codec)
+}
+
+/**
+ * Encode [this] value to [O] using the given [codec].
+ *
+ * @receiver the value to encode.
+ * @param codec the codec to be used.
+ * @return the encoded value.
+ * @throws CodecException if encoding failed.
+ * @since 2.0.0
+ */
+@JvmName("encodeAnyInfix")
+@CodecKeywordMarker
+infix fun <I, O> Any?.encodeAny(codec: Codec<I, O>): O {
+    return encodeAny(this, codec)
+}
+
+/* ============= ------------------ ============= */
+
 // Decode Any
 
 /**
@@ -376,6 +349,40 @@ fun <I, O> decode(value: O, block: Codecs.() -> Codec<I, O>): I {
     return decodeAny(value, block(Codecs))
 }
 
+// Decode Infix
+
+/**
+ * Decode [this] value to [I] using the given [codec].
+ *
+ * @receiver the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@JvmName("decodeInfix")
+@CodecKeywordMarker
+infix fun <I, O> O.decode(codec: Codec<I, O>): I {
+    return decode(this, codec)
+}
+
+/**
+ * Decode [this] value to [I] using the given [codec].
+ *
+ * @receiver the value to decode.
+ * @param codec the codec to be used.
+ * @return the decoded value.
+ * @throws CodecException if decoding failed.
+ * @since 2.0.0
+ */
+@JvmName("decodeAnyInfix")
+@CodecKeywordMarker
+infix fun <I, O> Any?.decodeAny(codec: Codec<I, O>): I {
+    return decodeAny(this, codec)
+}
+
+/* ============= ------------------ ============= */
+
 // Inline Codec Any
 
 /**
@@ -409,11 +416,11 @@ inline fun <T> tryInlineCodecAny(value: Any?, block: (Any?) -> Result<T>): Resul
 @CodecMarker
 inline fun <T> tryInlineCodecAnyCatching(value: Any?, block: (Any?) -> T): Result<T> {
     return try {
-        success(block(value))
+        Result.success(block(value))
     } catch (error: CodecException) {
-        failure(error)
+        Result.failure(error)
     } catch (error: Throwable) {
-        failure(CodecException(cause = error))
+        Result.failure(CodecException(cause = error))
     }
 }
 
@@ -480,9 +487,11 @@ inline fun <T> inlineCodecAnyCatching(value: Any?, block: (Any?) -> T): T {
 inline fun <reified T, U> tryInlineCodec(value: Any?, block: (T) -> Result<U>): Result<U> {
     return when (value) {
         is T -> block(value)
-        else -> failure(CodecException(
-            "Cannot encode/decode ${value?.let { it::class }}; expected ${T::class}"
-        ))
+        else -> Result.failure(
+            CodecException(
+                "Cannot encode/decode ${value?.let { it::class }}; expected ${T::class}"
+            )
+        )
     }
 }
 
@@ -506,11 +515,11 @@ inline fun <reified T, U> tryInlineCodec(value: Any?, block: (T) -> Result<U>): 
 inline fun <reified T, U> tryInlineCodecCatching(value: Any?, block: (T) -> U): Result<U> {
     return tryInlineCodec<T, U>(value) {
         try {
-            success(block(it))
+            Result.success(block(it))
         } catch (error: CodecException) {
-            failure(error)
+            Result.failure(error)
         } catch (error: Throwable) {
-            failure(CodecException(cause = error))
+            Result.failure(CodecException(cause = error))
         }
     }
 }
@@ -557,351 +566,6 @@ inline fun <reified T, U> inlineCodec(value: Any?, block: (T) -> Result<U>): U {
 inline fun <reified T, U> inlineCodecCatching(value: Any?, block: (T) -> U): U {
     // will always wrap errors as CodecException
     return tryInlineCodecCatching(value, block).getOrThrow()
-}
-
-/* ============= ------------------ ============= */
-
-/**
- * A builder building a basic [Codec] implementation.
- *
- */
-interface CodecBuilder<I, O> {
-    /**
-     * The encoding block.
-     *
-     * > Do not set directly. Use `encode {}` instead.
-     */
-    var encodeBlock: (Any?) -> Result<O>
-
-    /**
-     * The decoding block.
-     *
-     * > Do not set directly. Use `decode {}` instead.
-     */
-    var decodeBlock: (Any?) -> Result<I>
-
-    /**
-     * Build the codec.
-     *
-     * @since 2.0.0
-     */
-    fun build(): Codec<I, O>
-}
-
-// Constructor
-
-/**
- * Obtain a new [CodecBuilder] instance.
- */
-fun <I, O> CodecBuilder(): CodecBuilder<I, O> {
-    return object : CodecBuilder<I, O> {
-        override lateinit var encodeBlock: (Any?) -> Result<O>
-        override lateinit var decodeBlock: (Any?) -> Result<I>
-
-        override fun build(): Codec<I, O> {
-            if (!::encodeBlock.isInitialized)
-                error("encodeBlock is required but was not set.")
-            if (!::decodeBlock.isInitialized)
-                error("decodeBlock is required but was not set.")
-
-            val localEncodeBlock = encodeBlock
-            val localDecodeBlock = decodeBlock
-            return object : Codec<I, O> {
-                override fun encode(value: Any?) = localEncodeBlock(value)
-                override fun decode(value: Any?) = localDecodeBlock(value)
-            }
-        }
-    }
-}
-
-/**
- * Create a new codec configured using the given [block].
- */
-fun <I, O> Codec(block: CodecBuilder<I, O>.() -> Unit): Codec<I, O> {
-    val builder = CodecBuilder<I, O>()
-    builder.apply(block)
-    return builder.build()
-}
-
-// Encode-Any
-
-/**
- * Set the encode block to be the given [block].
- *
- * @see tryInlineCodecAny
- */
-@CodecKeywordMarker
-fun <I, O> CodecBuilder<I, O>.encodeAny(block: (Any?) -> Result<O>) {
-    encodeBlock = block
-}
-
-/**
- * Set the encode block to be the given [block].
- *
- * Any error thrown by [block] will be caught,
- * wrapped with [CodecException] then returned as
- * a failure.
- *
- * @see tryInlineCodecAnyCatching
- */
-@CodecKeywordMarker
-fun <I, O> CodecBuilder<I, O>.encodeAnyCatching(block: (Any?) -> O) {
-    encodeAny { tryInlineCodecAnyCatching(it, block) }
-}
-
-// Encode
-
-/**
- * Set the encode block to be the given [block].
- *
- * Any error thrown by [block] will fall through
- * uncaught.
- *
- * The value will be safely casted to type [I].
- * A failure with a [CodecException] will be returned
- * when casting failed.
- *
- * @see tryInlineCodec
- */
-@CodecKeywordMarker
-inline fun <reified I, O> CodecBuilder<I, O>.encode(crossinline block: (I) -> Result<O>) {
-    encodeAny { tryInlineCodec(it, block) }
-}
-
-/**
- * Set the encode block to be the given [block].
- *
- * Any error thrown by [block] will be caught,
- * wrapped with [CodecException] then returned as
- * a failure.
- *
- * The value will be safely casted to type [I].
- * A failure with a [CodecException] will be returned
- * when casting failed.
- *
- * @see tryInlineCodecCatching
- */
-@CodecKeywordMarker
-inline fun <reified I, O> CodecBuilder<I, O>.encodeCatching(crossinline block: (I) -> O) {
-    encodeAny { tryInlineCodecCatching(it, block) }
-}
-
-// Decode-Any
-
-/**
- * Set the decode block to be the given [block].
- *
- * @see tryInlineCodecAny
- */
-@CodecKeywordMarker
-fun <I, O> CodecBuilder<I, O>.decodeAny(block: (Any?) -> Result<I>) {
-    decodeBlock = block
-}
-
-/**
- * Set the decode block to be the given [block].
- *
- * Any error thrown by [block] will be caught,
- * wrapped with [CodecException] then returned as
- * a failure.
- *
- * @see tryInlineCodecAnyCatching
- */
-@CodecKeywordMarker
-fun <I, O> CodecBuilder<I, O>.decodeAnyCatching(block: (Any?) -> I) {
-    decodeAny { tryInlineCodecAnyCatching(it, block) }
-}
-
-// Decode
-
-/**
- * Set the decode block to be the given [block].
- *
- * Any error thrown by [block] will fall through
- * uncaught.
- *
- * The value will be safely casted to type [I].
- * A failure with a [CodecException] will be returned
- * when casting failed.
- *
- * @see tryInlineCodec
- */
-@CodecKeywordMarker
-inline fun <I, reified O> CodecBuilder<I, O>.decode(crossinline block: (O) -> Result<I>) {
-    decodeAny { tryInlineCodec(it, block) }
-}
-
-/**
- * Set the decode block to be the given [block].
- *
- * Any error thrown by [block] will be caught,
- * wrapped with [CodecException] then returned as
- * a failure.
- *
- * The value will be safely casted to type [I].
- * A failure with a [CodecException] will be returned
- * when casting failed.
- *
- * @see tryInlineCodecCatching
- */
-@CodecKeywordMarker
-inline fun <I, reified O> CodecBuilder<I, O>.decodeCatching(crossinline block: (O) -> I) {
-    decodeAny { tryInlineCodecCatching(it, block) }
-}
-
-/* ============= ------------------ ============= */
-
-/**
- * A codec specifically for the value of some field.
- * It stores two things, the name of the field, and
- * how to encode and decode its values.
- *
- * @param I the type of the decoded value.
- * @param O the type of the encoded value.
- * @author LSafer
- * @since 2.0.0
- */
-interface FieldCodec<I, O> : Codec<I, O> {
-    /**
-     * The name of the field.
-     */
-    val name: String
-}
-
-// Constructor
-
-/**
- * Create a new [FieldCodec] with the given [name]
- * and backed by the given [codec].
- */
-fun <I, O> FieldCodec(name: String, codec: Codec<I, O>): FieldCodec<I, O> {
-    return object : FieldCodec<I, O>, Codec<I, O> by codec {
-        override val name = name
-    }
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by the codec returned from invoking
- * the given [block].
- */
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-fun <I, O> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
-    return FieldCodec(name, block(Codecs))
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by [this] codec.
- */
-@CodecKeywordMarker
-infix fun <I, O> Codec<I, O>.at(name: String): FieldCodec<I, O> {
-    return FieldCodec(name, this)
-}
-
-/**
- * Create a new field codec with the receiver name
- * and backed by the given [codec].
- */
-@CodecKeywordMarker
-infix fun <I, O> String.be(codec: Codec<I, O>): FieldCodec<I, O> {
-    return FieldCodec(this, codec)
-}
-
-/**
- * Create a new field codec with the receiver name
- * and backed by the codec from the given [block].
- */
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@CodecKeywordMarker
-infix fun <I, O> String.be(block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
-    return FieldCodec(this, block)
-}
-
-/* ============= ------------------ ============= */
-
-@CodecKeywordMarker
-infix fun <I, O> Codec<I, O>.catchIn(block: (Throwable) -> I): Codec<I, O> {
-    val codec = this
-    return object : Codec<I, O> {
-        override fun encode(value: Any?): Result<O> {
-            return codec.encode(value)
-        }
-
-        override fun decode(value: Any?): Result<I> {
-            return runCatching {
-                codec.decode(value).getOrElse(block)
-            }
-        }
-    }
-}
-
-@CodecKeywordMarker
-infix fun <I, O> Codec<I, O>.catchOut(block: (Throwable) -> O): Codec<I, O> {
-    val codec = this
-    return object : Codec<I, O> {
-        override fun encode(value: Any?): Result<O> {
-            return runCatching {
-                codec.encode(value).getOrElse(block)
-            }
-        }
-
-        override fun decode(value: Any?): Result<I> {
-            return codec.decode(value)
-        }
-    }
-}
-
-@CodecKeywordMarker
-infix fun <I, O> FieldCodec<I, O>.catchIn(block: (Throwable) -> I): FieldCodec<I, O> {
-    val codec = this as Codec<I, O>
-    return FieldCodec(name, codec catchIn block)
-}
-
-@CodecKeywordMarker
-infix fun <I, O> FieldCodec<I, O>.catchOut(block: (Throwable) -> O): FieldCodec<I, O> {
-    val codec = this as Codec<I, O>
-    return FieldCodec(name, codec catchOut block)
-}
-
-/* ============= ------------------ ============= */
-
-/**
- * Marker class for adding well-known codec shortcuts.
- */
-interface Codecs {
-    companion object : Codecs
-}
-
-// Constructor
-
-/**
- * Invoke the given [block] with the [Codecs] companion object.
- */
-@Suppress("FunctionName")
-inline fun <I, O> Codecs(block: Codecs.() -> Codec<I, O>): Codec<I, O> {
-    return block(Codecs)
-}
-
-/* ============= ------------------ ============= */
-
-/**
- * An exception thrown when a codec operation fails.
- *
- * @author LSafer
- * @since 2.0.0
- */
-open class CodecException(
-    message: String? = null,
-    cause: Throwable? = null,
-    enableSuppression: Boolean = true,
-    writableStackTrace: Boolean = true
-) : RuntimeException(message ?: cause?.message, cause, enableSuppression, writableStackTrace) {
-    companion object {
-        private const val serialVersionUID: Long = -1616193939070247846L
-    }
 }
 
 /* ============= ------------------ ============= */

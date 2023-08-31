@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2023 cufy.org and meemer.com
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -19,116 +19,6 @@ import org.cufy.bson.*
 import java.math.BigDecimal
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.experimental.ExperimentalTypeInference
-
-/* ============= ------------------ ============= */
-
-/**
- * A bson variant of [FieldCodec] enabling extra
- * features that can be achieved only when the
- * target output is known to be bson.
- *
- * This implements [MutableBsonMapField] to enable the following syntax:
- * ```kotlin
- * document {
- *      MyField by myValue
- * }
- * ```
- *
- * This interface will be useless after context
- * receivers is released for production.
- * This interface will be removed gradually after
- * context receivers is released for production.
- *
- * @param I the type of the decoded value.
- * @param O the type of the encoded value.
- * @author LSafer
- * @since 2.0.0
- */
-interface BsonFieldCodec<I, O : BsonElement> : FieldCodec<I, O>, MutableBsonMapField<I> {
-    override fun encode(value: I): BsonElement =
-        encode(value, this)
-}
-
-// Constructor
-
-/**
- * Create a new [BsonFieldCodec] with
- * the given [name] and backed by the given [codec].
- */
-@ExperimentalCodecApi
-fun <I, O : BsonElement> BsonFieldCodec(name: String, codec: Codec<I, O>): BsonFieldCodec<I, O> {
-    return object : BsonFieldCodec<I, O>, Codec<I, O> by codec {
-        override val name = name
-    }
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by the given [codec].
- */
-@Suppress("FunctionName")
-@OptIn(ExperimentalCodecApi::class)
-fun <I, O : BsonElement> FieldCodec(name: String, codec: Codec<I, O>): BsonFieldCodec<I, O> {
-    return BsonFieldCodec(name, codec)
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by the codec returned from invoking
- * the given [block].
- */
-@OptIn(ExperimentalTypeInference::class, ExperimentalCodecApi::class)
-@OverloadResolutionByLambdaReturnType
-@Suppress("FunctionName")
-fun <I, O : BsonElement> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
-    return BsonFieldCodec(name, block(Codecs))
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by [this] codec.
- */
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> Codec<I, O>.at(name: String): BsonFieldCodec<I, O> {
-    return FieldCodec(name, this)
-}
-
-/**
- * Create a new field codec with the receiver name
- * and backed by the given [codec].
- */
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> String.be(codec: Codec<I, O>): BsonFieldCodec<I, O> {
-    return FieldCodec(this, codec)
-}
-
-/**
- * Create a new field codec with the receiver name
- * and backed by the codec from the given [block].
- */
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
-    return FieldCodec(this, block)
-}
-
-/* ============= ------------------ ============= */
-
-@OptIn(ExperimentalCodecApi::class)
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(block: (Throwable) -> I): BsonFieldCodec<I, O> {
-    val codec = this as Codec<I, O>
-    return BsonFieldCodec(name, codec catchIn block)
-}
-
-@OptIn(ExperimentalCodecApi::class)
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) -> O): BsonFieldCodec<I, O> {
-    val codec = this as Codec<I, O>
-    return BsonFieldCodec(name, codec catchOut block)
-}
 
 /* ============= ------------------ ============= */
 
@@ -144,7 +34,7 @@ infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) 
  */
 class BsonNullableCodec<I, O : BsonElement>(
     @Suppress("MemberVisibilityCanBePrivate")
-    val codec: Codec<I, O>
+    val codec: Codec<I, O>,
 ) : Codec<I?, BsonElement> {
     override fun encode(value: Any?) =
         when (value) {
@@ -287,7 +177,7 @@ fun <I, O : BsonElement> decode(value: O, codec: BsonNullableCodec<I, O>): I? {
  */
 class BsonArrayCodec<I, O : BsonElement>(
     @Suppress("MemberVisibilityCanBePrivate")
-    val codec: Codec<I, O>
+    val codec: Codec<I, O>,
 ) : Codec<List<I>, BsonArray> {
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: List<*> ->
@@ -319,7 +209,7 @@ val <I, O : BsonElement> Codec<I, O>.Array: BsonArrayCodec<I, O>
  * uses this codec to encode/decode each
  * individual item.
  */
-val <I, O : BsonElement> FieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
+val <I, O : BsonElement> FieldCodec<I, O>.Array: BsonFieldCodec<List<I>, BsonArray>
     get() = FieldCodec(name, (this as Codec<I, O>).Array)
 
 /**
@@ -328,7 +218,7 @@ val <I, O : BsonElement> FieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
  * individual item.
  */
 @OptIn(ExperimentalCodecApi::class)
-val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
+val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: BsonFieldCodec<List<I>, BsonArray>
     get() = BsonFieldCodec(name, (this as Codec<I, O>).Array)
 
 /* ============= ------------------ ============= */
@@ -349,42 +239,6 @@ object BsonStringCodec : Codec<String, BsonString> {
             success(it.value)
         }
 }
-
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("ObjectPropertyName")
-@Deprecated(
-    "Codecs.String instead",
-    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
-)
-inline val `bson string` get() = BsonStringCodec
-
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("ObjectPropertyName")
-@Deprecated(
-    "Codecs.String.Nullable instead",
-    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
-)
-inline val `bson nullable string` get() = BsonStringCodec.Nullable
-
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("ObjectPropertyName")
-@Deprecated(
-    "Codecs.String.Array instead",
-    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
-)
-inline val `bson string array` get() = BsonStringCodec.Array
 
 /**
  * The codec for [String] and [BsonString].
@@ -601,11 +455,13 @@ object BsonIdCodec : Codec<Id<*>, BsonElement> {
             when (it) {
                 is BsonObjectId -> success(Id<Any>(it.value))
                 is BsonString -> success(Id(it.value))
-                else -> failure(CodecException(
-                    "Cannot decode ${it::class}; expected either " +
-                            BsonObjectId::class + " or " +
-                            BsonString::class
-                ))
+                else -> failure(
+                    CodecException(
+                        "Cannot decode ${it::class}; expected either " +
+                                BsonObjectId::class + " or " +
+                                BsonString::class
+                    )
+                )
             }
         }
 
