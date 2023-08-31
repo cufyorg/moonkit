@@ -510,3 +510,9 @@ class EnumCodec<I, O>(private val pairs: List<Pair<I, O>>) : Codec<I, O> {
 }
 
 /* ============= ------------------ ============= */
+
+operator fun <I> Codec<I, BsonDocument>.invoke(block: BsonDocumentBlock): I {
+    return decode(BsonDocument(block), this)
+}
+
+/* ============= ------------------ ============= */
