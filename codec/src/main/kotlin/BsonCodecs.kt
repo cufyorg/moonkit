@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2023 cufy.org and meemer.com
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -19,116 +19,6 @@ import org.cufy.bson.*
 import java.math.BigDecimal
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.experimental.ExperimentalTypeInference
-
-/* ============= ------------------ ============= */
-
-/**
- * A bson variant of [FieldCodec] enabling extra
- * features that can be achieved only when the
- * target output is known to be bson.
- *
- * This implements [MutableBsonMapField] to enable the following syntax:
- * ```kotlin
- * document {
- *      MyField by myValue
- * }
- * ```
- *
- * This interface will be useless after context
- * receivers is released for production.
- * This interface will be removed gradually after
- * context receivers is released for production.
- *
- * @param I the type of the decoded value.
- * @param O the type of the encoded value.
- * @author LSafer
- * @since 2.0.0
- */
-interface BsonFieldCodec<I, O : BsonElement> : FieldCodec<I, O>, MutableBsonMapField<I> {
-    override fun encode(value: I): BsonElement =
-        encode(value, this)
-}
-
-// Constructor
-
-/**
- * Create a new [BsonFieldCodec] with
- * the given [name] and backed by the given [codec].
- */
-@ExperimentalCodecApi
-fun <I, O : BsonElement> BsonFieldCodec(name: String, codec: Codec<I, O>): BsonFieldCodec<I, O> {
-    return object : BsonFieldCodec<I, O>, Codec<I, O> by codec {
-        override val name = name
-    }
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by the given [codec].
- */
-@Suppress("FunctionName")
-@OptIn(ExperimentalCodecApi::class)
-fun <I, O : BsonElement> FieldCodec(name: String, codec: Codec<I, O>): BsonFieldCodec<I, O> {
-    return BsonFieldCodec(name, codec)
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by the codec returned from invoking
- * the given [block].
- */
-@OptIn(ExperimentalTypeInference::class, ExperimentalCodecApi::class)
-@OverloadResolutionByLambdaReturnType
-@Suppress("FunctionName")
-fun <I, O : BsonElement> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
-    return BsonFieldCodec(name, block(Codecs))
-}
-
-/**
- * Create a new field codec with the given [name]
- * and backed by [this] codec.
- */
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> Codec<I, O>.at(name: String): BsonFieldCodec<I, O> {
-    return FieldCodec(name, this)
-}
-
-/**
- * Create a new field codec with the receiver name
- * and backed by the given [codec].
- */
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> String.be(codec: Codec<I, O>): BsonFieldCodec<I, O> {
-    return FieldCodec(this, codec)
-}
-
-/**
- * Create a new field codec with the receiver name
- * and backed by the codec from the given [block].
- */
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
-    return FieldCodec(this, block)
-}
-
-/* ============= ------------------ ============= */
-
-@OptIn(ExperimentalCodecApi::class)
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(block: (Throwable) -> I): BsonFieldCodec<I, O> {
-    val codec = this as Codec<I, O>
-    return BsonFieldCodec(name, codec catchIn block)
-}
-
-@OptIn(ExperimentalCodecApi::class)
-@CodecKeywordMarker
-infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) -> O): BsonFieldCodec<I, O> {
-    val codec = this as Codec<I, O>
-    return BsonFieldCodec(name, codec catchOut block)
-}
 
 /* ============= ------------------ ============= */
 
@@ -144,16 +34,14 @@ infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) 
  */
 class BsonNullableCodec<I, O : BsonElement>(
     @Suppress("MemberVisibilityCanBePrivate")
-    val codec: Codec<I, O>
+    val codec: Codec<I, O>,
 ) : Codec<I?, BsonElement> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         when (value) {
             null -> success(BsonNull)
             else -> codec.encode(value)
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         when (value) {
             null, BsonNull, BsonUndefined -> success(null)
@@ -289,9 +177,8 @@ fun <I, O : BsonElement> decode(value: O, codec: BsonNullableCodec<I, O>): I? {
  */
 class BsonArrayCodec<I, O : BsonElement>(
     @Suppress("MemberVisibilityCanBePrivate")
-    val codec: Codec<I, O>
+    val codec: Codec<I, O>,
 ) : Codec<List<I>, BsonArray> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: List<*> ->
             success(BsonArray {
@@ -301,7 +188,6 @@ class BsonArrayCodec<I, O : BsonElement>(
             })
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonArray ->
             success(it.map {
@@ -323,7 +209,7 @@ val <I, O : BsonElement> Codec<I, O>.Array: BsonArrayCodec<I, O>
  * uses this codec to encode/decode each
  * individual item.
  */
-val <I, O : BsonElement> FieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
+val <I, O : BsonElement> FieldCodec<I, O>.Array: BsonFieldCodec<List<I>, BsonArray>
     get() = FieldCodec(name, (this as Codec<I, O>).Array)
 
 /**
@@ -332,7 +218,7 @@ val <I, O : BsonElement> FieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
  * individual item.
  */
 @OptIn(ExperimentalCodecApi::class)
-val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArray>
+val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: BsonFieldCodec<List<I>, BsonArray>
     get() = BsonFieldCodec(name, (this as Codec<I, O>).Array)
 
 /* ============= ------------------ ============= */
@@ -343,54 +229,16 @@ val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArr
  * @since 2.0.0
  */
 object BsonStringCodec : Codec<String, BsonString> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: String ->
             success(BsonString(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonString ->
             success(it.value)
         }
 }
-
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("ObjectPropertyName")
-@Deprecated(
-    "Codecs.String instead",
-    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
-)
-inline val `bson string` get() = BsonStringCodec
-
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("ObjectPropertyName")
-@Deprecated(
-    "Codecs.String.Nullable instead",
-    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
-)
-inline val `bson nullable string` get() = BsonStringCodec.Nullable
-
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("ObjectPropertyName")
-@Deprecated(
-    "Codecs.String.Array instead",
-    ReplaceWith("Codecs.String", "org.cufy.codec.Codecs")
-)
-inline val `bson string array` get() = BsonStringCodec.Array
 
 /**
  * The codec for [String] and [BsonString].
@@ -408,13 +256,11 @@ inline val Codecs.String get() = BsonStringCodec
  * @since 2.0.0
  */
 object BsonBooleanCodec : Codec<Boolean, BsonBoolean> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Boolean ->
             success(BsonBoolean(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonBoolean ->
             success(it.value)
@@ -437,13 +283,11 @@ inline val Codecs.Boolean get() = BsonBooleanCodec
  * @since 2.0.0
  */
 object BsonInt32Codec : Codec<Int, BsonInt32> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Int ->
             success(BsonInt32(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonInt32 ->
             success(it.value)
@@ -466,13 +310,11 @@ inline val Codecs.Int32 get() = BsonInt32Codec
  * @since 2.0.0
  */
 object BsonInt64Codec : Codec<Long, BsonInt64> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Long ->
             success(BsonInt64(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonInt64 ->
             success(it.value)
@@ -495,13 +337,11 @@ inline val Codecs.Int64 get() = BsonInt64Codec
  * @since 2.0.0
  */
 object BsonDoubleCodec : Codec<Double, BsonDouble> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Double ->
             success(BsonDouble(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonDouble ->
             success(it.value)
@@ -524,13 +364,11 @@ inline val Codecs.Double get() = BsonDoubleCodec
  * @since 2.0.0
  */
 object BsonDecimal128Codec : Codec<Decimal128, BsonDecimal128> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Decimal128 ->
             success(BsonDecimal128(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonDecimal128 ->
             success(it.value)
@@ -553,13 +391,11 @@ inline val Codecs.Decimal128 get() = BsonDecimal128Codec
  * @since 2.0.0
  */
 object BsonBigDecimalCodec : Codec<BigDecimal, BsonDecimal128> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: BigDecimal ->
             success(BsonDecimal128(Decimal128(it)))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonDecimal128 ->
             success(it.value.bigDecimalValue())
@@ -582,13 +418,11 @@ inline val Codecs.BigDecimal get() = BsonBigDecimalCodec
  * @since 2.0.0
  */
 object BsonObjectIdCodec : Codec<ObjectId, BsonObjectId> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: ObjectId ->
             success(BsonObjectId(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonObjectId ->
             success(it.value)
@@ -611,23 +445,23 @@ inline val Codecs.ObjectId get() = BsonObjectIdCodec
  * @since 2.0.0
  */
 object BsonIdCodec : Codec<Id<*>, BsonElement> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Id<*> ->
             success(it.bson)
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonElement ->
             when (it) {
                 is BsonObjectId -> success(Id<Any>(it.value))
                 is BsonString -> success(Id(it.value))
-                else -> failure(CodecException(
-                    "Cannot decode ${it::class}; expected either " +
-                            BsonObjectId::class + " or " +
-                            BsonString::class
-                ))
+                else -> failure(
+                    CodecException(
+                        "Cannot decode ${it::class}; expected either " +
+                                BsonObjectId::class + " or " +
+                                BsonString::class
+                    )
+                )
             }
         }
 
@@ -656,7 +490,6 @@ inline val Codecs.Id get() = BsonIdCodec
 class EnumCodec<I, O>(private val pairs: List<Pair<I, O>>) : Codec<I, O> {
     constructor(vararg pairs: Pair<I, O>) : this(pairs.asList())
 
-    @AdvancedCodecApi
     override fun encode(value: Any?): Result<O> {
         return pairs.firstOrNull { it.first == value }.let {
             when (it) {
@@ -666,7 +499,6 @@ class EnumCodec<I, O>(private val pairs: List<Pair<I, O>>) : Codec<I, O> {
         }
     }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?): Result<I> {
         return pairs.firstOrNull { it.second == value }.let {
             when (it) {
