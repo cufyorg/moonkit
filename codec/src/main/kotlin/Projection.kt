@@ -34,6 +34,7 @@ import kotlin.reflect.jvm.reflect
  * @author LSafer
  * @since 2.0.0
  */
+@Deprecated("Use `CodecClass<I, O>({})` or `: Codec<I, O> by codec`")
 interface CodecOf<I, O> : Codec<I, O> {
     /**
      * The delegated codec.
@@ -47,6 +48,7 @@ interface CodecOf<I, O> : Codec<I, O> {
     override fun decode(value: Any?) = codec.decode(value)
 }
 
+@Deprecated("Use DocumentCodec instead")
 typealias DocumentCodecOf<I> = CodecOf<I, BsonDocument>
 
 /**
@@ -77,6 +79,8 @@ operator fun <I, O : BsonElement> FieldCodec<I, O>.provideDelegate(s: Any?, p: K
     return ReadOnlyProperty { self, _ -> self.element[this] }
 }
 
+@Suppress("DEPRECATION", "TYPEALIAS_EXPANSION_DEPRECATION", "DeprecatedCallableAddReplaceWith")
+@Deprecated("DocumentCodecOf is deprecated")
 operator fun <I> DocumentCodecOf<I>.invoke(block: BsonDocumentBlock): I {
     return decode(BsonDocument(block), this)
 }
@@ -87,7 +91,7 @@ operator fun <I> DocumentCodecOf<I>.invoke(block: BsonDocumentBlock): I {
  * @author LSafer
  * @since 2.0.0
  */
-@ExperimentalCodecApi
+@Deprecated("Automatically creating a Projection Codec is not reliable")
 class ProjectionCodec<I : Projection<O>, O>(
     val constructor: (O) -> I
 ) : Codec<I, O> {
@@ -137,6 +141,7 @@ class ProjectionCodec<I : Projection<O>, O>(
 /**
  * A helper function to create a codec from a projection constructor.
  */
-@ExperimentalCodecApi
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("Automatically creating a Projection Codec is not reliable")
 operator fun <I : Projection<O>, O> ((O) -> I).getValue(t: Any?, p: KProperty<*>) =
     ProjectionCodec(this)
