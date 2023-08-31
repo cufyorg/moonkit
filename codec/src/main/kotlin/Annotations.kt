@@ -48,28 +48,6 @@ annotation class ExperimentalCodecApi(
 )
 
 /**
- * Marks the annotated component as advanced.
- *
- * Components marked by this annotation are meant
- * to be used in libraries and not application code.
- *
- * This was put to avoid users getter into stuff
- * that needs more reading by accident.
- *
- * @since 2.0.0
- */
-@RequiresOptIn(
-    message = "This API is meant to be used to extend the functionality of Monkt",
-    level = RequiresOptIn.Level.WARNING
-)
-annotation class AdvancedCodecApi(
-    /**
-     * Optionally, the reason why the component was marked with this annotation.
-     */
-    val reason: String = "This API is meant to be used to extend the functionality of Monkt"
-)
-
-/**
  * A dsl marker for codec builder functions.
  *
  * @author LSafer

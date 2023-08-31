@@ -42,10 +42,8 @@ interface CodecOf<I, O> : Codec<I, O> {
      */
     val codec: Codec<I, O>
 
-    @AdvancedCodecApi
     override fun encode(value: Any?) = codec.encode(value)
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) = codec.decode(value)
 }
 
@@ -105,14 +103,12 @@ class ProjectionCodec<I : Projection<O>, O>(
         outT = reflection.parameters.single().type
     }
 
-    @AdvancedCodecApi
     override fun encode(value: Any?): Result<O> {
         return inT.safeCast<I>(value).mapCatching {
             it.element
         }
     }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?): Result<I> {
         return outT.safeCast<O>(value).mapCatching {
             constructor(it)

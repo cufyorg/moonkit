@@ -146,14 +146,12 @@ class BsonNullableCodec<I, O : BsonElement>(
     @Suppress("MemberVisibilityCanBePrivate")
     val codec: Codec<I, O>
 ) : Codec<I?, BsonElement> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         when (value) {
             null -> success(BsonNull)
             else -> codec.encode(value)
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         when (value) {
             null, BsonNull, BsonUndefined -> success(null)
@@ -291,7 +289,6 @@ class BsonArrayCodec<I, O : BsonElement>(
     @Suppress("MemberVisibilityCanBePrivate")
     val codec: Codec<I, O>
 ) : Codec<List<I>, BsonArray> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: List<*> ->
             success(BsonArray {
@@ -301,7 +298,6 @@ class BsonArrayCodec<I, O : BsonElement>(
             })
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonArray ->
             success(it.map {
@@ -343,13 +339,11 @@ val <I, O : BsonElement> BsonFieldCodec<I, O>.Array: FieldCodec<List<I>, BsonArr
  * @since 2.0.0
  */
 object BsonStringCodec : Codec<String, BsonString> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: String ->
             success(BsonString(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonString ->
             success(it.value)
@@ -408,13 +402,11 @@ inline val Codecs.String get() = BsonStringCodec
  * @since 2.0.0
  */
 object BsonBooleanCodec : Codec<Boolean, BsonBoolean> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Boolean ->
             success(BsonBoolean(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonBoolean ->
             success(it.value)
@@ -437,13 +429,11 @@ inline val Codecs.Boolean get() = BsonBooleanCodec
  * @since 2.0.0
  */
 object BsonInt32Codec : Codec<Int, BsonInt32> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Int ->
             success(BsonInt32(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonInt32 ->
             success(it.value)
@@ -466,13 +456,11 @@ inline val Codecs.Int32 get() = BsonInt32Codec
  * @since 2.0.0
  */
 object BsonInt64Codec : Codec<Long, BsonInt64> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Long ->
             success(BsonInt64(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonInt64 ->
             success(it.value)
@@ -495,13 +483,11 @@ inline val Codecs.Int64 get() = BsonInt64Codec
  * @since 2.0.0
  */
 object BsonDoubleCodec : Codec<Double, BsonDouble> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Double ->
             success(BsonDouble(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonDouble ->
             success(it.value)
@@ -524,13 +510,11 @@ inline val Codecs.Double get() = BsonDoubleCodec
  * @since 2.0.0
  */
 object BsonDecimal128Codec : Codec<Decimal128, BsonDecimal128> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Decimal128 ->
             success(BsonDecimal128(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonDecimal128 ->
             success(it.value)
@@ -553,13 +537,11 @@ inline val Codecs.Decimal128 get() = BsonDecimal128Codec
  * @since 2.0.0
  */
 object BsonBigDecimalCodec : Codec<BigDecimal, BsonDecimal128> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: BigDecimal ->
             success(BsonDecimal128(Decimal128(it)))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonDecimal128 ->
             success(it.value.bigDecimalValue())
@@ -582,13 +564,11 @@ inline val Codecs.BigDecimal get() = BsonBigDecimalCodec
  * @since 2.0.0
  */
 object BsonObjectIdCodec : Codec<ObjectId, BsonObjectId> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: ObjectId ->
             success(BsonObjectId(it))
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonObjectId ->
             success(it.value)
@@ -611,13 +591,11 @@ inline val Codecs.ObjectId get() = BsonObjectIdCodec
  * @since 2.0.0
  */
 object BsonIdCodec : Codec<Id<*>, BsonElement> {
-    @AdvancedCodecApi
     override fun encode(value: Any?) =
         tryInlineCodec(value) { it: Id<*> ->
             success(it.bson)
         }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?) =
         tryInlineCodec(value) { it: BsonElement ->
             when (it) {
@@ -656,7 +634,6 @@ inline val Codecs.Id get() = BsonIdCodec
 class EnumCodec<I, O>(private val pairs: List<Pair<I, O>>) : Codec<I, O> {
     constructor(vararg pairs: Pair<I, O>) : this(pairs.asList())
 
-    @AdvancedCodecApi
     override fun encode(value: Any?): Result<O> {
         return pairs.firstOrNull { it.first == value }.let {
             when (it) {
@@ -666,7 +643,6 @@ class EnumCodec<I, O>(private val pairs: List<Pair<I, O>>) : Codec<I, O> {
         }
     }
 
-    @AdvancedCodecApi
     override fun decode(value: Any?): Result<I> {
         return pairs.firstOrNull { it.second == value }.let {
             when (it) {

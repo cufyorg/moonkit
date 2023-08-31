@@ -35,21 +35,23 @@ interface Codec<I, O> {
     /**
      * Encode the given [value] to type [O].
      *
+     * > Do not use this function directly. Use `encode(I, Codec)` instead.
+     *
      * @param value the value to be encoded.
      * @return the encoded value.
      * @since 2.0.0
      */
-    @AdvancedCodecApi("Use `encode(I, Codec)` instead")
     fun encode(value: Any?): Result<O>
 
     /**
      * Decode the given [value] value into [I].
      *
+     * > Do not use this function directly. Use `decode(Codec, I)` instead.
+     *
      * @param value the value to be decoded.
      * @return the decoded value.
      * @since 2.0.0
      */
-    @AdvancedCodecApi("Use `decode(I, Codec)` instead")
     fun decode(value: Any?): Result<I>
 }
 
@@ -154,7 +156,6 @@ infix fun <V, I, O : V> FieldCodec<I, in O>.from(map: Map<String, V>): Lazy<I> {
  * @return the encoding result.
  * @since 2.0.0
  */
-@OptIn(AdvancedCodecApi::class)
 @CodecMarker
 fun <I, O> tryEncodeAny(value: Any?, codec: Codec<I, O>): Result<O> {
     return codec.encode(value)
@@ -270,7 +271,6 @@ fun <I, O> encode(value: I, block: Codecs.() -> Codec<I, O>): O {
  * @return the decoding result.
  * @since 2.0.0
  */
-@OptIn(AdvancedCodecApi::class)
 @CodecMarker
 fun <I, O> tryDecodeAny(value: Any?, codec: Codec<I, O>): Result<I> {
     return codec.decode(value)
@@ -568,14 +568,16 @@ inline fun <reified T, U> inlineCodecCatching(value: Any?, block: (T) -> U): U {
 interface CodecBuilder<I, O> {
     /**
      * The encoding block.
+     *
+     * > Do not set directly. Use `encode {}` instead.
      */
-    @AdvancedCodecApi("Use `encode()` instead")
     var encodeBlock: (Any?) -> Result<O>
 
     /**
      * The decoding block.
+     *
+     * > Do not set directly. Use `decode {}` instead.
      */
-    @AdvancedCodecApi("Use `decode()` instead")
     var decodeBlock: (Any?) -> Result<I>
 
     /**
@@ -591,7 +593,6 @@ interface CodecBuilder<I, O> {
 /**
  * Obtain a new [CodecBuilder] instance.
  */
-@OptIn(AdvancedCodecApi::class)
 fun <I, O> CodecBuilder(): CodecBuilder<I, O> {
     return object : CodecBuilder<I, O> {
         override lateinit var encodeBlock: (Any?) -> Result<O>
@@ -629,7 +630,6 @@ fun <I, O> Codec(block: CodecBuilder<I, O>.() -> Unit): Codec<I, O> {
  *
  * @see tryInlineCodecAny
  */
-@OptIn(AdvancedCodecApi::class)
 @CodecKeywordMarker
 fun <I, O> CodecBuilder<I, O>.encodeAny(block: (Any?) -> Result<O>) {
     encodeBlock = block
@@ -693,7 +693,6 @@ inline fun <reified I, O> CodecBuilder<I, O>.encodeCatching(crossinline block: (
  *
  * @see tryInlineCodecAny
  */
-@OptIn(AdvancedCodecApi::class)
 @CodecKeywordMarker
 fun <I, O> CodecBuilder<I, O>.decodeAny(block: (Any?) -> Result<I>) {
     decodeBlock = block
@@ -827,12 +826,10 @@ infix fun <I, O> String.be(block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
 infix fun <I, O> Codec<I, O>.catchIn(block: (Throwable) -> I): Codec<I, O> {
     val codec = this
     return object : Codec<I, O> {
-        @AdvancedCodecApi
         override fun encode(value: Any?): Result<O> {
             return codec.encode(value)
         }
 
-        @AdvancedCodecApi
         override fun decode(value: Any?): Result<I> {
             return runCatching {
                 codec.decode(value).getOrElse(block)
@@ -845,14 +842,12 @@ infix fun <I, O> Codec<I, O>.catchIn(block: (Throwable) -> I): Codec<I, O> {
 infix fun <I, O> Codec<I, O>.catchOut(block: (Throwable) -> O): Codec<I, O> {
     val codec = this
     return object : Codec<I, O> {
-        @AdvancedCodecApi
         override fun encode(value: Any?): Result<O> {
             return runCatching {
                 codec.encode(value).getOrElse(block)
             }
         }
 
-        @AdvancedCodecApi
         override fun decode(value: Any?): Result<I> {
             return codec.decode(value)
         }
