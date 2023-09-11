@@ -1,8 +1,6 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-
 plugins {
-    kotlin("jvm") version kotlin_version
-    kotlin("plugin.serialization") version kotlin_version
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.serialization") version libs.versions.kotlin
     id("maven-publish")
 }
 
@@ -15,14 +13,15 @@ dependencies {
     implementation(project(":bson"))
 
     implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
 
-    implementation(Dependencies.Kotlin.serialization)
-    implementation(Dependencies.Kotlin.coroutines_core)
-    implementation(Dependencies.Kotlin.coroutines_reactive)
-    implementation(Dependencies.Kotlin.reflect)
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlin.coroutines.reactive)
+    implementation(libs.kotlin.datetime)
 
-    implementation(Dependencies.MongoDB.driver_sync)
-    implementation(Dependencies.MongoDB.driver_reactivestreams)
+    implementation(libs.mongodb.sync)
+    implementation(libs.mongodb.reactivestreams)
 
     testImplementation(kotlin("test"))
 }

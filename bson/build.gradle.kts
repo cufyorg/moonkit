@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version kotlin_version
-    kotlin("plugin.serialization") version kotlin_version
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.serialization") version libs.versions.kotlin
     id("maven-publish")
 }
 
@@ -12,10 +12,11 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
 
-    implementation(Dependencies.Kotlin.serialization)
+    implementation(libs.kotlin.datetime)
+    implementation(libs.kotlin.serialization.json)
 
-    implementation(Dependencies.MongoDB.driver_sync)
-    implementation(Dependencies.MongoDB.driver_reactivestreams)
+    implementation(libs.mongodb.sync)
+    implementation(libs.mongodb.reactivestreams)
 
     testImplementation(kotlin("test"))
 }

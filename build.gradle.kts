@@ -1,13 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version kotlin_version
-    kotlin("plugin.serialization") version kotlin_version
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.serialization") version libs.versions.kotlin
     id("maven-publish")
 }
 
 group = "org.cufy"
 version = "2.0.0"
+
+tasks.wrapper {
+    gradleVersion = "8.2.1"
+}
 
 repositories {
     mavenCentral()
