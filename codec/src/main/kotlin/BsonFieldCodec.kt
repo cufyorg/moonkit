@@ -168,7 +168,7 @@ operator fun <I, O : BsonElement> Map<String, BsonElement>.get(codec: FieldCodec
  * ```
  */
 @CodecKeywordMarker
-infix fun <I> FieldCodec<I, in BsonElement>.from(map: Map<String, BsonElement>): Lazy<I> {
+infix fun <I> FieldCodec<I, out BsonElement>.from(map: Map<String, BsonElement>): Lazy<I> {
     return lazy { map[this] }
 }
 
@@ -186,7 +186,7 @@ infix fun <I> FieldCodec<I, in BsonElement>.from(map: Map<String, BsonElement>):
  * ```
  */
 @CodecKeywordMarker
-infix fun <T, I> FieldCodec<I, in BsonElement>.from(block: T.() -> Map<String, BsonElement>): ReadOnlyProperty<T, I> {
+infix fun <T, I> FieldCodec<I, out BsonElement>.from(block: T.() -> Map<String, BsonElement>): ReadOnlyProperty<T, I> {
     return ReadOnlyProperty { thisRef, _ -> block(thisRef)[this] }
 }
 
