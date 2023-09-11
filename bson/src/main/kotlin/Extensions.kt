@@ -15,7 +15,9 @@
  */
 package org.cufy.bson
 
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
+import java.util.*
 
 /* ============= ------------------ ============= */
 
@@ -316,6 +318,26 @@ val BigDecimal.bson: BsonDecimal128 get() = toDecimal128().bson
 val BigDecimal?.bson: BsonElement get() = this?.let { bson } ?: null.bson
 
 /**
+ * Return a [BsonDateTime] with the value of this.
+ */
+inline val Date.bson: BsonDateTime get() = BsonDateTime(this)
+
+/**
+ * Return a [BsonDateTime] with the value of this or [BsonNull] if this is `null`.
+ */
+val Date?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
+ * Return a [BsonDateTime] with the value of this.
+ */
+inline val Instant.bson: BsonDateTime get() = BsonDateTime(this)
+
+/**
+ * Return a [BsonDateTime] with the value of this or [BsonNull] if this is `null`.
+ */
+val Instant?.bson: BsonElement get() = this?.let { bson } ?: null.bson
+
+/**
  * Return a [BsonString] with the value of this.
  */
 inline val String.bson: BsonString get() = BsonString(this)
@@ -441,6 +463,20 @@ fun BigDecimal.toDecimal128(): Decimal128 {
  */
 fun Decimal128.toBigDecimal(): BigDecimal {
     return bigDecimalValue()
+}
+
+/**
+ * Return a [Date] with the value of this.
+ */
+fun BsonDateTime.toDate(): Date {
+    return Date(value)
+}
+
+/**
+ * Return a [Instant] with the value of this.
+ */
+fun BsonDateTime.toInstant(): Instant {
+    return Instant.fromEpochMilliseconds(value)
 }
 
 /**
