@@ -15,7 +15,9 @@
  */
 package org.cufy.bson
 
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
+import java.util.*
 import kotlin.reflect.KCallable
 
 /* ============= ------------------ ============= */
@@ -519,6 +521,84 @@ interface MutableBsonMap : BsonMap, MutableMap<String, BsonElement> {
      */
     @BsonConstructorMarker
     infix fun MutableBsonMapField<*>.byname(value: BigDecimal?) {
+        name by value
+    }
+
+    //
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    infix fun String.by(value: Date?) {
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    infix fun KCallable<*>.by(value: Date?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Date?) {
+        name by value
+    }
+
+    //
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    infix fun String.by(value: Instant?) {
+        value ?: return run { this@MutableBsonMap[this] = null.bson }
+        this@MutableBsonMap[this] = value.bson
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    infix fun KCallable<*>.by(value: Instant?) {
+        name by value
+    }
+
+    /**
+     * Set the field with the name [this] to the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    infix fun MutableBsonMapField<*>.byname(value: Instant?) {
         name by value
     }
 

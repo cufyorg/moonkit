@@ -15,7 +15,9 @@
  */
 package org.cufy.bson
 
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
+import java.util.*
 
 /* ============= ------------------ ============= */
 
@@ -220,6 +222,32 @@ interface MutableBsonList : BsonList, MutableList<BsonElement> {
      */
     @BsonConstructorMarker
     fun by(value: BigDecimal?) {
+        value ?: return run { this += null.bson }
+        this += value.bson
+    }
+
+    /**
+     * Add the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    fun by(value: Date?) {
+        value ?: return run { this += null.bson }
+        this += value.bson
+    }
+
+    /**
+     * Add the given [value].
+     *
+     * If [value] is null then [BsonNull] will be set instead.
+     *
+     * The given [value] will be wrapped with [BsonDateTime].
+     */
+    @BsonConstructorMarker
+    fun by(value: Instant?) {
         value ?: return run { this += null.bson }
         this += value.bson
     }
