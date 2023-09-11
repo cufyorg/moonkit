@@ -15,9 +15,11 @@
  */
 package org.cufy.bson
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.cufy.bson.internal.IdSerializer
 import org.intellij.lang.annotations.Language
+import java.util.*
 
 /* ============= ------------------ ============= */
 
@@ -132,7 +134,13 @@ enum class BsonType(val value: Int) {
      */
     Boolean(0x08),
 
-    //    DateTime(0x09),
+    /**
+     * The type for [BsonDateTime].
+     *
+     * @see org.bson.BsonType.DATE_TIME
+     * @since 2.0.0
+     */
+    DateTime(0x09),
 
     /**
      * The type for [BsonNull].
@@ -491,6 +499,43 @@ data class BsonDecimal128(val value: Decimal128) : BsonElement, BsonNumber {
 
     override fun toString() =
         value.toString()
+}
+
+/**
+ * Return a [BsonDateTime] with the given [value].
+ *
+ * @since 2.0.0
+ */
+fun BsonDateTime(value: Date): BsonDateTime {
+    return BsonDateTime(value.time)
+}
+
+/**
+ * Return a [BsonDateTime] with the given [value].
+ *
+ * @since 2.0.0
+ */
+fun BsonDateTime(value: Instant): BsonDateTime {
+    return BsonDateTime(value.toEpochMilliseconds())
+}
+
+/**
+ * A representation of the BSON DateTime type.
+ *
+ * @see org.bson.BsonDateTime
+ * @since 2.0.0
+ */
+data class BsonDateTime(val value: Long) : BsonElement {
+    override val type: BsonType get() = BsonType.DateTime
+
+    override fun equals(other: Any?) =
+        other is BsonDateTime && other.value == value
+
+    override fun hashCode() =
+        value.hashCode()
+
+    override fun toString() =
+        Date(value).toString()
 }
 
 /**

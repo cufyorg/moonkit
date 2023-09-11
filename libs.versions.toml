@@ -1,0 +1,11 @@
+[versions]
+kotlin = "1.9.0"
+
+[libraries]
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.1" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
+kotlin-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version = "1.6.4" }
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.4.0" }
+
+mongodb-sync = { module = "org.mongodb:mongodb-driver-sync", version = "4.8.0" }
+mongodb-reactivestreams = { module = "org.mongodb:mongodb-driver-reactivestreams", version = "4.8.0" }

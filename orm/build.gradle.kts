@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version kotlin_version
-    kotlin("plugin.serialization") version kotlin_version
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.serialization") version libs.versions.kotlin
     id("maven-publish")
 }
 
@@ -14,16 +14,16 @@ dependencies {
     implementation(project(":coroutines"))
 
     implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
 
-    implementation(Dependencies.Kotlin.serialization)
-    implementation(Dependencies.Kotlin.coroutines_core)
-    implementation(Dependencies.Kotlin.coroutines_reactive)
-    implementation(Dependencies.Kotlin.reflect)
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlin.coroutines.reactive)
 
-    implementation(Dependencies.MongoDB.driver_sync)
-    implementation(Dependencies.MongoDB.driver_reactivestreams)
+    implementation(libs.mongodb.sync)
+    implementation(libs.mongodb.reactivestreams)
 
-    implementation(Dependencies.weakness)
+    implementation("org.cufy:weakness:1.0.0")
 
     testImplementation(kotlin("test"))
 }

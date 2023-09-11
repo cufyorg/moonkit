@@ -15,8 +15,10 @@
  */
 package org.cufy.codec
 
+import kotlinx.datetime.Instant
 import org.cufy.bson.*
 import java.math.BigDecimal
+import java.util.*
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 
@@ -409,6 +411,87 @@ object BsonBigDecimalCodec : Codec<BigDecimal, BsonDecimal128> {
  */
 @Suppress("UnusedReceiverParameter")
 inline val Codecs.BigDecimal get() = BsonBigDecimalCodec
+
+/* ============= ------------------ ============= */
+
+/**
+ * The codec for [Long] and [BsonDateTime].
+ *
+ * @since 2.0.0
+ */
+object BsonDateTimeCodec : Codec<Long, BsonDateTime> {
+    override fun encode(value: Any?) =
+        tryInlineCodec(value) { it: Long ->
+            success(BsonDateTime(it))
+        }
+
+    override fun decode(value: Any?) =
+        tryInlineCodec(value) { it: BsonDateTime ->
+            success(it.value)
+        }
+}
+
+/**
+ * The codec for [Long] and [BsonDateTime].
+ *
+ * @since 2.0.0
+ */
+@Suppress("UnusedReceiverParameter")
+inline val Codecs.DateTime get() = BsonDateTimeCodec
+
+/* ============= ------------------ ============= */
+
+/**
+ * The codec for [Date] and [BsonDateTime].
+ *
+ * @since 2.0.0
+ */
+object BsonDateCodec : Codec<Date, BsonDateTime> {
+    override fun encode(value: Any?) =
+        tryInlineCodec(value) { it: Date ->
+            success(BsonDateTime(it))
+        }
+
+    override fun decode(value: Any?) =
+        tryInlineCodec(value) { it: BsonDateTime ->
+            success(Date(it.value))
+        }
+}
+
+/**
+ * The codec for [Date] and [BsonDateTime].
+ *
+ * @since 2.0.0
+ */
+@Suppress("UnusedReceiverParameter")
+inline val Codecs.Date get() = BsonDateCodec
+
+/* ============= ------------------ ============= */
+
+/**
+ * The codec for [Instant] and [BsonDateTime].
+ *
+ * @since 2.0.0
+ */
+object BsonInstantCodec : Codec<Instant, BsonDateTime> {
+    override fun encode(value: Any?) =
+        tryInlineCodec(value) { it: Instant ->
+            success(BsonDateTime(it))
+        }
+
+    override fun decode(value: Any?) =
+        tryInlineCodec(value) { it: BsonDateTime ->
+            success(Instant.fromEpochMilliseconds(it.value))
+        }
+}
+
+/**
+ * The codec for [Instant] and [BsonDateTime].
+ *
+ * @since 2.0.0
+ */
+@Suppress("UnusedReceiverParameter")
+inline val Codecs.Instant get() = BsonInstantCodec
 
 /* ============= ------------------ ============= */
 

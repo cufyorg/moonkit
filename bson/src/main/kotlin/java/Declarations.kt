@@ -36,6 +36,7 @@ val BsonElement.java: JavaBsonElement
         is BsonInt64 -> java
         is BsonDouble -> java
         is BsonDecimal128 -> java
+        is BsonDateTime -> java
         is BsonBoolean -> java
         is BsonUndefined -> java
         is BsonNull -> java
@@ -55,6 +56,7 @@ val JavaBsonElement.kt: BsonElement
         is JavaBsonInt64 -> kt
         is JavaBsonDouble -> kt
         is JavaBsonDecimal128 -> kt
+        is JavaBsonDateTime -> kt
         is JavaBsonBoolean -> kt
         is JavaBsonUndefined -> kt
         is JavaBsonNull -> kt
@@ -217,6 +219,23 @@ val BsonDecimal128.java: JavaBsonDecimal128
  */
 val JavaBsonDecimal128.kt: BsonDecimal128
     get() = BsonDecimal128(value)
+
+//
+
+internal typealias JavaBsonDateTime =
+        org.bson.BsonDateTime
+
+/**
+ * Return the java version of this bson element.
+ */
+val BsonDateTime.java: JavaBsonDateTime
+    get() = JavaBsonDateTime(value)
+
+/**
+ * Return the kotlin version of this bson element.
+ */
+val JavaBsonDateTime.kt: BsonDateTime
+    get() = BsonDateTime(value)
 
 //
 
