@@ -128,21 +128,4 @@ operator fun <I, O> Map<String, O>.get(codec: FieldCodec<I, O>): I {
     return decodeAny(this[codec.name], codec)
 }
 
-/**
- * Get the value of the field with the name of the
- * [this] codec and decode it using [this] codec.
- *
- * This function was made to be used in this manner:
- *
- * ```kotlin
- * data class MyClass(private val document: BsonDocument) {
- *    val field by "field" be { String } from document
- * }
- * ```
- */
-@CodecKeywordMarker
-infix fun <I, O> FieldCodec<I, O>.from(map: Map<String, O>): Lazy<I> {
-    return lazy { map[this] }
-}
-
 /* ============= ------------------ ============= */
