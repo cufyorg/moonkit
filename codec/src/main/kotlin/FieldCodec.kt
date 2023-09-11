@@ -119,13 +119,3 @@ infix fun <I, O> FieldCodec<I, O>.catchOut(block: (Throwable) -> O): FieldCodec<
 }
 
 /* ============= ------------------ ============= */
-
-/**
- * Get the value of the field with the name of the
- * given [codec] and decode it using the given [codec].
- */
-operator fun <I, O> Map<String, O>.get(codec: FieldCodec<I, O>): I {
-    return decodeAny(this[codec.name], codec)
-}
-
-/* ============= ------------------ ============= */
