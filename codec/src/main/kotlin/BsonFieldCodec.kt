@@ -16,6 +16,7 @@
 package org.cufy.codec
 
 import org.cufy.bson.BsonElement
+import org.cufy.bson.BsonMap
 import org.cufy.bson.MutableBsonMapField
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.properties.ReadOnlyProperty
@@ -151,7 +152,7 @@ infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) 
  * Get the value of the field with the name of the
  * given [codec] and decode it using the given [codec].
  */
-operator fun <I, O : BsonElement> Map<String, BsonElement>.get(codec: FieldCodec<I, O>): I {
+operator fun <I> BsonMap.get(codec: FieldCodec<I, out BsonElement>): I {
     return decodeAny(this[codec.name], codec)
 }
 
@@ -168,7 +169,7 @@ operator fun <I, O : BsonElement> Map<String, BsonElement>.get(codec: FieldCodec
  * ```
  */
 @CodecKeywordMarker
-infix fun <I> FieldCodec<I, out BsonElement>.from(map: Map<String, BsonElement>): Lazy<I> {
+infix fun <I> FieldCodec<I, out BsonElement>.from(map: BsonMap): Lazy<I> {
     return lazy { map[this] }
 }
 
@@ -186,7 +187,7 @@ infix fun <I> FieldCodec<I, out BsonElement>.from(map: Map<String, BsonElement>)
  * ```
  */
 @CodecKeywordMarker
-infix fun <T, I> FieldCodec<I, out BsonElement>.from(block: T.() -> Map<String, BsonElement>): ReadOnlyProperty<T, I> {
+infix fun <T, I> FieldCodec<I, out BsonElement>.from(block: T.() -> BsonMap): ReadOnlyProperty<T, I> {
     return ReadOnlyProperty { thisRef, _ -> block(thisRef)[this] }
 }
 
