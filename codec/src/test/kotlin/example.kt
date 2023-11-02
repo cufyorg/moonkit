@@ -59,7 +59,7 @@ class ExampleTest {
     @Test
     fun `catchIn actually uses the fallback value`() {
         val nameSource = "Hello World".bson
-        val codec = Codecs.Int32 catchIn { 0 }
+        val codec = Codecs.Int32 catchIn 0
 
         val name = nameSource decodeAny codec
 
@@ -76,16 +76,21 @@ object Document1 {
 data class Document1f1(
     val id: Id<Document1>,
     val name: String,
-    val age: Int
+    val age: Int,
 )
 
-data class Document1f2(private val document: BsonDocument) {
+data class Document1f2(val document: BsonDocument) {
     val id by Document1.Id from document
     val name by Document1.Name from document
     val age by Document1.Age from document
 
     val birthday by Codecs.Int64.Nullable at "birthday" from document
 }
+
+val Document1f2.birthday1 by Codecs.Int64.Nullable
+    .at("birthday1")
+    .catchIn(0)
+    .from(Document1f2::document)
 
 val Document1f1Codec = Codec {
     encodeCatching { it: Document1f1 ->

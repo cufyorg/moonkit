@@ -20,6 +20,7 @@ import org.cufy.bson.BsonMap
 import org.cufy.bson.MutableBsonMapField
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty1
 
 /* ============= ------------------ ============= */
 
@@ -134,9 +135,23 @@ infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonF
 
 @OptIn(ExperimentalCodecApi::class)
 @CodecKeywordMarker
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(defaultValue: I): BsonFieldCodec<I, O> {
+    val codec = this as Codec<I, O>
+    return BsonFieldCodec(name, codec catchIn defaultValue)
+}
+
+@OptIn(ExperimentalCodecApi::class)
+@CodecKeywordMarker
 infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(block: (Throwable) -> I): BsonFieldCodec<I, O> {
     val codec = this as Codec<I, O>
     return BsonFieldCodec(name, codec catchIn block)
+}
+
+@OptIn(ExperimentalCodecApi::class)
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(defaultValue: O): BsonFieldCodec<I, O> {
+    val codec = this as Codec<I, O>
+    return BsonFieldCodec(name, codec catchOut defaultValue)
 }
 
 @OptIn(ExperimentalCodecApi::class)
@@ -189,6 +204,24 @@ infix fun <I> FieldCodec<I, out BsonElement>.from(map: BsonMap): Lazy<I> {
 @CodecKeywordMarker
 infix fun <T, I> FieldCodec<I, out BsonElement>.from(block: T.() -> BsonMap): ReadOnlyProperty<T, I> {
     return ReadOnlyProperty { thisRef, _ -> block(thisRef)[this] }
+}
+
+/**
+ * Return a readonly property that returns the value of the field
+ * with the name of [this] from the result of invoking the given [property]
+ * and decode it using [this] codec.
+ *
+ * This function was made to be used in this manner:
+ *
+ * ```kotlin
+ * data class MyClass(val document: BsonDocument)
+ *
+ * fun MyClass.field by "field" be { String } from MyClass::document
+ * ```
+ */
+@CodecKeywordMarker
+infix fun <T, I> FieldCodec<I, out BsonElement>.from(property: KProperty1<T, BsonMap>): ReadOnlyProperty<T, I> {
+    return ReadOnlyProperty { thisRef, _ -> property.get(thisRef)[this] }
 }
 
 /* ============= ------------------ ============= */
