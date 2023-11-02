@@ -378,6 +378,8 @@ class BsonDocument internal constructor(
  * @since 2.0.0
  */
 sealed interface BsonNumber : BsonElement {
+    val value: Number
+
     /**
      * Returns the value of the specified number
      * as an [Int], which may involve rounding or
@@ -411,7 +413,7 @@ sealed interface BsonNumber : BsonElement {
  * @see org.bson.BsonInt32
  * @since 2.0.0
  */
-data class BsonInt32(val value: Int) : BsonElement, BsonNumber {
+data class BsonInt32(override val value: Int) : BsonElement, BsonNumber {
     override val type: BsonType get() = BsonType.Int32
 
     override fun toInt() = value
@@ -435,7 +437,7 @@ data class BsonInt32(val value: Int) : BsonElement, BsonNumber {
  * @see org.bson.BsonInt64
  * @since 2.0.0
  */
-data class BsonInt64(val value: Long) : BsonElement, BsonNumber {
+data class BsonInt64(override val value: Long) : BsonElement, BsonNumber {
     override val type: BsonType get() = BsonType.Int64
 
     override fun toInt() = value.toInt()
@@ -459,7 +461,7 @@ data class BsonInt64(val value: Long) : BsonElement, BsonNumber {
  * @see org.bson.BsonDouble
  * @since 2.0.0
  */
-data class BsonDouble(val value: Double) : BsonElement, BsonNumber {
+data class BsonDouble(override val value: Double) : BsonElement, BsonNumber {
     override val type: BsonType get() = BsonType.Double
 
     override fun toInt() = value.toInt()
@@ -483,7 +485,7 @@ data class BsonDouble(val value: Double) : BsonElement, BsonNumber {
  * @see org.bson.BsonDecimal128
  * @since 2.0.0
  */
-data class BsonDecimal128(val value: Decimal128) : BsonElement, BsonNumber {
+data class BsonDecimal128(override val value: Decimal128) : BsonElement, BsonNumber {
     override val type: BsonType get() = BsonType.Decimal128
 
     override fun toInt() = value.toBigDecimal().toInt()
