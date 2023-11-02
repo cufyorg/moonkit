@@ -52,7 +52,7 @@ interface Codec<I, O> {
 /* ============= ------------------ ============= */
 
 @CodecKeywordMarker
-infix fun <I, O> Codec<I, O>.catchIn(defaultValue: I): Codec<I, O> {
+infix fun <I, O> Codec<I, O>.defaultIn(defaultValue: I): Codec<I, O> {
     val codec = this
     return object : Codec<I, O> {
         override fun encode(value: Any?): Result<O> {
@@ -84,7 +84,7 @@ infix fun <I, O> Codec<I, O>.catchIn(block: (Throwable) -> I): Codec<I, O> {
 }
 
 @CodecKeywordMarker
-infix fun <I, O> Codec<I, O>.catchOut(defaultValue: O): Codec<I, O> {
+infix fun <I, O> Codec<I, O>.defaultOut(defaultValue: O): Codec<I, O> {
     val codec = this
     return object : Codec<I, O> {
         override fun encode(value: Any?): Result<O> {

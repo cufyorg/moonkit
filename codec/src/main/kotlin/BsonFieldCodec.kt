@@ -135,9 +135,9 @@ infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonF
 
 @OptIn(ExperimentalCodecApi::class)
 @CodecKeywordMarker
-infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(defaultValue: I): BsonFieldCodec<I, O> {
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.defaultIn(defaultValue: I): BsonFieldCodec<I, O> {
     val codec = this as Codec<I, O>
-    return BsonFieldCodec(name, codec catchIn defaultValue)
+    return BsonFieldCodec(name, codec defaultIn defaultValue)
 }
 
 @OptIn(ExperimentalCodecApi::class)
@@ -149,9 +149,9 @@ infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchIn(block: (Throwable) -
 
 @OptIn(ExperimentalCodecApi::class)
 @CodecKeywordMarker
-infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(defaultValue: O): BsonFieldCodec<I, O> {
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.defaultOut(defaultValue: O): BsonFieldCodec<I, O> {
     val codec = this as Codec<I, O>
-    return BsonFieldCodec(name, codec catchOut defaultValue)
+    return BsonFieldCodec(name, codec defaultOut defaultValue)
 }
 
 @OptIn(ExperimentalCodecApi::class)
