@@ -19,8 +19,10 @@ import org.cufy.bson.*
 import org.cufy.mongodb.`$type`
 import org.cufy.mongodb.CreateIndexModel
 import org.cufy.mongodb.CreateIndexOptions
-import org.cufy.monkt.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.Pathname
 import org.cufy.monkt.schema.*
+import kotlin.collections.set
 import kotlin.reflect.KCallable
 
 /* ============= ---- Protocol ---- ============= */
@@ -35,7 +37,7 @@ open class IndexesBuilderConfiguration : IndexesConfiguration() {
     /**
      * The index's keys.
      */
-    val keys: MutableBsonMap = mutableBsonMapOf()
+    val keys: MutableBsonDocumentLike = mutableBsonDocumentOf()
 
     /**
      * The index's options.

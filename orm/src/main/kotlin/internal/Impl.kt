@@ -1,8 +1,12 @@
 package org.cufy.monkt.internal
 
 import org.cufy.bson.*
-import org.cufy.monkt.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.InternalMonktApi
+import org.cufy.monkt.Model
+import org.cufy.monkt.Pathname
 import org.cufy.monkt.schema.*
+import kotlin.collections.set
 
 /**
  * The default implementation of [ArraySchema].
@@ -111,7 +115,7 @@ open class ArraySchemaImpl<T>(
     @AdvancedMonktApi
     override fun decode(element: BsonElement): List<T> {
         element as BsonArray
-        val array = element.toMutableBsonList()
+        val array = element.toMutableBsonArray()
 
         val list = mutableListOf<T>()
 
@@ -149,7 +153,7 @@ open class ArraySchemaImpl<T>(
 
     @AdvancedMonktApi
     override fun encode(value: List<T>): BsonElement {
-        val array = mutableBsonListOf()
+        val array = mutableBsonArrayOf()
 
         value.forEach { item ->
             val element = run {
@@ -477,7 +481,7 @@ open class FieldDefinitionImpl<T : Any, M>(
     }
 
     @AdvancedMonktApi
-    override fun decode(instance: T, document: MutableBsonMap) {
+    override fun decode(instance: T, document: MutableBsonDocumentLike) {
         val schema = schema
 
         val bsonValue = document[name] ?: BsonUndefined
@@ -513,7 +517,7 @@ open class FieldDefinitionImpl<T : Any, M>(
     }
 
     @AdvancedMonktApi
-    override fun encode(instance: T, document: MutableBsonMap) {
+    override fun encode(instance: T, document: MutableBsonDocumentLike) {
         val schema = schema
 
         val value = getter(instance)
@@ -635,7 +639,7 @@ open class ObjectSchemaImpl<T : Any>(
     @AdvancedMonktApi
     override fun decode(element: BsonElement): T {
         element as BsonDocument
-        val document = element.toMutableBsonMap()
+        val document = element.toMutableBsonDocument()
 
         val instance = constructor()
 
@@ -654,7 +658,7 @@ open class ObjectSchemaImpl<T : Any>(
 
     @AdvancedMonktApi
     override fun encode(value: T): BsonDocument {
-        val document = mutableBsonMapOf()
+        val document = mutableBsonDocumentOf()
 
         fields.forEach { it.encode(value, document) }
 
