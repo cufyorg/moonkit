@@ -15,8 +15,8 @@
  */
 package org.cufy.codec
 
-import org.cufy.bson.BsonElement
 import org.cufy.bson.BsonDocumentLike
+import org.cufy.bson.BsonElement
 import org.cufy.bson.MutableBsonMapField
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.properties.ReadOnlyProperty
@@ -79,7 +79,8 @@ fun <I, O : BsonElement> FieldCodec(name: String, codec: Codec<I, O>): BsonField
  */
 @OptIn(ExperimentalTypeInference::class, ExperimentalCodecApi::class)
 @OverloadResolutionByLambdaReturnType
-@Suppress("FunctionName")
+@Suppress("FunctionName", "DeprecatedCallableAddReplaceWith")
+@Deprecated("Use `Codecs` directly")
 fun <I, O : BsonElement> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
     return BsonFieldCodec(name, block(Codecs))
 }
@@ -126,9 +127,11 @@ infix fun <I, O : BsonElement> String.be(codec: Codec<I, O>): BsonFieldCodec<I, 
  * }
  * ```
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 @CodecKeywordMarker
+@Deprecated("Use `Codecs` directly")
 infix fun <I, O : BsonElement> String.be(block: Codecs.() -> Codec<I, O>): BsonFieldCodec<I, O> {
     return FieldCodec(this, block)
 }
@@ -178,12 +181,23 @@ operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>): I 
  * This function was made to be used in this manner:
  *
  * ```kotlin
- * data class MyClass(private val document: BsonDocument) {
+ * data class MyClass(val document: BsonDocument) {
  *    val field by "field" be { String } from document
+ * }
+ * ```
+ *
+ * This function can be replaced in this manner:
+ *
+ * ```kotlin
+ * private val FIELD = "field" be { String }
+ *
+ * data class MyClass(val document: BsonDocument) {
+ *    val field by lazy { document[FIELD] }
  * }
  * ```
  */
 @CodecKeywordMarker
+@Deprecated("use lazy { } instead", ReplaceWith("lazy { map[this] }"))
 infix fun <I> FieldCodec<I, out BsonElement>.from(map: BsonDocumentLike): Lazy<I> {
     return lazy { map[this] }
 }
@@ -198,10 +212,21 @@ infix fun <I> FieldCodec<I, out BsonElement>.from(map: BsonDocumentLike): Lazy<I
  * ```kotlin
  * data class MyClass(val document: BsonDocument)
  *
- * fun MyClass.field by "field" be { String } from { document }
+ * val MyClass.field by "field" be { String } from { document }
+ * ```
+ *
+ * This function can be replaced in this manner:
+ *
+ * ```kotlin
+ * data class MyClass(val document: BsonDocument)
+ *
+ * private val FIELD = "field" be { String }
+ *
+ * val MyClass.field get() = document[FIELD]
  * ```
  */
 @CodecKeywordMarker
+@Deprecated("use a field with custom getter instead")
 infix fun <T, I> FieldCodec<I, out BsonElement>.from(block: T.() -> BsonDocumentLike): ReadOnlyProperty<T, I> {
     return ReadOnlyProperty { thisRef, _ -> block(thisRef)[this] }
 }
@@ -216,10 +241,21 @@ infix fun <T, I> FieldCodec<I, out BsonElement>.from(block: T.() -> BsonDocument
  * ```kotlin
  * data class MyClass(val document: BsonDocument)
  *
- * fun MyClass.field by "field" be { String } from MyClass::document
+ * val MyClass.field by "field" be { String } from MyClass::document
+ * ```
+ *
+ * This function can be replaced in this manner:
+ *
+ * ```kotlin
+ * data class MyClass(val document: BsonDocument)
+ *
+ * private val FIELD = "field" be { String }
+ *
+ * val MyClass.field get() = document[FIELD]
  * ```
  */
 @CodecKeywordMarker
+@Deprecated("use a field with custom getter instead")
 infix fun <T, I> FieldCodec<I, out BsonElement>.from(property: KProperty1<T, BsonDocumentLike>): ReadOnlyProperty<T, I> {
     return ReadOnlyProperty { thisRef, _ -> property.get(thisRef)[this] }
 }

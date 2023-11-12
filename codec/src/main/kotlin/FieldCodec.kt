@@ -51,8 +51,10 @@ fun <I, O> FieldCodec(name: String, codec: Codec<I, O>): FieldCodec<I, O> {
  * and backed by the codec returned from invoking
  * the given [block].
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
+@Deprecated("Use `Codecs` directly")
 fun <I, O> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
     return FieldCodec(name, block(Codecs))
 }
@@ -99,9 +101,11 @@ infix fun <I, O> String.be(codec: Codec<I, O>): FieldCodec<I, O> {
  * }
  * ```
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 @CodecKeywordMarker
+@Deprecated("Use `Codecs` directly")
 infix fun <I, O> String.be(block: Codecs.() -> Codec<I, O>): FieldCodec<I, O> {
     return FieldCodec(this, block)
 }
