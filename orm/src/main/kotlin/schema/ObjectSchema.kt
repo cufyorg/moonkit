@@ -88,7 +88,7 @@ open class ObjectSchemaCodecScope<T : Any>(
     /**
      * The source document.
      */
-    val document: MutableBsonMap
+    val document: MutableBsonDocumentLike
 )
 
 /**

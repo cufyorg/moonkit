@@ -140,7 +140,9 @@ fun <I, O> tryEncodeAny(value: Any?, codec: Codec<I, O>): Result<O> {
  * @return the encoding result.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> tryEncodeAny(value: Any?, block: Codecs.() -> Codec<I, O>): Result<O> {
     return tryEncodeAny(value, block(Codecs))
 }
@@ -171,7 +173,9 @@ fun <I, O> encodeAny(value: Any?, codec: Codec<I, O>): O {
  * @throws CodecException if encoding failed.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> encodeAny(value: Any?, block: Codecs.() -> Codec<I, O>): O {
     return encodeAny(value, block(Codecs))
 }
@@ -199,7 +203,9 @@ fun <I, O> tryEncode(value: I, codec: Codec<I, O>): Result<O> {
  * @return the encoding result.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> tryEncode(value: I, block: Codecs.() -> Codec<I, O>): Result<O> {
     return tryEncodeAny(value, block(Codecs))
 }
@@ -227,7 +233,9 @@ fun <I, O> encode(value: I, codec: Codec<I, O>): O {
  * @throws CodecException if encoding failed.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> encode(value: I, block: Codecs.() -> Codec<I, O>): O {
     return encodeAny(value, block(Codecs))
 }
@@ -289,7 +297,9 @@ fun <I, O> tryDecodeAny(value: Any?, codec: Codec<I, O>): Result<I> {
  * @return the decoding result.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> tryDecodeAny(value: Any?, block: Codecs.() -> Codec<I, O>): Result<I> {
     return tryDecodeAny(value, block(Codecs))
 }
@@ -320,7 +330,9 @@ fun <I, O> decodeAny(value: Any?, codec: Codec<I, O>): I {
  * @throws CodecException if decoding failed.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> decodeAny(value: Any?, block: Codecs.() -> Codec<I, O>): I {
     return decodeAny(value, block(Codecs))
 }
@@ -348,7 +360,9 @@ fun <I, O> tryDecode(value: O, codec: Codec<I, O>): Result<I> {
  * @return the decoding result.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> tryDecode(value: O, block: Codecs.() -> Codec<I, O>): Result<I> {
     return tryDecodeAny(value, block(Codecs))
 }
@@ -376,7 +390,9 @@ fun <I, O> decode(value: O, codec: Codec<I, O>): I {
  * @throws CodecException if decoding failed.
  * @since 2.0.0
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @CodecMarker
+@Deprecated("Use `Codecs` directly")
 fun <I, O> decode(value: O, block: Codecs.() -> Codec<I, O>): I {
     return decodeAny(value, block(Codecs))
 }

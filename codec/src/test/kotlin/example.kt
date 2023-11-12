@@ -71,6 +71,14 @@ object Document1 {
     val Id = Codecs.Id<Document1>() at "_id"
     val Name = Codecs.String at "name"
     val Age = Codecs.Int32 at "age"
+
+    val Birthday = "birthday"
+        .be(Codecs.Int64.Nullable)
+
+    val Birthday1 = "birthday1"
+        .be(Codecs.Int64.Nullable)
+        .defaultIn(0)
+        .catchIn { 0 }
 }
 
 data class Document1f1(
@@ -80,18 +88,14 @@ data class Document1f1(
 )
 
 data class Document1f2(val document: BsonDocument) {
-    val id by Document1.Id from document
-    val name by Document1.Name from document
-    val age by Document1.Age from document
+    val id by lazy { document[Document1.Id] }
+    val name by lazy { document[Document1.Name] }
+    val age by lazy { document[Document1.Age] }
 
-    val birthday by Codecs.Int64.Nullable at "birthday" from document
+    val birthday by lazy { document[Document1.Birthday] }
 }
 
-val Document1f2.birthday1 by Codecs.Int64.Nullable
-    .at("birthday1")
-    .defaultIn(0)
-    .catchIn { 0 }
-    .from(Document1f2::document)
+val Document1f2.birthday1 get() = document[Document1.Birthday1]
 
 val Document1f1Codec = Codec {
     encodeCatching { it: Document1f1 ->

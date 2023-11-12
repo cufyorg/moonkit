@@ -19,7 +19,6 @@ package org.cufy.mongodb
 
 import org.cufy.bson.*
 import org.intellij.lang.annotations.Language
-import java.util.*
 
 /* ============= ------------------ ============= */
 
@@ -34,7 +33,7 @@ import java.util.*
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.ID(value: BsonElement) {
+fun MutableBsonDocumentLike.ID(value: BsonElement) {
     "_id" by { `$eq` by value }
 }
 
@@ -49,7 +48,7 @@ fun MutableBsonMap.ID(value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.ID(value: BsonElement) {
+fun MutableBsonArrayLike.ID(value: BsonElement) {
     by { ID(value) }
 }
 
@@ -66,7 +65,7 @@ fun MutableBsonList.ID(value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.EQ(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.EQ(name: String, value: BsonElement) {
     name by value
 }
 
@@ -81,7 +80,7 @@ fun MutableBsonMap.EQ(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.EQ(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.EQ(name: String, value: BsonElement) {
     by { EQ(name, value) }
 }
 
@@ -99,7 +98,7 @@ fun MutableBsonList.EQ(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.NE(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.NE(name: String, value: BsonElement) {
     name by { `$ne` by value }
 }
 
@@ -115,7 +114,7 @@ fun MutableBsonMap.NE(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.NE(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.NE(name: String, value: BsonElement) {
     by { NE(name, value) }
 }
 
@@ -133,7 +132,7 @@ fun MutableBsonList.NE(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.GT(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.GT(name: String, value: BsonElement) {
     name by { `$gt` by value }
 }
 
@@ -149,7 +148,7 @@ fun MutableBsonMap.GT(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.GT(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.GT(name: String, value: BsonElement) {
     by { GT(name, value) }
 }
 
@@ -167,7 +166,7 @@ fun MutableBsonList.GT(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.LT(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.LT(name: String, value: BsonElement) {
     name by { `$lt` by value }
 }
 
@@ -183,7 +182,7 @@ fun MutableBsonMap.LT(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.LT(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.LT(name: String, value: BsonElement) {
     by { LT(name, value) }
 }
 
@@ -201,7 +200,7 @@ fun MutableBsonList.LT(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.GTE(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.GTE(name: String, value: BsonElement) {
     name by { `$gte` by value }
 }
 
@@ -217,7 +216,7 @@ fun MutableBsonMap.GTE(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.GTE(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.GTE(name: String, value: BsonElement) {
     by { GTE(name, value) }
 }
 
@@ -235,7 +234,7 @@ fun MutableBsonList.GTE(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.LTE(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.LTE(name: String, value: BsonElement) {
     name by { `$gte` by value }
 }
 
@@ -251,7 +250,7 @@ fun MutableBsonMap.LTE(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.LTE(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.LTE(name: String, value: BsonElement) {
     by { LTE(name, value) }
 }
 
@@ -271,7 +270,7 @@ fun MutableBsonList.LTE(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.IN(name: String, block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.IN(name: String, block: BsonArrayBlock) {
     name by { `$in` by array(block) }
 }
 
@@ -289,7 +288,7 @@ fun MutableBsonMap.IN(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.IN(name: String, block: BsonArrayBlock) {
+fun MutableBsonArrayLike.IN(name: String, block: BsonArrayBlock) {
     by { IN(name, block) }
 }
 
@@ -309,7 +308,7 @@ fun MutableBsonList.IN(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.NIN(name: String, block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.NIN(name: String, block: BsonArrayBlock) {
     name by { `$nin` by array(block) }
 }
 
@@ -325,7 +324,7 @@ fun MutableBsonMap.NIN(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.NIN(name: String, block: BsonArrayBlock) {
+fun MutableBsonArrayLike.NIN(name: String, block: BsonArrayBlock) {
     by { NIN(name, block) }
 }
 
@@ -343,7 +342,7 @@ fun MutableBsonList.NIN(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.AND(block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.AND(block: BsonArrayBlock) {
     `$and` by array(block)
 }
 
@@ -359,7 +358,7 @@ fun MutableBsonMap.AND(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.AND(block: BsonArrayBlock) {
+fun MutableBsonArrayLike.AND(block: BsonArrayBlock) {
     by { AND(block) }
 }
 
@@ -377,7 +376,7 @@ fun MutableBsonList.AND(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.OR(block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.OR(block: BsonArrayBlock) {
     `$or` by array(block)
 }
 
@@ -393,7 +392,7 @@ fun MutableBsonMap.OR(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.OR(block: BsonArrayBlock) {
+fun MutableBsonArrayLike.OR(block: BsonArrayBlock) {
     by { OR(block) }
 }
 
@@ -411,7 +410,7 @@ fun MutableBsonList.OR(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.NOT(block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.NOT(block: BsonDocumentBlock) {
     `$not` by block
 }
 
@@ -427,7 +426,7 @@ fun MutableBsonMap.NOT(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.NOT(block: BsonArrayBlock) {
+fun MutableBsonArrayLike.NOT(block: BsonArrayBlock) {
     by { NOT(block) }
 }
 
@@ -445,7 +444,7 @@ fun MutableBsonList.NOT(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.NOR(block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.NOR(block: BsonArrayBlock) {
     `$nor` by array(block)
 }
 
@@ -461,7 +460,7 @@ fun MutableBsonMap.NOR(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.NOR(block: BsonArrayBlock) {
+fun MutableBsonArrayLike.NOR(block: BsonArrayBlock) {
     by { NOR(block) }
 }
 
@@ -479,7 +478,7 @@ fun MutableBsonList.NOR(block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.EXISTS(name: String, value: Boolean = true) {
+fun MutableBsonDocumentLike.EXISTS(name: String, value: Boolean = true) {
     name by { `$exists` by value }
 }
 
@@ -495,7 +494,7 @@ fun MutableBsonMap.EXISTS(name: String, value: Boolean = true) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.EXISTS(name: String, value: Boolean = true) {
+fun MutableBsonArrayLike.EXISTS(name: String, value: Boolean = true) {
     by { EXISTS(name, value) }
 }
 
@@ -513,7 +512,7 @@ fun MutableBsonList.EXISTS(name: String, value: Boolean = true) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.TYPE(name: String, value: BsonType) {
+fun MutableBsonDocumentLike.TYPE(name: String, value: BsonType) {
     name by { `$type` by value.value }
 }
 
@@ -529,7 +528,7 @@ fun MutableBsonMap.TYPE(name: String, value: BsonType) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.TYPE(name: String, value: BsonType) {
+fun MutableBsonArrayLike.TYPE(name: String, value: BsonType) {
     by { TYPE(name, value) }
 }
 
@@ -547,7 +546,7 @@ fun MutableBsonList.TYPE(name: String, value: BsonType) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.MOD(name: String, divisor: Long, remainder: Long) {
+fun MutableBsonDocumentLike.MOD(name: String, divisor: Long, remainder: Long) {
     name by { `$mod` by array(divisor.bson, remainder.bson) }
 }
 
@@ -563,7 +562,7 @@ fun MutableBsonMap.MOD(name: String, divisor: Long, remainder: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.MOD(name: String, divisor: Long, remainder: Long) {
+fun MutableBsonArrayLike.MOD(name: String, divisor: Long, remainder: Long) {
     by { MOD(name, divisor, remainder) }
 }
 
@@ -581,7 +580,7 @@ fun MutableBsonList.MOD(name: String, divisor: Long, remainder: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.REGEXP(name: String, @Language("RegExp") pattern: String, options: String) {
+fun MutableBsonDocumentLike.REGEXP(name: String, @Language("RegExp") pattern: String, options: String) {
     name by BsonRegExp(pattern, options)
 }
 
@@ -597,7 +596,7 @@ fun MutableBsonMap.REGEXP(name: String, @Language("RegExp") pattern: String, opt
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.REGEXP(name: String, @Language("RegExp") pattern: String, options: String) {
+fun MutableBsonArrayLike.REGEXP(name: String, @Language("RegExp") pattern: String, options: String) {
     by { REGEXP(name, pattern, options) }
 }
 
@@ -615,7 +614,7 @@ fun MutableBsonList.REGEXP(name: String, @Language("RegExp") pattern: String, op
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.REGEXP(name: String, @Language("RegExp") pattern: String, options: Set<Char> = emptySet()) {
+fun MutableBsonDocumentLike.REGEXP(name: String, @Language("RegExp") pattern: String, options: Set<Char> = emptySet()) {
     name by BsonRegExp(pattern, options)
 }
 
@@ -631,7 +630,7 @@ fun MutableBsonMap.REGEXP(name: String, @Language("RegExp") pattern: String, opt
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.REGEXP(name: String, @Language("RegExp") pattern: String, options: Set<Char> = emptySet()) {
+fun MutableBsonArrayLike.REGEXP(name: String, @Language("RegExp") pattern: String, options: Set<Char> = emptySet()) {
     by { REGEXP(name, pattern, options) }
 }
 
@@ -649,7 +648,7 @@ fun MutableBsonList.REGEXP(name: String, @Language("RegExp") pattern: String, op
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.TEXT(search: String, options: TextSearchOptions = TextSearchOptions()) {
+fun MutableBsonDocumentLike.TEXT(search: String, options: TextSearchOptions = TextSearchOptions()) {
     `$text` by {
         `$search` by search
         options.language?.let { "\$language" by it }
@@ -670,7 +669,7 @@ fun MutableBsonMap.TEXT(search: String, options: TextSearchOptions = TextSearchO
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.TEXT(search: String, options: TextSearchOptions = TextSearchOptions()) {
+fun MutableBsonArrayLike.TEXT(search: String, options: TextSearchOptions = TextSearchOptions()) {
     by { TEXT(search, options) }
 }
 
@@ -688,7 +687,7 @@ fun MutableBsonList.TEXT(search: String, options: TextSearchOptions = TextSearch
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.TEXT(search: String, options: TextSearchOptions.() -> Unit) {
+fun MutableBsonDocumentLike.TEXT(search: String, options: TextSearchOptions.() -> Unit) {
     TEXT(search, TextSearchOptions(options))
 }
 
@@ -704,7 +703,7 @@ fun MutableBsonMap.TEXT(search: String, options: TextSearchOptions.() -> Unit) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.TEXT(search: String, options: TextSearchOptions.() -> Unit) {
+fun MutableBsonArrayLike.TEXT(search: String, options: TextSearchOptions.() -> Unit) {
     by { TEXT(search, options) }
 }
 
@@ -722,7 +721,7 @@ fun MutableBsonList.TEXT(search: String, options: TextSearchOptions.() -> Unit) 
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.WHERE(@Language("JavaScript") expression: String) {
+fun MutableBsonDocumentLike.WHERE(@Language("JavaScript") expression: String) {
     `$where` by expression
 }
 
@@ -738,7 +737,7 @@ fun MutableBsonMap.WHERE(@Language("JavaScript") expression: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.WHERE(expression: String) {
+fun MutableBsonArrayLike.WHERE(expression: String) {
     by { WHERE(expression) }
 }
 
@@ -756,7 +755,7 @@ fun MutableBsonList.WHERE(expression: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.EXPR(expression: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.EXPR(expression: BsonDocumentBlock) {
     `$expr` by expression
 }
 
@@ -772,7 +771,7 @@ fun MutableBsonMap.EXPR(expression: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.EXPR(expression: String) {
+fun MutableBsonArrayLike.EXPR(expression: String) {
     by { EXPR(expression) }
 }
 
@@ -790,7 +789,7 @@ fun MutableBsonList.EXPR(expression: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.ALL(name: String, block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.ALL(name: String, block: BsonArrayBlock) {
     name by { `$all` by array(block) }
 }
 
@@ -806,7 +805,7 @@ fun MutableBsonMap.ALL(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.ALL(name: String, block: BsonArrayBlock) {
+fun MutableBsonArrayLike.ALL(name: String, block: BsonArrayBlock) {
     by { ALL(name, block) }
 }
 
@@ -824,7 +823,7 @@ fun MutableBsonList.ALL(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.ELEM_MATCH(name: String, block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.ELEM_MATCH(name: String, block: BsonDocumentBlock) {
     name by { `$elemMatch` by block }
 }
 
@@ -840,7 +839,7 @@ fun MutableBsonMap.ELEM_MATCH(name: String, block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.ELEM_MATCH(name: String, block: BsonDocumentBlock) {
+fun MutableBsonArrayLike.ELEM_MATCH(name: String, block: BsonDocumentBlock) {
     by { ELEM_MATCH(name, block) }
 }
 
@@ -858,7 +857,7 @@ fun MutableBsonList.ELEM_MATCH(name: String, block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.SIZE(name: String, value: Int) {
+fun MutableBsonDocumentLike.SIZE(name: String, value: Int) {
     name by { `$size` by value }
 }
 
@@ -874,7 +873,7 @@ fun MutableBsonMap.SIZE(name: String, value: Int) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.SIZE(name: String, value: Int) {
+fun MutableBsonArrayLike.SIZE(name: String, value: Int) {
     by { SIZE(name, value) }
 }
 
@@ -892,7 +891,7 @@ fun MutableBsonList.SIZE(name: String, value: Int) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.BITS_ALL_CLEAR(name: String, bitmask: Long) {
+fun MutableBsonDocumentLike.BITS_ALL_CLEAR(name: String, bitmask: Long) {
     name by { `$bitsAllClear` by bitmask }
 }
 
@@ -908,7 +907,7 @@ fun MutableBsonMap.BITS_ALL_CLEAR(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.BITS_ALL_CLEAR(name: String, bitmask: Long) {
+fun MutableBsonArrayLike.BITS_ALL_CLEAR(name: String, bitmask: Long) {
     by { BITS_ALL_CLEAR(name, bitmask) }
 }
 
@@ -926,7 +925,7 @@ fun MutableBsonList.BITS_ALL_CLEAR(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.BITS_ALL_SET(name: String, bitmask: Long) {
+fun MutableBsonDocumentLike.BITS_ALL_SET(name: String, bitmask: Long) {
     name by { `$bitsAllSet` by bitmask }
 }
 
@@ -942,7 +941,7 @@ fun MutableBsonMap.BITS_ALL_SET(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.BITS_ALL_SET(name: String, bitmask: Long) {
+fun MutableBsonArrayLike.BITS_ALL_SET(name: String, bitmask: Long) {
     by { BITS_ALL_SET(name, bitmask) }
 }
 
@@ -960,7 +959,7 @@ fun MutableBsonList.BITS_ALL_SET(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.BITS_ANY_CLEAR(name: String, bitmask: Long) {
+fun MutableBsonDocumentLike.BITS_ANY_CLEAR(name: String, bitmask: Long) {
     name by { `$bitsAnyClear` by bitmask }
 }
 
@@ -976,7 +975,7 @@ fun MutableBsonMap.BITS_ANY_CLEAR(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.BITS_ANY_CLEAR(name: String, bitmask: Long) {
+fun MutableBsonArrayLike.BITS_ANY_CLEAR(name: String, bitmask: Long) {
     by { BITS_ANY_CLEAR(name, bitmask) }
 }
 
@@ -994,7 +993,7 @@ fun MutableBsonList.BITS_ANY_CLEAR(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.BITS_ANY_SET(name: String, bitmask: Long) {
+fun MutableBsonDocumentLike.BITS_ANY_SET(name: String, bitmask: Long) {
     name by { `$bitsAnySet` by bitmask }
 }
 
@@ -1010,7 +1009,7 @@ fun MutableBsonMap.BITS_ANY_SET(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.BITS_ANY_SET(name: String, bitmask: Long) {
+fun MutableBsonArrayLike.BITS_ANY_SET(name: String, bitmask: Long) {
     by { BITS_ANY_SET(name, bitmask) }
 }
 
@@ -1040,7 +1039,7 @@ fun MutableBsonList.BITS_ANY_SET(name: String, bitmask: Long) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.JSON_SCHEMA(schema: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.JSON_SCHEMA(schema: BsonDocumentBlock) {
     `$jsonSchema` by schema
 }
 
@@ -1056,7 +1055,7 @@ fun MutableBsonMap.JSON_SCHEMA(schema: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.JSON_SCHEMA(schema: BsonDocumentBlock) {
+fun MutableBsonArrayLike.JSON_SCHEMA(schema: BsonDocumentBlock) {
     by { JSON_SCHEMA(schema) }
 }
 

@@ -33,7 +33,7 @@ import org.cufy.bson.*
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.SET(block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.SET(block: BsonDocumentBlock) {
     `$set` by block
 }
 
@@ -49,7 +49,7 @@ fun MutableBsonMap.SET(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.SET(block: BsonDocumentBlock) {
+fun MutableBsonArrayLike.SET(block: BsonDocumentBlock) {
     by { SET(block) }
 }
 
@@ -67,7 +67,7 @@ fun MutableBsonList.SET(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.SET(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.SET(name: String, value: BsonElement) {
     `$set` by { name by value }
 }
 
@@ -83,7 +83,7 @@ fun MutableBsonMap.SET(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.SET(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.SET(name: String, value: BsonElement) {
     by { SET(name, value) }
 }
 
@@ -101,7 +101,7 @@ fun MutableBsonList.SET(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.UNSET(block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.UNSET(block: BsonDocumentBlock) {
     `$unset` by block
 }
 
@@ -117,7 +117,7 @@ fun MutableBsonMap.UNSET(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.UNSET(block: BsonDocumentBlock) {
+fun MutableBsonArrayLike.UNSET(block: BsonDocumentBlock) {
     by { UNSET(block) }
 }
 
@@ -135,7 +135,7 @@ fun MutableBsonList.UNSET(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.UNSET(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.UNSET(name: String, value: BsonElement) {
     `$unset` by { name by value }
 }
 
@@ -151,7 +151,7 @@ fun MutableBsonMap.UNSET(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.UNSET(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.UNSET(name: String, value: BsonElement) {
     by { UNSET(name, value) }
 }
 
@@ -169,7 +169,7 @@ fun MutableBsonList.UNSET(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.SET_ON_INSERT(block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.SET_ON_INSERT(block: BsonDocumentBlock) {
     `$setOnInsert` by block
 }
 
@@ -185,7 +185,7 @@ fun MutableBsonMap.SET_ON_INSERT(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.SET_ON_INSERT(block: BsonDocumentBlock) {
+fun MutableBsonArrayLike.SET_ON_INSERT(block: BsonDocumentBlock) {
     by { SET_ON_INSERT(block) }
 }
 
@@ -203,7 +203,7 @@ fun MutableBsonList.SET_ON_INSERT(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.SET_ON_INSERT(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.SET_ON_INSERT(name: String, value: BsonElement) {
     `$setOnInsert` by { name by value }
 }
 
@@ -219,7 +219,7 @@ fun MutableBsonMap.SET_ON_INSERT(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.SET_ON_INSERT(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.SET_ON_INSERT(name: String, value: BsonElement) {
     by { SET_ON_INSERT(name, value) }
 }
 
@@ -237,7 +237,7 @@ fun MutableBsonList.SET_ON_INSERT(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.RENAME(name: String, value: String) {
+fun MutableBsonDocumentLike.RENAME(name: String, value: String) {
     `$rename` by { name by value }
 }
 
@@ -253,7 +253,7 @@ fun MutableBsonMap.RENAME(name: String, value: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.RENAME(name: String, value: String) {
+fun MutableBsonArrayLike.RENAME(name: String, value: String) {
     by { RENAME(name, value) }
 }
 
@@ -271,7 +271,7 @@ fun MutableBsonList.RENAME(name: String, value: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.INC(name: String, value: BsonNumber) {
+fun MutableBsonDocumentLike.INC(name: String, value: BsonNumber) {
     `$inc` by { name by value }
 }
 
@@ -287,7 +287,7 @@ fun MutableBsonMap.INC(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.INC(name: String, value: BsonNumber) {
+fun MutableBsonArrayLike.INC(name: String, value: BsonNumber) {
     by { INC(name, value) }
 }
 
@@ -305,7 +305,7 @@ fun MutableBsonList.INC(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.MUL(name: String, value: BsonNumber) {
+fun MutableBsonDocumentLike.MUL(name: String, value: BsonNumber) {
     `$mul` by { name by value }
 }
 
@@ -321,7 +321,7 @@ fun MutableBsonMap.MUL(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.MUL(name: String, value: BsonNumber) {
+fun MutableBsonArrayLike.MUL(name: String, value: BsonNumber) {
     by { MUL(name, value) }
 }
 
@@ -339,7 +339,7 @@ fun MutableBsonList.MUL(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.MIN(name: String, value: BsonNumber) {
+fun MutableBsonDocumentLike.MIN(name: String, value: BsonNumber) {
     `$min` by { name by value }
 }
 
@@ -355,7 +355,7 @@ fun MutableBsonMap.MIN(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.MIN(name: String, value: BsonNumber) {
+fun MutableBsonArrayLike.MIN(name: String, value: BsonNumber) {
     by { MIN(name, value) }
 }
 
@@ -373,7 +373,7 @@ fun MutableBsonList.MIN(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.MAX(name: String, value: BsonNumber) {
+fun MutableBsonDocumentLike.MAX(name: String, value: BsonNumber) {
     `$max` by { name by value }
 }
 
@@ -389,7 +389,7 @@ fun MutableBsonMap.MAX(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.MAX(name: String, value: BsonNumber) {
+fun MutableBsonArrayLike.MAX(name: String, value: BsonNumber) {
     by { MAX(name, value) }
 }
 
@@ -407,7 +407,7 @@ fun MutableBsonList.MAX(name: String, value: BsonNumber) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.CURRENT_DATE(name: String) {
+fun MutableBsonDocumentLike.CURRENT_DATE(name: String) {
     `$currentDate` by { name by true }
 }
 
@@ -423,7 +423,7 @@ fun MutableBsonMap.CURRENT_DATE(name: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.CURRENT_DATE(name: String) {
+fun MutableBsonArrayLike.CURRENT_DATE(name: String) {
     by { CURRENT_DATE(name) }
 }
 
@@ -441,7 +441,7 @@ fun MutableBsonList.CURRENT_DATE(name: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.CURRENT_TIMESTAMP(name: String) {
+fun MutableBsonDocumentLike.CURRENT_TIMESTAMP(name: String) {
     `$currentDate` by { name by { `$type` by "timestamp" } }
 }
 
@@ -457,7 +457,7 @@ fun MutableBsonMap.CURRENT_TIMESTAMP(name: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.CURRENT_TIMESTAMP(name: String) {
+fun MutableBsonArrayLike.CURRENT_TIMESTAMP(name: String) {
     by { CURRENT_TIMESTAMP(name) }
 }
 
@@ -475,7 +475,7 @@ fun MutableBsonList.CURRENT_TIMESTAMP(name: String) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.ADD_TO_SET(block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.ADD_TO_SET(block: BsonDocumentBlock) {
     `$addToSet` by block
 }
 
@@ -491,7 +491,7 @@ fun MutableBsonMap.ADD_TO_SET(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.ADD_TO_SET(block: BsonDocumentBlock) {
+fun MutableBsonArrayLike.ADD_TO_SET(block: BsonDocumentBlock) {
     by { ADD_TO_SET(block) }
 }
 
@@ -509,7 +509,7 @@ fun MutableBsonList.ADD_TO_SET(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.ADD_TO_SET(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.ADD_TO_SET(name: String, value: BsonElement) {
     `$addToSet` by { name by value }
 }
 
@@ -525,7 +525,7 @@ fun MutableBsonMap.ADD_TO_SET(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.ADD_TO_SET(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.ADD_TO_SET(name: String, value: BsonElement) {
     by { ADD_TO_SET(name, value) }
 }
 
@@ -543,7 +543,7 @@ fun MutableBsonList.ADD_TO_SET(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
     `$addToSet` by { name by { `$each` by array(block) } }
 }
 
@@ -559,7 +559,7 @@ fun MutableBsonMap.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
+fun MutableBsonArrayLike.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
     by { ADD_EACH_TO_SET(name, block) }
 }
 
@@ -577,7 +577,7 @@ fun MutableBsonList.ADD_EACH_TO_SET(name: String, block: BsonArrayBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.PUSH(block: BsonDocumentBlock) {
+fun MutableBsonDocumentLike.PUSH(block: BsonDocumentBlock) {
     `$push` by block
 }
 
@@ -593,7 +593,7 @@ fun MutableBsonMap.PUSH(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.PUSH(block: BsonDocumentBlock) {
+fun MutableBsonArrayLike.PUSH(block: BsonDocumentBlock) {
     by { PUSH(block) }
 }
 
@@ -611,7 +611,7 @@ fun MutableBsonList.PUSH(block: BsonDocumentBlock) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.PUSH(name: String, value: BsonElement) {
+fun MutableBsonDocumentLike.PUSH(name: String, value: BsonElement) {
     `$push` by { name by value }
 }
 
@@ -627,7 +627,7 @@ fun MutableBsonMap.PUSH(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.PUSH(name: String, value: BsonElement) {
+fun MutableBsonArrayLike.PUSH(name: String, value: BsonElement) {
     by { PUSH(name, value) }
 }
 
@@ -645,7 +645,7 @@ fun MutableBsonList.PUSH(name: String, value: BsonElement) {
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions = PushOptions(), block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.PUSH_EACH(name: String, options: PushOptions = PushOptions(), block: BsonArrayBlock) {
     `$push` by {
         name by {
             `$each` by array(block)
@@ -668,7 +668,7 @@ fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions = PushOptions(),
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.PUSH_EACH(name: String, options: PushOptions = PushOptions(), block: BsonArrayBlock) {
+fun MutableBsonArrayLike.PUSH_EACH(name: String, options: PushOptions = PushOptions(), block: BsonArrayBlock) {
     by { PUSH_EACH(name, options, block) }
 }
 
@@ -686,7 +686,7 @@ fun MutableBsonList.PUSH_EACH(name: String, options: PushOptions = PushOptions()
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions.() -> Unit, block: BsonArrayBlock) {
+fun MutableBsonDocumentLike.PUSH_EACH(name: String, options: PushOptions.() -> Unit, block: BsonArrayBlock) {
     PUSH_EACH(name, PushOptions(options), block)
 }
 
@@ -702,7 +702,7 @@ fun MutableBsonMap.PUSH_EACH(name: String, options: PushOptions.() -> Unit, bloc
  */
 @BsonConstructorMarker
 @ExperimentalMongodbApi
-fun MutableBsonList.PUSH_EACH(name: String, options: PushOptions.() -> Unit, block: BsonArrayBlock) {
+fun MutableBsonArrayLike.PUSH_EACH(name: String, options: PushOptions.() -> Unit, block: BsonArrayBlock) {
     by { PUSH_EACH(name, options, block) }
 }
 

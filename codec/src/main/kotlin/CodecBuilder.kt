@@ -90,13 +90,6 @@ abstract class CodecClass<I, O>(block: CodecBuilder<I, O>.() -> Unit) : Codec<I,
     override fun decode(value: Any?) = codec.decode(value)
 }
 
-/**
- * Marker class for adding well-known codec shortcuts.
- */
-interface Codecs {
-    companion object : Codecs
-}
-
 /* ============= ------------------ ============= */
 
 // Encode-Any

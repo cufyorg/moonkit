@@ -242,14 +242,6 @@ object BsonStringCodec : Codec<String, BsonString> {
         }
 }
 
-/**
- * The codec for [String] and [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.String get() = BsonStringCodec
-
 /* ============= ------------------ ============= */
 
 /**
@@ -268,14 +260,6 @@ object BsonBooleanCodec : Codec<Boolean, BsonBoolean> {
             success(it.value)
         }
 }
-
-/**
- * The codec for [Boolean] and [BsonBoolean].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Boolean get() = BsonBooleanCodec
 
 /* ============= ------------------ ============= */
 
@@ -296,14 +280,6 @@ object BsonInt32Codec : Codec<Int, BsonInt32> {
         }
 }
 
-/**
- * The codec for [Int] and [BsonInt32].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Int32 get() = BsonInt32Codec
-
 /* ============= ------------------ ============= */
 
 /**
@@ -322,14 +298,6 @@ object BsonInt64Codec : Codec<Long, BsonInt64> {
             success(it.value)
         }
 }
-
-/**
- * The codec for [Long] and [BsonInt64].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Int64 get() = BsonInt64Codec
 
 /* ============= ------------------ ============= */
 
@@ -350,14 +318,6 @@ object BsonDoubleCodec : Codec<Double, BsonDouble> {
         }
 }
 
-/**
- * The codec for [Double] and [BsonDouble].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Double get() = BsonDoubleCodec
-
 /* ============= ------------------ ============= */
 
 /**
@@ -376,14 +336,6 @@ object BsonDecimal128Codec : Codec<Decimal128, BsonDecimal128> {
             success(it.value)
         }
 }
-
-/**
- * The codec for [Decimal128] and [BsonDecimal128].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Decimal128 get() = BsonDecimal128Codec
 
 /* ============= ------------------ ============= */
 
@@ -404,14 +356,6 @@ object BsonBigDecimalCodec : Codec<BigDecimal, BsonDecimal128> {
         }
 }
 
-/**
- * The codec for [BigDecimal] and [BsonDecimal128].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.BigDecimal get() = BsonBigDecimalCodec
-
 /* ============= ------------------ ============= */
 
 /**
@@ -430,14 +374,6 @@ object BsonDateTimeCodec : Codec<Long, BsonDateTime> {
             success(it.value)
         }
 }
-
-/**
- * The codec for [Long] and [BsonDateTime].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.DateTime get() = BsonDateTimeCodec
 
 /* ============= ------------------ ============= */
 
@@ -458,14 +394,6 @@ object BsonDateCodec : Codec<Date, BsonDateTime> {
         }
 }
 
-/**
- * The codec for [Date] and [BsonDateTime].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Date get() = BsonDateCodec
-
 /* ============= ------------------ ============= */
 
 /**
@@ -485,14 +413,6 @@ object BsonInstantCodec : Codec<Instant, BsonDateTime> {
         }
 }
 
-/**
- * The codec for [Instant] and [BsonDateTime].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Instant get() = BsonInstantCodec
-
 /* ============= ------------------ ============= */
 
 /**
@@ -511,14 +431,6 @@ object BsonObjectIdCodec : Codec<ObjectId, BsonObjectId> {
             success(it.value)
         }
 }
-
-/**
- * The codec for [ObjectId] and [BsonObjectId].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.ObjectId get() = BsonObjectIdCodec
 
 /* ============= ------------------ ============= */
 
@@ -556,14 +468,6 @@ object BsonIdCodec : Codec<Id<*>, BsonElement> {
         return this as Codec<Id<T>, BsonElement>
     }
 }
-
-/**
- * The codec for [Id] and [BsonObjectId] or [BsonString].
- *
- * @since 2.0.0
- */
-@Suppress("UnusedReceiverParameter")
-inline val Codecs.Id get() = BsonIdCodec
 
 /* ============= ------------------ ============= */
 
