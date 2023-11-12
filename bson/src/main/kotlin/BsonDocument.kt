@@ -74,7 +74,7 @@ inline fun BsonDocument(): BsonDocument {
  * function will result to an undefined behaviour.**
  */
 fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
-    val content = mutableBsonMapOf()
+    val content = mutableBsonDocumentOf()
     content.apply(block)
     return BsonDocument(content)
 }
