@@ -29,7 +29,7 @@ package org.cufy.bson
  * @see org.bson.BsonDocument
  * @since 2.0.0
  */
-class BsonDocument internal constructor(
+class BsonDocument @PublishedApi internal constructor(
     private val content: BsonDocumentLike,
 ) : BsonElement, BsonDocumentLike by content {
     companion object {
@@ -73,7 +73,7 @@ inline fun BsonDocument(): BsonDocument {
  * given [block] after the execution of this
  * function will result to an undefined behaviour.**
  */
-fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
+inline fun BsonDocument(block: BsonDocumentBlock): BsonDocument {
     val content = mutableBsonDocumentOf()
     content.apply(block)
     return BsonDocument(content)
@@ -114,7 +114,7 @@ operator fun BsonDocument.plus(map: BsonDocumentLike): BsonDocument {
 /**
  * Create a new document from combining this document with the given [block].
  */
-operator fun BsonDocument.plus(block: BsonDocumentBlock): BsonDocument {
+inline operator fun BsonDocument.plus(block: BsonDocumentBlock): BsonDocument {
     return BsonDocument {
         byAll(this)
         block()
