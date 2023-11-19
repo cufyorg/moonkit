@@ -29,7 +29,7 @@ package org.cufy.bson
  * @see org.bson.BsonArray
  * @since 2.0.0
  */
-class BsonArray internal constructor(
+class BsonArray @PublishedApi internal constructor(
     private val content: BsonArrayLike,
 ) : BsonElement, BsonArrayLike by content {
     companion object {
@@ -71,7 +71,7 @@ inline fun BsonArray(): BsonArray {
  * given [block] after the execution of this
  * function will result to an undefined behaviour.**
  */
-fun BsonArray(block: BsonArrayBlock): BsonArray {
+inline fun BsonArray(block: BsonArrayBlock): BsonArray {
     val content = mutableBsonArrayOf()
     content.apply(block)
     return BsonArray(content)
@@ -112,7 +112,7 @@ operator fun BsonArray.plus(list: BsonArrayLike): BsonArray {
 /**
  * Create a new array from combining this array with the given [block].
  */
-operator fun BsonArray.plus(block: BsonArrayBlock): BsonArray {
+inline operator fun BsonArray.plus(block: BsonArrayBlock): BsonArray {
     return BsonArray {
         byAll(this)
         block()
