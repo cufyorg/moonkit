@@ -62,6 +62,16 @@ fun <I, O> FieldCodec(name: String, block: Codecs.() -> Codec<I, O>): FieldCodec
 /* ============= ------------------ ============= */
 
 /**
+ * Return a field codec derived from this one with
+ * its name tagged with the given language [tag].
+ */
+@CodecKeywordMarker
+infix fun <I, O> FieldCodec<I, O>.lang(tag: String): FieldCodec<I, O> {
+    if (tag.isEmpty()) return this
+    return FieldCodec("$name#$tag", this)
+}
+
+/**
  * Create a new field codec with the given [name]
  * and backed by [this] codec.
  */

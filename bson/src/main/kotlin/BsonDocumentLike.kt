@@ -174,6 +174,63 @@ fun mutableBsonMapOf(vararg pairs: Pair<String, BsonElement>) =
 /* ============= ------------------ ============= */
 
 /**
+ * Select the element with the perfect tag for the given [lang] preference.
+ *
+ * @param lang a list of comma-separated language ranges or a list of language
+ *                 ranges in the form of the "Accept-Language" header defined in RFC 2616
+ * @throws IllegalArgumentException if a language range or a weight found in the
+ *                                  given ranges is ill-formed
+ * @see Locale.LanguageRange.parse
+ */
+@OptIn(ExperimentalBsonApi::class)
+operator fun BsonDocumentLike.get(name: String, lang: String): BsonElement? {
+    val rangeList = Locale.LanguageRange.parse(lang)
+    val langTagList = getLangList(name)
+    val langTag = Locale.lookupTag(rangeList, langTagList)
+    langTag ?: return get(name)
+    if (langTag.isEmpty()) return get(name)
+    return get("$name#$langTag")
+}
+
+/**
+ * Select the element with the perfect tag for the given [lang] preference.
+ *
+ * @param lang the languages ordered by preference. (e.g. `["en-US", "ar-SA"]`)
+ * @throws IllegalArgumentException if the given range does not comply with the
+ *                                  syntax of the language range mentioned
+ *                                  in RFC 4647
+ * @see Locale.LanguageRange
+ */
+@OptIn(ExperimentalBsonApi::class)
+operator fun BsonDocumentLike.get(name: String, lang: List<String>): BsonElement? {
+    val rangeList = lang.map { Locale.LanguageRange(it) }
+    val langTagList = getLangList(name)
+    val langTag = Locale.lookupTag(rangeList, langTagList)
+    langTag ?: return get(name)
+    if (langTag.isEmpty()) return get(name)
+    return get("$name#$langTag")
+}
+
+/**
+ * Return the tags of the fields that has the given [name].
+ */
+@ExperimentalBsonApi
+fun BsonDocumentLike.getLangList(name: String): List<String> {
+    return buildList {
+        for (nt in keys) {
+            val nts = nt.split("#", limit = 2)
+            val n = nts.first()
+            val t = nts.getOrNull(1)
+
+            if (n == name)
+                add(t ?: "")
+        }
+    }
+}
+
+/* ============= ------------------ ============= */
+
+/**
  * An interface allowing custom receivers for
  * [MutableBsonDocumentLike.by].
  *

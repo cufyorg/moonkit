@@ -15,9 +15,8 @@
  */
 package org.cufy.codec
 
-import org.cufy.bson.BsonDocumentLike
-import org.cufy.bson.BsonElement
-import org.cufy.bson.MutableBsonMapField
+import org.cufy.bson.*
+import java.util.*
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty1
@@ -86,6 +85,16 @@ fun <I, O : BsonElement> FieldCodec(name: String, block: Codecs.() -> Codec<I, O
 }
 
 /* ============= ------------------ ============= */
+
+/**
+ * Return a field codec derived from this one with
+ * its name tagged with the given language [tag].
+ */
+@CodecKeywordMarker
+infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.lang(tag: String): BsonFieldCodec<I, O> {
+    if (tag.isEmpty()) return this
+    return FieldCodec("$name#$tag", this)
+}
 
 /**
  * Create a new field codec with the given [name]
@@ -172,6 +181,40 @@ infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) 
  */
 operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>): I {
     return decodeAny(this[codec.name], codec)
+}
+
+/**
+ * Select the element with the perfect tag for the given [language] preference.
+ *
+ * @param language a list of comma-separated language ranges or a list of language
+ *                 ranges in the form of the "Accept-Language" header defined in RFC 2616
+ * @throws IllegalArgumentException if a language range or a weight found in the
+ *                                  given ranges is ill-formed
+ * @see Locale.LanguageRange.parse
+ */
+operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, language: String): I {
+    return decodeAny(this[codec.name, language], codec)
+}
+
+/**
+ * Select the element with the perfect tag for the given [language] preference.
+ *
+ * @param language the languages ordered by preference. (e.g. `["en-US", "ar-SA"]`)
+ * @throws IllegalArgumentException if the given range does not comply with the
+ *                                  syntax of the language range mentioned
+ *                                  in RFC 4647
+ * @see Locale.LanguageRange
+ */
+operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, language: List<String>): I {
+    return decodeAny(this[codec.name, language], codec)
+}
+
+/**
+ * Return the tags of the fields that has the name of the given [codec].
+ */
+@ExperimentalBsonApi
+fun <I> BsonDocumentLike.getLangList(codec: FieldCodec<I, out BsonElement>): List<String> {
+    return getLangList(codec.name)
 }
 
 /**
