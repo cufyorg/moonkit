@@ -10,6 +10,24 @@ import kotlin.test.assertEquals
 
 class ExampleTest {
     @Test
+    fun `tagged fields`() {
+        val doc = BsonDocument {
+            Document1.Name by "default"
+            Document1.Name lang "en" by "EN"
+            Document1.Name lang "en-US" by "EN-US"
+            Document1.Name lang "ar" by "AR"
+            Document1.Name lang "ar-SA" by "AR-SA"
+        }
+
+        val preference = listOf("en-US", "ar-SA")
+        val automatic = doc[Document1.Name, preference]
+        val manual = doc[Document1.Name.Nullable lang "ar-SA"]
+
+        assertEquals(automatic, "EN-US")
+        assertEquals(manual, "AR-SA")
+    }
+
+    @Test
     fun `common example 1`() {
         val id = Id<Document1>()
         val name = "Sulaiman"

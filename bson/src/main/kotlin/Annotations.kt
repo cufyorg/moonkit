@@ -32,3 +32,14 @@ annotation class BsonConstructorMarker
  */
 @DslMarker
 annotation class BsonKeywordMarker
+
+/**
+ * Marks the annotated component as experimental.
+ *
+ * @since 2.0.0
+ */
+@RequiresOptIn(
+    message = "This is an experimental API and might change at anytime",
+    level = RequiresOptIn.Level.WARNING
+)
+annotation class ExperimentalBsonApi
