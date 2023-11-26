@@ -193,9 +193,9 @@ operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>): I 
  *                                  given ranges is ill-formed
  * @see Locale.LanguageRange.parse
  */
-operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lang: String): Pair<I, String> {
+operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lang: String): Localized<I> {
     val (element, langTag) = this[codec.name, lang]
-    return decodeAny(element, codec) to langTag
+    return Localized(decodeAny(element, codec), lang = langTag)
 }
 
 /**
@@ -207,9 +207,9 @@ operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lan
  *                                  in RFC 4647
  * @see Locale.LanguageRange
  */
-operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lang: List<String>): Pair<I, String> {
+operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lang: List<String>): Localized<I> {
     val (element, langTag) = this[codec.name, lang]
-    return decodeAny(element, codec) to langTag
+    return Localized(decodeAny(element, codec), lang = langTag)
 }
 
 /**
