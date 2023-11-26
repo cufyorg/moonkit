@@ -4,6 +4,7 @@ import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
 import org.cufy.bson.bson
 import org.cufy.bson.java.java
+import org.cufy.bson.lang
 import org.cufy.codec.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -23,6 +24,7 @@ class ExampleTest {
         val (automatic, automaticLang) = doc[Document1.Name, preference]
         val manual = doc[Document1.Name.Nullable lang "ar-SA"]
 
+        assertEquals("name#en-US", "name" lang "en-US")
         assertEquals(automatic, "EN-US")
         assertEquals(automaticLang, "en-US")
         assertEquals(manual, "AR-SA")
