@@ -5,11 +5,15 @@ dependencyResolutionManagement {
         }
     }
 }
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
-rootProject.name = "monkt"
+rootProject.name = "moonkit"
 
-include(":bson")
-include(":codec")
 include(":coroutines")
-include(":op")
+include(":moonkit")
 include(":orm")

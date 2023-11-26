@@ -1,28 +1,39 @@
 plugins {
-    kotlin("jvm") version libs.versions.kotlin
-    kotlin("plugin.serialization") version libs.versions.kotlin
-    id("maven-publish")
+    `maven-publish`
+
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://jitpack.io") }
-}
+kotlin {
+    jvm {
+        withJava()
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(kotlin("stdlib"))
+                implementation(kotlin("reflect"))
 
-dependencies {
-    implementation(project(":bson"))
+                implementation(libs.bson)
 
-    implementation(kotlin("stdlib"))
+                implementation(libs.kotlin.datetime)
+                implementation(libs.kotlin.serialization.json)
+                implementation(libs.kotlin.coroutines.core)
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation(libs.kotlin.coroutines.reactive)
 
-    implementation(libs.kotlin.coroutines.core)
-    implementation(libs.kotlin.coroutines.reactive)
-
-    implementation(libs.mongodb.sync)
-    implementation(libs.mongodb.reactivestreams)
-
-    testImplementation(kotlin("test"))
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
+                implementation(libs.mongodb.sync)
+                implementation(libs.mongodb.reactivestreams)
+            }
+        }
+    }
 }
