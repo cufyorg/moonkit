@@ -20,10 +20,11 @@ class ExampleTest {
         }
 
         val preference = listOf("en-US", "ar-SA")
-        val automatic = doc[Document1.Name, preference]
+        val (automatic, automaticLang) = doc[Document1.Name, preference]
         val manual = doc[Document1.Name.Nullable lang "ar-SA"]
 
         assertEquals(automatic, "EN-US")
+        assertEquals(automaticLang, "en-US")
         assertEquals(manual, "AR-SA")
     }
 

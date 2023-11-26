@@ -183,13 +183,13 @@ fun mutableBsonMapOf(vararg pairs: Pair<String, BsonElement>) =
  * @see Locale.LanguageRange.parse
  */
 @OptIn(ExperimentalBsonApi::class)
-operator fun BsonDocumentLike.get(name: String, lang: String): BsonElement? {
+operator fun BsonDocumentLike.get(name: String, lang: String): Pair<BsonElement?, String> {
     val rangeList = Locale.LanguageRange.parse(lang)
     val langTagList = getLangList(name)
     val langTag = Locale.lookupTag(rangeList, langTagList)
-    langTag ?: return get(name)
-    if (langTag.isEmpty()) return get(name)
-    return get("$name#$langTag")
+    langTag ?: return get(name) to ""
+    if (langTag.isEmpty()) return get(name) to ""
+    return get("$name#$langTag") to langTag
 }
 
 /**
@@ -202,13 +202,13 @@ operator fun BsonDocumentLike.get(name: String, lang: String): BsonElement? {
  * @see Locale.LanguageRange
  */
 @OptIn(ExperimentalBsonApi::class)
-operator fun BsonDocumentLike.get(name: String, lang: List<String>): BsonElement? {
+operator fun BsonDocumentLike.get(name: String, lang: List<String>): Pair<BsonElement?, String> {
     val rangeList = lang.map { Locale.LanguageRange(it) }
     val langTagList = getLangList(name)
     val langTag = Locale.lookupTag(rangeList, langTagList)
-    langTag ?: return get(name)
-    if (langTag.isEmpty()) return get(name)
-    return get("$name#$langTag")
+    langTag ?: return get(name) to ""
+    if (langTag.isEmpty()) return get(name) to ""
+    return get("$name#$langTag") to langTag
 }
 
 /**
