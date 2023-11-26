@@ -18,6 +18,7 @@ kotlin {
                 implementation(kotlin("reflect"))
 
                 implementation(libs.bson)
+                implementation(libs.kped.core)
                 implementation(libs.kped.bson)
 
                 implementation(libs.kotlin.serialization.json)
@@ -31,7 +32,10 @@ kotlin {
         }
         jvmMain {
             dependencies {
-                implementation("org.cufy:weakness:1.0.0")
+                implementation(libs.kotlin.coroutines.reactive)
+
+                implementation(libs.mongodb.sync)
+                implementation(libs.mongodb.reactivestreams)
             }
         }
     }
