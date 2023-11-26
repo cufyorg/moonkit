@@ -180,33 +180,36 @@ infix fun <I, O : BsonElement> BsonFieldCodec<I, O>.catchOut(block: (Throwable) 
  * given [codec] and decode it using the given [codec].
  */
 operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>): I {
-    return decodeAny(this[codec.name], codec)
+    val element = this[codec.name]
+    return decodeAny(element, codec)
 }
 
 /**
- * Select the element with the perfect tag for the given [language] preference.
+ * Select the element with the perfect tag for the given [lang] preference.
  *
- * @param language a list of comma-separated language ranges or a list of language
+ * @param lang a list of comma-separated language ranges or a list of language
  *                 ranges in the form of the "Accept-Language" header defined in RFC 2616
  * @throws IllegalArgumentException if a language range or a weight found in the
  *                                  given ranges is ill-formed
  * @see Locale.LanguageRange.parse
  */
-operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, language: String): I {
-    return decodeAny(this[codec.name, language], codec)
+operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lang: String): Pair<I, String> {
+    val (element, langTag) = this[codec.name, lang]
+    return decodeAny(element, codec) to langTag
 }
 
 /**
- * Select the element with the perfect tag for the given [language] preference.
+ * Select the element with the perfect tag for the given [lang] preference.
  *
- * @param language the languages ordered by preference. (e.g. `["en-US", "ar-SA"]`)
+ * @param lang the languages ordered by preference. (e.g. `["en-US", "ar-SA"]`)
  * @throws IllegalArgumentException if the given range does not comply with the
  *                                  syntax of the language range mentioned
  *                                  in RFC 4647
  * @see Locale.LanguageRange
  */
-operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, language: List<String>): I {
-    return decodeAny(this[codec.name, language], codec)
+operator fun <I> BsonDocumentLike.get(codec: FieldCodec<I, out BsonElement>, lang: List<String>): Pair<I, String> {
+    val (element, langTag) = this[codec.name, lang]
+    return decodeAny(element, codec) to langTag
 }
 
 /**
