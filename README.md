@@ -1,11 +1,10 @@
-# Monkt [![](https://jitpack.io/v/org.cufy/monkt.svg)](https://jitpack.io/#org.cufy/monkt)
+# Moonkit [![](https://jitpack.io/v/org.cufy/moonkit.svg)](https://jitpack.io/#org.cufy/moonkit)
 
 DSL Based MongoDB driver wrapper for kotlin with an optional schema system.
 
-
 > Note: this README is demonstrating how to use the ORM module.
-> But, it is fine to only use the bson DSL and the driver
-> coroutines wrapper.
+> But, the ORM module is DEPRECATED and a demonstration of using
+> MOONKIT module is coming in a day called "Someday"
 
 ### Install
 
@@ -21,10 +20,10 @@ repositories {
 
 dependencies {
     // Replace TAG with the desired version
-    const val monkt_version = "TAG"
-    implementation("org.cufy.monkt:bson:$monkt_version")
-    implementation("org.cufy.monkt:coroutines:$monkt_version")
-    implementation("org.cufy.monkt:orm:$monkt_version")
+    const val moonkit_version = "TAG"
+    implementation("org.cufy.kped:bson:$moonkit_version")
+    implementation("org.cufy.moonkit:coroutines:$moonkit_version")
+    implementation("org.cufy.moonkit:orm:$moonkit_version")
 }
 ```
 
