@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.20"
-kped = "6bf8700169"
+kped = "2.0.0-RC.1"
 
 [libraries]
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.1" }
