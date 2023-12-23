@@ -17,8 +17,7 @@ kotlin {
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
 
-                implementation(libs.bson)
-                implementation(libs.kped.bson)
+                implementation(libs.cufyorg.bson)
 
                 implementation(libs.kotlin.serialization.json)
                 implementation(libs.kotlin.coroutines.core)
