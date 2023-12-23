@@ -3,10 +3,10 @@ package org.cufy.monktop
 import kotlinx.coroutines.runBlocking
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.Id
-import org.cufy.kped.*
 import org.cufy.mongodb.`$set`
 import org.cufy.mongodb.drop
 import org.cufy.moonkit.*
+import org.cufy.ped.*
 import java.math.BigDecimal
 import java.util.UUID.randomUUID
 import kotlin.test.AfterTest

@@ -17,9 +17,7 @@ kotlin {
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
 
-                implementation(libs.bson)
-                implementation(libs.kped.core)
-                implementation(libs.kped.bson)
+                implementation(libs.cufyorg.bson)
 
                 implementation(libs.kotlin.serialization.json)
                 implementation(libs.kotlin.coroutines.core)
@@ -36,6 +34,12 @@ kotlin {
 
                 implementation(libs.mongodb.sync)
                 implementation(libs.mongodb.reactivestreams)
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation(libs.cufyorg.ped.core)
+                implementation(libs.cufyorg.ped.bson)
             }
         }
     }

@@ -15,7 +15,7 @@ kotlin {
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
 
-                implementation(libs.bson)
+                implementation(libs.cufyorg.bson)
 
                 implementation(libs.kotlin.datetime)
                 implementation(libs.kotlin.serialization.json)
