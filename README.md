@@ -20,10 +20,9 @@ repositories {
 
 dependencies {
     // Replace TAG with the desired version
-    const val moonkit_version = "TAG"
-    implementation("org.cufy.kped:bson:$moonkit_version")
-    implementation("org.cufy.moonkit:coroutines:$moonkit_version")
-    implementation("org.cufy.moonkit:orm:$moonkit_version")
+    implementation("org.cufy.serialization:cufyorg-bson:TAG")
+    implementation("org.cufy.moonkit:cufyorg-mongodb:TAG")
+    implementation("org.cufy.moonkit:cufyorg-moonkit-orm:TAG")
 }
 ```
 
