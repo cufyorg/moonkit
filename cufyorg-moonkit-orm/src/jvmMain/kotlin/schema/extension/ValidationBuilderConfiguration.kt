@@ -15,10 +15,12 @@
  */
 package org.cufy.monkt.schema.extension
 
-import org.cufy.bson.AnyId
+import org.cufy.bson.AnyID
 import org.cufy.mongodb.count
 import org.cufy.mongodb.get
-import org.cufy.monkt.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.Model
+import org.cufy.monkt.ValidationException
 import org.cufy.monkt.schema.*
 
 /* ============= ---- Protocol ---- ============= */
@@ -160,7 +162,7 @@ fun <T : Any, M> FieldDefinitionBuilder<T, M>.required(
  * @param block the model getter.
  * @since 2.0.0
  */
-fun <T : Any, M : AnyId?> FieldDefinitionBuilder<T, M>.exists(
+fun <T : Any, M : AnyID?> FieldDefinitionBuilder<T, M>.exists(
     block: ReturnOptionBlock<T, M & Any, ValidationBuilderConfiguration, Model<*>>
 ) {
     insure {
@@ -183,7 +185,7 @@ fun <T : Any, M : AnyId?> FieldDefinitionBuilder<T, M>.exists(
  * @since 2.0.0
  */
 @Deprecated("Use `exists` instead. This validator is unnecessary")
-fun <T : Any, M : AnyId?> FieldDefinitionBuilder<T, M>.existsAt(
+fun <T : Any, M : AnyID?> FieldDefinitionBuilder<T, M>.existsAt(
     block: ReturnOptionBlock<T, M & Any, ValidationBuilderConfiguration, String>
 ) {
     insure {

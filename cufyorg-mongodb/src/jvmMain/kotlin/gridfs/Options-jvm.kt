@@ -21,9 +21,6 @@ import java.util.concurrent.TimeUnit
 
 /* ============= ------------------ ============= */
 
-internal typealias JavaUploadOptions =
-        com.mongodb.client.gridfs.model.GridFSUploadOptions
-
 /**
  * Return a java version of this.
  */
@@ -35,9 +32,6 @@ val UploadOptions.java: JavaUploadOptions
 
 /* ============= ------------------ ============= */
 
-internal typealias JavaDownloadPublisher =
-        com.mongodb.reactivestreams.client.gridfs.GridFSDownloadPublisher
-
 /**
  * Apply the given [options] to this publisher.
  */
@@ -47,9 +41,6 @@ fun JavaDownloadPublisher.apply(options: DownloadOptions): JavaDownloadPublisher
 }
 
 /* ============= ------------------ ============= */
-
-internal typealias JavaBucketFindPublisher =
-        com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher
 
 /**
  * Apply the given [options] to this publisher.

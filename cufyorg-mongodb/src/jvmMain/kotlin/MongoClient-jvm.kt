@@ -13,6 +13,8 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb
 
 import com.mongodb.reactivestreams.client.MongoClients
@@ -26,14 +28,9 @@ import java.io.Closeable
 
 /* ============= ------------------ ============= */
 
-typealias JavaMongoClient =
-        com.mongodb.reactivestreams.client.MongoClient
-
-actual interface MongoClient : Closeable {
-    val java: JavaMongoClient
-
-    override fun close() =
-        java.close()
+actual data class MongoClient(val java: JavaMongoClient) : Closeable {
+    override fun close() = java.close()
+    override fun toString() = "MongoClient#${hashCode()}"
 }
 
 /* ============= ------------------ ============= */
@@ -45,9 +42,7 @@ actual interface MongoClient : Closeable {
  * @since 2.0.0
  */
 val JavaMongoClient.kt: MongoClient
-    get() = object : MongoClient {
-        override val java = this@kt
-    }
+    get() = MongoClient(this)
 
 /* ============= ------------------ ============= */
 

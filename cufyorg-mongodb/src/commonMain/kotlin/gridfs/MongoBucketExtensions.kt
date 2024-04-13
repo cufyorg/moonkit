@@ -19,6 +19,7 @@ import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonDocumentBlock
 import org.cufy.bson.BsonElement
 import org.cufy.mongodb.ClientSession
+import org.cufy.mongodb.ExperimentalMongodbApi
 
 /*
 These implementations are back-pressure wrappers
@@ -44,6 +45,7 @@ over the same functions in `MongoBucket.kt`
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.asyncUpload(
     filename: String,
     metadata: BsonDocument = BsonDocument.Empty,
@@ -69,6 +71,7 @@ expect suspend fun MongoBucket.asyncUpload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
@@ -94,6 +97,7 @@ expect suspend fun MongoBucket.asyncUpload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.asyncUpload(
     filename: String,
     metadata: BsonDocumentBlock,
@@ -126,6 +130,7 @@ suspend fun MongoBucket.asyncUpload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
@@ -160,6 +165,7 @@ suspend fun MongoBucket.asyncUpload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.asyncDownload(
     id: BsonElement,
     options: DownloadOptions = DownloadOptions(),
@@ -183,6 +189,7 @@ expect suspend fun MongoBucket.asyncDownload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.asyncDownload(
     filename: String,
     options: DownloadOptions = DownloadOptions(),
@@ -206,6 +213,7 @@ expect suspend fun MongoBucket.asyncDownload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.asyncDownload(
     id: BsonElement,
     session: ClientSession? = null,
@@ -235,6 +243,7 @@ suspend fun MongoBucket.asyncDownload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.asyncDownload(
     filename: String,
     revision: FileRevision = FileRevision.Latest,

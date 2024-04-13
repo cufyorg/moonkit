@@ -15,8 +15,13 @@
  */
 package org.cufy.monkt.internal
 
-import org.cufy.monkt.*
-import org.cufy.monkt.schema.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.Model
+import org.cufy.monkt.Pathname
+import org.cufy.monkt.schema.OptionData
+import org.cufy.monkt.schema.OptionScope
+import org.cufy.monkt.schema.Signal
+import org.cufy.monkt.schema.SignalProperty
 
 /**
  * Construct a new option scope with the given
@@ -27,8 +32,7 @@ import org.cufy.monkt.schema.*
  *                  to be resolved.
  */
 @AdvancedMonktApi
-@InternalMonktApi
-fun <T : Any, M, C> OptionScope(
+internal fun <T : Any, M, C> OptionScope(
     option: OptionData<T, M, C>,
     onWait: suspend (signals: List<Signal<*>>) -> List<Any?>
 ): OptionScope<T, M, C> {
@@ -71,8 +75,7 @@ fun <T : Any, M, C> OptionScope(
     }
 }
 
-@InternalMonktApi
-class SignalPropertyImpl<O> : SignalProperty<O> {
+internal class SignalPropertyImpl<O> : SignalProperty<O> {
     private var isComplete: Boolean = false
     private var _value: Any? = null
     private val onComplete: MutableList<suspend (Any?) -> Any?> = mutableListOf()

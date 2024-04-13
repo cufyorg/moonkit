@@ -16,8 +16,9 @@
 package org.cufy.monkt.schema
 
 import org.cufy.bson.BsonElement
-import org.cufy.monkt.*
-import org.cufy.monkt.internal.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.ExperimentalMonktApi
+import org.cufy.monkt.internal.ScalarSchemaBuilderImpl
 import kotlin.reflect.typeOf
 
 /**
@@ -84,7 +85,6 @@ interface ScalarSchemaBuilder<T> :
  *
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T> ScalarSchemaBuilder(): ScalarSchemaBuilder<T> {
     return ScalarSchemaBuilderImpl()
 }

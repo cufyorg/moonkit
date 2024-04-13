@@ -17,7 +17,7 @@ package org.cufy.monkt
 
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonDocumentBlock
-import org.cufy.bson.Id
+import org.cufy.bson.ID
 import org.cufy.mongodb.*
 import org.cufy.monkt.schema.extension.*
 
@@ -34,7 +34,6 @@ import org.cufy.monkt.schema.extension.*
  * @throws IllegalStateException if already initialized.
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 @AdvancedMonktApi("Tweaks should be created and handled internally")
 suspend fun Monkt.initImpl(
     session: ClientSession? = null,
@@ -441,7 +440,7 @@ suspend fun <T : Any> Model<T>.find(
  * @see MongoCollection.find
  */
 suspend fun <T : Any> Model<T>.findById(
-    ids: List<Id<T>>,
+    ids: List<ID<T>>,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): List<T> {
@@ -464,7 +463,7 @@ suspend fun <T : Any> Model<T>.findById(
  * @see MongoCollection.find
  */
 suspend fun <T : Any> Model<T>.findById(
-    vararg ids: Id<T>,
+    vararg ids: ID<T>,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): List<T> {
@@ -558,7 +557,7 @@ suspend fun <T : Any> Model<T>.findOne(
  * @see MongoCollection.findOne
  */
 suspend fun <T : Any> Model<T>.findOneById(
-    ids: List<Id<T>>,
+    ids: List<ID<T>>,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): T? {
@@ -579,7 +578,7 @@ suspend fun <T : Any> Model<T>.findOneById(
  * @see MongoCollection.findOne
  */
 suspend fun <T : Any> Model<T>.findOneById(
-    vararg ids: Id<T>,
+    vararg ids: ID<T>,
     session: ClientSession? = null,
     block: FindTweak.() -> Unit = {}
 ): T? {
@@ -1263,7 +1262,7 @@ suspend fun <T : Any> Model<T>.deleteOne(
  * @since 2.0.0
  */
 suspend fun <T : Any> Model<T>.deleteOneById(
-    ids: List<Id<T>>,
+    ids: List<ID<T>>,
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): T? {
@@ -1295,7 +1294,7 @@ suspend fun <T : Any> Model<T>.deleteOneById(
  * @since 2.0.0
  */
 suspend fun <T : Any> Model<T>.deleteOneById(
-    vararg ids: Id<T>,
+    vararg ids: ID<T>,
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): T? {
@@ -1420,7 +1419,7 @@ suspend fun <T : Any> Model<T>.deleteMany(
  * @since 2.0.0
  */
 suspend fun <T : Any> Model<T>.deleteManyById(
-    ids: List<Id<T>>,
+    ids: List<ID<T>>,
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): List<T> {
@@ -1448,7 +1447,7 @@ suspend fun <T : Any> Model<T>.deleteManyById(
  * @since 2.0.0
  */
 suspend fun <T : Any> Model<T>.deleteManyById(
-    vararg ids: Id<T>,
+    vararg ids: ID<T>,
     session: ClientSession? = null,
     block: FindAndDeleteTweak.() -> Unit = {}
 ): List<T> {

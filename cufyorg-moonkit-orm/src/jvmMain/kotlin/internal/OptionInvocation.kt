@@ -19,16 +19,16 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
-import org.cufy.monkt.*
-import org.cufy.monkt.schema.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.schema.OptionData
+import org.cufy.monkt.schema.Signal
 
 /**
  * Return an option invocation invoking this
  * option with the given arguments.
  */
 @AdvancedMonktApi
-@InternalMonktApi
-suspend fun <T : Any, M, C> OptionInvocation(
+internal suspend fun <T : Any, M, C> OptionInvocation(
     option: OptionData<T, M, C>,
 ): OptionInvocation<T, C> {
     var hasNext = true

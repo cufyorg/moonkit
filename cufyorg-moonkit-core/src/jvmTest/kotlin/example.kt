@@ -2,7 +2,7 @@ package org.cufy.monktop
 
 import kotlinx.coroutines.runBlocking
 import org.cufy.bson.BsonDocument
-import org.cufy.bson.Id
+import org.cufy.bson.ID
 import org.cufy.mongodb.`$set`
 import org.cufy.mongodb.drop
 import org.cufy.moonkit.*
@@ -37,7 +37,7 @@ class ExampleTest {
     fun `use simple read and write with codec`() {
         runBlocking {
             val input = TransactionFragment(
-                id = Id(),
+                id = ID(),
                 from = "here",
                 to = "there",
                 value = BigDecimal("12.42")
@@ -58,7 +58,7 @@ class ExampleTest {
     @Test
     fun `use of from and into infix`() {
         runBlocking {
-            val id = Id<Transaction>()
+            val id = ID<Transaction>()
 
             val document1 = BsonDocument {
                 Transaction.Id by id
@@ -87,7 +87,7 @@ class ExampleTest {
 object Transaction : OpCollection {
     override val name = "Transaction"
 
-    val Id = "_id" be Bson.Id<Transaction>()
+    val Id = "_id" be Bson.ID<Transaction>()
     val From = "from" be Bson.String.Nullable
     val To = "to" be Bson.String.Nullable
     val Value = "value" be Bson.BigDecimal
@@ -103,7 +103,7 @@ class TransactionProjection(val element: BsonDocument) {
 }
 
 data class TransactionFragment(
-    val id: Id<Transaction>,
+    val id: ID<Transaction>,
     val from: String?,
     val to: String?,
     val value: BigDecimal,

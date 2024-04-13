@@ -1,3 +1,5 @@
+@file:Suppress("LocalVariableName")
+
 package org.cufy.monkt.test
 
 import kotlinx.coroutines.runBlocking
@@ -106,7 +108,7 @@ class ExampleTest {
 //            val source = Model1.collection().findSuspend().single()
 //
 //            assertEquals(setOf("_id", "value"), source.keys)
-//            assertEquals(source["value"], bnull)
+//            assertEquals(source["value"], null.bson)
 //        }
 //    }
 

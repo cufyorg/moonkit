@@ -34,6 +34,7 @@ class GridFSTest {
     }
 
     @Test
+    @ExperimentalMongodbApi
     fun `upload simple files`() {
         runBlocking {
             val input = createTempFile().toFile()

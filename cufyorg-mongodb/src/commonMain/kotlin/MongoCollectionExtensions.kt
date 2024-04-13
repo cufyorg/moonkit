@@ -15,7 +15,7 @@
  */
 package org.cufy.mongodb
 
-import org.cufy.bson.AnyId
+import org.cufy.bson.AnyID
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonDocumentBlock
 
@@ -37,7 +37,7 @@ import org.cufy.bson.BsonDocumentBlock
  * @see com.mongodb.client.MongoCollection.deleteOne
  */
 suspend fun MongoCollection.deleteOneById(
-    id: AnyId,
+    id: AnyID,
     options: DeleteOptions = DeleteOptions(),
     session: ClientSession? = null,
 ): DeleteResult {
@@ -64,7 +64,7 @@ suspend fun MongoCollection.deleteOneById(
  * @see com.mongodb.client.MongoCollection.deleteOne
  */
 suspend fun MongoCollection.deleteOneById(
-    id: AnyId,
+    id: AnyID,
     session: ClientSession? = null,
     options: DeleteOptions.() -> Unit = {},
 ): DeleteResult {
@@ -91,7 +91,7 @@ suspend fun MongoCollection.deleteOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions(),
     session: ClientSession? = null,
@@ -118,7 +118,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {},
@@ -150,7 +150,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions(),
     session: ClientSession? = null,
@@ -180,7 +180,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.updateOne
  */
 suspend fun MongoCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     vararg update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {},
@@ -208,7 +208,7 @@ suspend fun MongoCollection.updateOneById(
  * @see com.mongodb.client.MongoCollection.replaceOne
  */
 suspend fun MongoCollection.replaceOneById(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions(),
     session: ClientSession? = null,
@@ -234,7 +234,7 @@ suspend fun MongoCollection.replaceOneById(
  * @see com.mongodb.client.MongoCollection.replaceOne
  */
 suspend fun MongoCollection.replaceOneById(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocumentBlock,
     session: ClientSession? = null,
     options: ReplaceOptions.() -> Unit = {},
@@ -261,7 +261,7 @@ suspend fun MongoCollection.replaceOneById(
  * @see com.mongodb.client.MongoCollection.findOneAndDelete
  */
 suspend fun MongoCollection.findOneByIdAndDelete(
-    id: AnyId,
+    id: AnyID,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions(),
     session: ClientSession? = null,
 ): BsonDocument? {
@@ -284,7 +284,7 @@ suspend fun MongoCollection.findOneByIdAndDelete(
  * @see com.mongodb.client.MongoCollection.findOneAndDelete
  */
 suspend fun MongoCollection.findOneByIdAndDelete(
-    id: AnyId,
+    id: AnyID,
     session: ClientSession? = null,
     options: FindOneAndDeleteOptions.() -> Unit,
 ): BsonDocument? {
@@ -312,7 +312,7 @@ suspend fun MongoCollection.findOneByIdAndDelete(
  * @see com.mongodb.client.MongoCollection.findOneAndReplace
  */
 suspend fun MongoCollection.findOneByIdAndReplace(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions(),
     session: ClientSession? = null,
@@ -340,7 +340,7 @@ suspend fun MongoCollection.findOneByIdAndReplace(
  * @see com.mongodb.client.MongoCollection.findOneAndReplace
  */
 suspend fun MongoCollection.findOneByIdAndReplace(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocumentBlock,
     session: ClientSession? = null,
     options: FindOneAndReplaceOptions.() -> Unit = {},
@@ -371,7 +371,7 @@ suspend fun MongoCollection.findOneByIdAndReplace(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions(),
     session: ClientSession? = null,
@@ -400,7 +400,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: FindOneAndUpdateOptions.() -> Unit = {},
@@ -434,7 +434,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions(),
     session: ClientSession? = null,
@@ -466,7 +466,7 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
 suspend fun MongoCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     vararg update: BsonDocumentBlock,
     session: ClientSession? = null,
     options: FindOneAndUpdateOptions.() -> Unit = {},
@@ -538,7 +538,7 @@ suspend fun MongoCollection.findOne(
  * @see MongoCollection.find
  */
 suspend fun MongoCollection.findOneById(
-    id: AnyId,
+    id: AnyID,
     options: FindOptions = FindOptions(),
     session: ClientSession? = null,
 ): BsonDocument? {
@@ -560,7 +560,7 @@ suspend fun MongoCollection.findOneById(
  * @see MongoCollection.find
  */
 suspend fun MongoCollection.findOneById(
-    id: AnyId,
+    id: AnyID,
     session: ClientSession? = null,
     options: FindOptions.() -> Unit,
 ): BsonDocument? {

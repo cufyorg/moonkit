@@ -20,9 +20,6 @@ import java.util.concurrent.TimeUnit
 
 /* ============= ------------------ ============= */
 
-typealias JavaDeleteOptions =
-        com.mongodb.client.model.DeleteOptions
-
 /**
  * Return a java version of this.
  */
@@ -39,9 +36,6 @@ val DeleteOptions.java: JavaDeleteOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaInsertOneOptions =
-        com.mongodb.client.model.InsertOneOptions
-
 /**
  * Return a java version of this.
  */
@@ -53,9 +47,6 @@ val InsertOneOptions.java: JavaInsertOneOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaInsertManyOptions =
-        com.mongodb.client.model.InsertManyOptions
 
 /**
  * Return a java version of this.
@@ -69,9 +60,6 @@ val InsertManyOptions.java: JavaInsertManyOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaUpdateOptions =
-        com.mongodb.client.model.UpdateOptions
 
 /**
  * Return a java version of this.
@@ -92,9 +80,6 @@ val UpdateOptions.java: JavaUpdateOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaReplaceOptions =
-        com.mongodb.client.model.ReplaceOptions
-
 /**
  * Return a java version of this.
  */
@@ -113,9 +98,6 @@ val ReplaceOptions.java: JavaReplaceOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaBulkWriteOptions =
-        com.mongodb.client.model.BulkWriteOptions
-
 /**
  * Return a java version of this.
  */
@@ -130,9 +112,6 @@ val BulkWriteOptions.java: JavaBulkWriteOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCountOptions =
-        com.mongodb.client.model.CountOptions
 
 /**
  * Return a java version of this.
@@ -151,9 +130,6 @@ val CountOptions.java: JavaCountOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaEstimatedCountOptions =
-        com.mongodb.client.model.EstimatedDocumentCountOptions
-
 /**
  * Return a java version of this.
  */
@@ -165,9 +141,6 @@ val EstimatedCountOptions.java: JavaEstimatedCountOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaFindOneAndDeleteOptions =
-        com.mongodb.client.model.FindOneAndDeleteOptions
 
 /**
  * Return a java version of this.
@@ -187,9 +160,6 @@ val FindOneAndDeleteOptions.java: JavaFindOneAndDeleteOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaFindOneAndReplaceOptions =
-        com.mongodb.client.model.FindOneAndReplaceOptions
 
 /**
  * Return a java version of this.
@@ -213,9 +183,6 @@ val FindOneAndReplaceOptions.java: JavaFindOneAndReplaceOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaFindOneAndUpdateOptions =
-        com.mongodb.client.model.FindOneAndUpdateOptions
-
 /**
  * Return a java version of this.
  */
@@ -238,9 +205,6 @@ val FindOneAndUpdateOptions.java: JavaFindOneAndUpdateOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaFindPublisher =
-        com.mongodb.reactivestreams.client.FindPublisher<org.bson.BsonDocument>
 
 /**
  * Apply the given [options] to this publisher.
@@ -271,9 +235,6 @@ fun JavaFindPublisher.apply(options: FindOptions): JavaFindPublisher {
 
 /* ============= ------------------ ============= */
 
-typealias JavaAggregatePublisher =
-        com.mongodb.reactivestreams.client.AggregatePublisher<org.bson.BsonDocument>
-
 /**
  * Apply the given [options] to this publisher.
  */
@@ -293,9 +254,6 @@ fun JavaAggregatePublisher.apply(options: AggregateOptions): JavaAggregatePublis
 
 /* ============= ------------------ ============= */
 
-typealias JavaDistinctPublisher =
-        com.mongodb.reactivestreams.client.DistinctPublisher<org.bson.BsonDocument>
-
 /**
  * Apply the given [options] to this publisher.
  */
@@ -308,9 +266,6 @@ fun JavaDistinctPublisher.apply(options: DistinctOptions): JavaDistinctPublisher
 }
 
 /* ============= ------------------ ============= */
-
-typealias JavaWatchPublisher =
-        com.mongodb.reactivestreams.client.ChangeStreamPublisher<org.bson.BsonDocument>
 
 /**
  * Apply the given [options] to this publisher.
@@ -330,9 +285,6 @@ fun JavaWatchPublisher.apply(options: WatchOptions): JavaWatchPublisher {
 
 /* ============= ------------------ ============= */
 
-typealias JavaListDatabasesPublisher =
-        com.mongodb.reactivestreams.client.ListDatabasesPublisher<org.bson.BsonDocument>
-
 /**
  * Apply the given [options] to this publisher.
  */
@@ -347,9 +299,6 @@ fun JavaListDatabasesPublisher.apply(options: ListDatabasesOptions): JavaListDat
 
 /* ============= ------------------ ============= */
 
-typealias JavaListCollectionsPublisher =
-        com.mongodb.reactivestreams.client.ListCollectionsPublisher<org.bson.BsonDocument>
-
 /**
  * Apply the given [options] to this publisher.
  */
@@ -362,9 +311,6 @@ fun JavaListCollectionsPublisher.apply(options: ListCollectionsOptions): JavaLis
 
 /* ============= ------------------ ============= */
 
-typealias JavaListIndexesPublisher =
-        com.mongodb.reactivestreams.client.ListIndexesPublisher<org.bson.BsonDocument>
-
 /**
  * Apply the given [options] to this publisher.
  */
@@ -376,9 +322,6 @@ fun JavaListIndexesPublisher.apply(options: ListIndexesOptions): JavaListIndexes
 }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCreateIndexOptions =
-        com.mongodb.client.model.IndexOptions
 
 /**
  * Return a java version of this.
@@ -410,9 +353,6 @@ val CreateIndexOptions.java: JavaCreateIndexOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaCreateIndexesOptions =
-        com.mongodb.client.model.CreateIndexOptions
-
 /**
  * Return a java version of this.
  */
@@ -426,9 +366,6 @@ val CreateIndexesOptions.java: JavaCreateIndexesOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaDropIndexOptions =
-        com.mongodb.client.model.DropIndexOptions
-
 /**
  * Return a java version of this.
  */
@@ -439,9 +376,6 @@ val DropIndexOptions.java: JavaDropIndexOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCreateCollectionOptions =
-        com.mongodb.client.model.CreateCollectionOptions
 
 /**
  * Return a java version of this.
@@ -469,9 +403,6 @@ val CreateCollectionOptions.java: JavaCreateCollectionOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaRenameCollectionOptions =
-        com.mongodb.client.model.RenameCollectionOptions
-
 /**
  * Return a java version of this.
  */
@@ -483,9 +414,6 @@ val RenameCollectionOptions.java: JavaRenameCollectionOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaCreateViewOptions =
-        com.mongodb.client.model.CreateViewOptions
-
 /**
  * Return a java version of this.
  */
@@ -496,9 +424,6 @@ val CreateViewOptions.java: JavaCreateViewOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaClientSessionOptions =
-        com.mongodb.ClientSessionOptions
 
 /**
  * Return a java version of this.
@@ -514,9 +439,6 @@ val ClientSessionOptions.java: JavaClientSessionOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaTextSearchOptions =
-        com.mongodb.client.model.TextSearchOptions
-
 /**
  * Return a java version of this.
  */
@@ -528,10 +450,5 @@ val TextSearchOptions.java: JavaTextSearchOptions
         options.diacriticSensitive(diacriticSensitive)
         return options
     }
-
-/* ============= ------------------ ============= */
-
-typealias JavaPushOptions =
-        com.mongodb.client.model.PushOptions
 
 /* ============= ------------------ ============= */

@@ -24,7 +24,7 @@ import org.cufy.moonkit.*
 
 /**
  * A type of operations that is focused on [MongoBucket].
- * This type of operations have a default behaviour that only
+ * This type of operation have a default behaviour that only
  * require an instance of [MongoBucket].
  *
  * @author LSafer

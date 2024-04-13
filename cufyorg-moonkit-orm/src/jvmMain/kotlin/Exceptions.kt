@@ -33,6 +33,7 @@ open class MonktException : RuntimeException {
     ) : super(message, cause, enableSuppression, writableStackTrace)
 
     companion object {
+        @Suppress("ConstPropertyName")
         private const val serialVersionUID: Long = 5786501671027284894L
     }
 }
@@ -55,6 +56,7 @@ open class MonktError : Error {
     ) : super(message, cause, enableSuppression, writableStackTrace)
 
     companion object {
+        @Suppress("ConstPropertyName")
         private const val serialVersionUID: Long = -2534605968066431192L
     }
 }
@@ -98,6 +100,7 @@ open class ValidationException : MonktException {
     }
 
     companion object {
+        @Suppress("ConstPropertyName")
         private const val serialVersionUID: Long = -709743821901577253L
 
         private fun formatMessage(label: String?, content: String?): String? {

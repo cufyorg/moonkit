@@ -105,7 +105,6 @@ interface ArraySchemaBuilder<T> :
  *
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T> ArraySchemaBuilder(): ArraySchemaBuilder<T> {
     return ArraySchemaBuilderImpl()
 }

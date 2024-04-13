@@ -13,6 +13,8 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb.gridfs
 
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
@@ -33,11 +35,8 @@ import java.nio.ByteBuffer
 
 /* ============= ------------------ ============= */
 
-internal typealias JavaMongoBucket =
-        com.mongodb.reactivestreams.client.gridfs.GridFSBucket
-
-actual interface MongoBucket {
-    val java: JavaMongoBucket
+actual data class MongoBucket(val java: JavaMongoBucket) {
+    override fun toString() = "MongoBucket(${java.bucketName})"
 }
 
 /* ============= ------------------ ============= */
@@ -49,9 +48,7 @@ actual interface MongoBucket {
  * @since 2.0.0
  */
 val JavaMongoBucket.kt: MongoBucket
-    get() = object : MongoBucket {
-        override val java = this@kt
-    }
+    get() = MongoBucket(this)
 
 /* ============= ------------------ ============= */
 
@@ -82,6 +79,7 @@ actual val MongoBucket.readConcern: ReadConcern
 
 /* ============= ------------------ ============= */
 
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
@@ -93,6 +91,7 @@ actual suspend fun MongoBucket.upload(
     return publisher.awaitSingle().kt.bson
 }
 
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
@@ -106,6 +105,7 @@ actual suspend fun MongoBucket.upload(
     publisher.awaitFirstOrNull()
 }
 
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.download(
     channel: SendChannel<ByteBuffer>,
     id: BsonElement,
@@ -121,6 +121,7 @@ actual suspend fun MongoBucket.download(
     return publisher.gridFSFile.awaitSingle().kt
 }
 
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.download(
     channel: SendChannel<ByteBuffer>,
     filename: String,

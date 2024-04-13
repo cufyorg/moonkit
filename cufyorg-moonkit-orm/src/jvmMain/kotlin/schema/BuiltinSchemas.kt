@@ -17,7 +17,6 @@ package org.cufy.monkt.schema
 
 import org.cufy.bson.*
 import org.cufy.monkt.AdvancedMonktApi
-import org.cufy.monkt.InternalMonktApi
 import org.cufy.monkt.internal.EnumSchemaBuilderImpl
 import org.cufy.monkt.internal.NullableSchemaImpl
 import java.math.BigDecimal
@@ -83,7 +82,6 @@ interface EnumSchemaBuilder<T> :
  *
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T> EnumSchemaBuilder(): EnumSchemaBuilder<T> {
     return EnumSchemaBuilderImpl()
 }
@@ -222,7 +220,6 @@ interface NullableSchema<T> : ElementSchema<T?> {
  * @param schema the wrapped schema.
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T> NullableSchema(
     schema: Schema<T>
 ): NullableSchema<T> {
@@ -286,7 +283,6 @@ val Int32Schema: ScalarSchema<Int> = ScalarSchema {
  *
  * @since 2.0.0
  */
-@Suppress("USELESS_IS_CHECK")
 val Int64Schema: ScalarSchema<Long> = ScalarSchema {
     canDecode(BsonType.Int64)
     canEncode { it is Long }
@@ -347,7 +343,7 @@ val ObjectIdSchema: ScalarSchema<ObjectId> = ScalarSchema {
  *
  * @since 2.0.0
  */
-val IdSchema: ScalarSchema<Id<Any>> = IdSchema()
+val IdSchema: ScalarSchema<ID<Any>> = IdSchema()
 
 /**
  * A schema for [Id] and both [BsonObjectId] and [BsonString].
@@ -355,9 +351,9 @@ val IdSchema: ScalarSchema<Id<Any>> = IdSchema()
  * @since 2.0.0
  */
 @Suppress("FunctionName")
-fun <T> IdSchema(): ScalarSchema<Id<T>> = ScalarSchema {
+fun <T> IdSchema(): ScalarSchema<ID<T>> = ScalarSchema {
     canDecode(BsonType.ObjectId, BsonType.String)
-    canEncode { it is Id<*> }
+    canEncode { it is ID<*> }
     encode {
         when {
             ObjectId.isValid(it.value) -> BsonObjectId(ObjectId(it.value))
@@ -366,8 +362,8 @@ fun <T> IdSchema(): ScalarSchema<Id<T>> = ScalarSchema {
     }
     decode {
         when (it) {
-            is BsonString -> Id(it.value)
-            is BsonObjectId -> Id(it.value)
+            is BsonString -> ID(it.value)
+            is BsonObjectId -> ID(it.value)
             else -> throw IllegalArgumentException(
                 "IdSchema expected ${BsonType.ObjectId} or ${BsonType.String} but got $it"
             )

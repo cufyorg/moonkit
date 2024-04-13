@@ -15,7 +15,7 @@
  */
 package org.cufy.monkt
 
-import org.cufy.bson.Id
+import org.cufy.bson.ID
 import org.cufy.weakness.Weakness
 import org.cufy.weakness.weak
 import kotlin.properties.ReadWriteProperty
@@ -37,8 +37,8 @@ private val internalWeakness = Weakness()
  * Return a delegate to the weak property `_id`.
  */
 @Suppress("FunctionName")
-fun <T : Any> Document.Companion._id(): ReadWriteProperty<T, Id<T>> {
-    return weak(internalWeakness, "_id", typeOf<Id<T>>())
+fun <T : Any> Document.Companion._id(): ReadWriteProperty<T, ID<T>> {
+    return weak(internalWeakness, "_id", typeOf<ID<T>>())
 }
 
 /**
@@ -79,7 +79,7 @@ fun <T : Any, V> Document.Companion.fantom(name: String? = null): ReadWritePrope
  * @since 2.0.0
  */
 @Suppress("ObjectPropertyName")
-val <T : Document> T._id: Id<T> by Document._id()
+val <T : Document> T._id: ID<T> by Document._id()
 
 /**
  * Return the model created the document.
@@ -107,7 +107,8 @@ val <T : Document> T.isDeleted: Boolean by Document.isDeleted()
 /**
  * Return the id of the document.
  */
-private var <T : Any> T._id: Id<T> by Document._id()
+@Suppress("ObjectPropertyName")
+private var <T : Any> T._id: ID<T> by Document._id()
 
 /**
  * Return the model created the document.
@@ -133,7 +134,7 @@ private var <T : Any> T.isDeleted: Boolean by Document.isDeleted()
  *
  * @since 2.0.0
  */
-fun <T : Any> Document.Companion.getId(instance: T): Id<T> {
+fun <T : Any> Document.Companion.getId(instance: T): ID<T> {
     return instance._id
 }
 
@@ -142,7 +143,7 @@ fun <T : Any> Document.Companion.getId(instance: T): Id<T> {
  * [instance] to the given [value]
  */
 @AdvancedMonktApi("Manually setting the id may cause misbehaviour")
-fun <T : Any> Document.Companion.setId(instance: T, value: Id<T>) {
+fun <T : Any> Document.Companion.setId(instance: T, value: ID<T>) {
     instance._id = value
 }
 

@@ -25,7 +25,7 @@ import org.cufy.mongodb.*
 
 /**
  * A type of ops that is focused on [MongoCollection].
- * This type of operations only produces operations
+ * This type of operation only produces operations
  * that are of type [CollectionOperation].
  *
  * @author LSafer

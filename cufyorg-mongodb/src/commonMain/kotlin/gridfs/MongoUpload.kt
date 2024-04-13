@@ -13,10 +13,13 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb.gridfs
 
 import kotlinx.coroutines.Deferred
 import org.cufy.bson.BsonElement
+import org.cufy.mongodb.ExperimentalMongodbApi
 
 /* ============= ------------------ ============= */
 
@@ -39,7 +42,8 @@ import org.cufy.bson.BsonElement
  * @author LSafer
  * @since 2.0.0
  */
-expect interface MongoUpload : Deferred<Unit>, AutoCloseable {
+@ExperimentalMongodbApi
+expect class MongoUpload : Deferred<Unit>, AutoCloseable {
     /**
      * True, if the upload is closed for writing.
      */

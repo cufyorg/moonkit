@@ -16,7 +16,6 @@
 package org.cufy.monkt.schema
 
 import org.cufy.bson.*
-import org.cufy.monkt.InternalMonktApi
 import org.cufy.monkt.internal.DeterministicDecoderImpl
 import java.math.BigDecimal
 import kotlin.math.roundToInt
@@ -79,7 +78,6 @@ class DeterministicDecoderScope<T> {
  * @param block the decoding block.
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 @Suppress("FunctionName")
 fun <T> DeterministicDecoder(
     block: DeterministicDecoderBlock<T>
@@ -92,7 +90,7 @@ fun <T> DeterministicDecoder(
 ==================================================*/
 
 // String Boolean Int32 Int64 Double Decimal128 ObjectId
-// Id BigDecimal
+// ID BigDecimal
 
 /**
  * Standard decoding algorithm for type [String].
@@ -213,24 +211,24 @@ val StandardObjectIdDecoder: ScalarDecoder<ObjectId> = ScalarDecoder {
 }
 
 /**
- * A schema for [Id] and both [BsonObjectId] and [BsonString].
+ * A schema for [ID] and both [BsonObjectId] and [BsonString].
  *
  * @since 2.0.0
  */
-val StandardIdDecoder: ScalarDecoder<Id<Any>> = StandardIdDecoder()
+val StandardIdDecoder: ScalarDecoder<ID<Any>> = StandardIdDecoder()
 
 /**
- * A schema for [Id] and both [BsonObjectId] and [BsonString].
+ * A schema for [ID] and both [BsonObjectId] and [BsonString].
  *
  * @since 2.0.0
  */
 @Suppress("FunctionName")
-fun <T> StandardIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
+fun <T> StandardIdDecoder(): ScalarDecoder<ID<T>> = ScalarDecoder {
     expect(BsonType.ObjectId, BsonType.String)
     deterministic {
         when (it) {
-            is BsonString -> decodeTo { Id(it.value) }
-            is BsonObjectId -> decodeTo { Id(it.value) }
+            is BsonString -> decodeTo { ID(it.value) }
+            is BsonObjectId -> decodeTo { ID(it.value) }
             else -> {}
         }
     }
@@ -256,25 +254,25 @@ val StandardBigDecimalDecoder: ScalarDecoder<BigDecimal> = ScalarDecoder {
 //
 
 /**
- * More lenient decoding algorithm for type [Id].
+ * More lenient decoding algorithm for type [ID].
  *
- * If `null` or `undefined` decode to a new Id.
+ * If `null` or `undefined` decode to a new ID.
  */
-val LenientIdDecoder: ScalarDecoder<Id<Any>> = LenientIdDecoder()
+val LenientIdDecoder: ScalarDecoder<ID<Any>> = LenientIdDecoder()
 
 /**
- * More lenient decoding algorithm for type [Id].
+ * More lenient decoding algorithm for type [ID].
  *
- * If `null` or `undefined` decode to a new Id.
+ * If `null` or `undefined` decode to a new ID.
  */
 @Suppress("FunctionName")
-fun <T> LenientIdDecoder(): ScalarDecoder<Id<T>> = ScalarDecoder {
+fun <T> LenientIdDecoder(): ScalarDecoder<ID<T>> = ScalarDecoder {
     expect(BsonType.String, BsonType.ObjectId, BsonType.Undefined, BsonType.Null)
     deterministic {
         when (it) {
-            is BsonString -> decodeTo { Id(it.value) }
-            is BsonObjectId -> decodeTo { Id(it.value) }
-            is BsonUndefined, is BsonNull -> decodeTo { Id() }
+            is BsonString -> decodeTo { ID(it.value) }
+            is BsonObjectId -> decodeTo { ID(it.value) }
+            is BsonUndefined, is BsonNull -> decodeTo { ID() }
             else -> {}
         }
     }

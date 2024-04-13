@@ -17,7 +17,7 @@ package org.cufy.monkt.internal
 
 import org.cufy.bson.BsonElement
 import org.cufy.bson.BsonType
-import org.cufy.monkt.*
+import org.cufy.monkt.AdvancedMonktApi
 import org.cufy.monkt.schema.*
 
 /**
@@ -26,8 +26,7 @@ import org.cufy.monkt.schema.*
  * @author LSafer
  * @since 2.0.0
  */
-@InternalMonktApi
-open class ScalarDecoderBuilderImpl<T> : ScalarDecoderBuilder<T> {
+internal open class ScalarDecoderBuilderImpl<T> : ScalarDecoderBuilder<T> {
     @AdvancedMonktApi
     override var types: MutableList<BsonType> = mutableListOf()
 
@@ -61,8 +60,7 @@ open class ScalarDecoderBuilderImpl<T> : ScalarDecoderBuilder<T> {
  * @author LSafer
  * @since 2.0.0
  */
-@InternalMonktApi
-open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
+internal open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
     @AdvancedMonktApi
     override val options: MutableList<Option<List<T>, List<T>, *>> = mutableListOf()
 
@@ -93,7 +91,7 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
 
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
+    @OptIn(AdvancedMonktApi::class)
     override fun build(): ArraySchema<T> {
         deferred.forEach { it() }
         deferred.clear()
@@ -122,8 +120,7 @@ open class ArraySchemaBuilderImpl<T> : ArraySchemaBuilder<T> {
  * @author LSafer
  * @since 2.0.0
  */
-@InternalMonktApi
-open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
+internal open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
     @AdvancedMonktApi
     override var types: MutableList<BsonType> = mutableListOf()
 
@@ -142,7 +139,7 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
 
-    @OptIn(InternalMonktApi::class, AdvancedMonktApi::class)
+    @OptIn(AdvancedMonktApi::class)
     override fun build(): ScalarSchema<T> {
         deferred.forEach { it() }
         deferred.clear()
@@ -168,15 +165,14 @@ open class ScalarSchemaBuilderImpl<T> : ScalarSchemaBuilder<T> {
  * @author LSafer
  * @since 2.0.0
  */
-@InternalMonktApi
-open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
+internal open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
     @AdvancedMonktApi
     override val deferred: MutableList<() -> Unit> = mutableListOf()
 
     @AdvancedMonktApi
     override val values: MutableMap<BsonElement, T> = mutableMapOf()
 
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
+    @OptIn(AdvancedMonktApi::class)
     override fun build(): EnumSchema<T> {
         deferred.forEach { it() }
         deferred.clear()
@@ -192,8 +188,7 @@ open class EnumSchemaBuilderImpl<T> : EnumSchemaBuilder<T> {
  * @author LSafer
  * @since 2.0.0
  */
-@InternalMonktApi
-open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M> {
+internal open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M> {
     @AdvancedMonktApi
     override val options: MutableList<Option<T, M?, *>> = mutableListOf()
 
@@ -233,7 +228,7 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
     @AdvancedMonktApi
     override var setter: FieldDefinitionSetter<T, M>? = null // REQUIRED
 
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
+    @OptIn(AdvancedMonktApi::class)
     override fun build(): FieldDefinition<T, M> {
         deferred.forEach { it() }
         deferred.clear()
@@ -268,8 +263,7 @@ open class FieldDefinitionBuilderImpl<T : Any, M> : FieldDefinitionBuilder<T, M>
  * @author LSafer
  * @since 2.0.0
  */
-@InternalMonktApi
-open class ObjectSchemaBuilderImpl<T : Any> : ObjectSchemaBuilder<T> {
+internal open class ObjectSchemaBuilderImpl<T : Any> : ObjectSchemaBuilder<T> {
     @AdvancedMonktApi
     override val options: MutableList<Option<T, T, *>> = mutableListOf()
 
@@ -291,7 +285,7 @@ open class ObjectSchemaBuilderImpl<T : Any> : ObjectSchemaBuilder<T> {
     @AdvancedMonktApi
     override val fields: MutableList<FieldDefinition<T, *>> = mutableListOf()
 
-    @OptIn(AdvancedMonktApi::class, InternalMonktApi::class)
+    @OptIn(AdvancedMonktApi::class)
     override fun build(): ObjectSchema<T> {
         deferred.forEach { it() }
         deferred.clear()

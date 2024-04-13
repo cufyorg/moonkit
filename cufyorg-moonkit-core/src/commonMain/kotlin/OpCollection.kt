@@ -15,7 +15,7 @@
  */
 package org.cufy.moonkit
 
-import org.cufy.bson.AnyId
+import org.cufy.bson.AnyID
 import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonDocumentBlock
 import org.cufy.bson.toBsonArray
@@ -140,7 +140,7 @@ fun OpCollection.deleteOne(
  * @since 2.0.0
  */
 fun OpCollection.deleteOneById(
-    id: AnyId,
+    id: AnyID,
     options: DeleteOptions = DeleteOptions()
 ): DeleteOneOp {
     return deleteOne(
@@ -159,7 +159,7 @@ fun OpCollection.deleteOneById(
  * @since 2.0.0
  */
 fun OpCollection.deleteOneById(
-    id: AnyId,
+    id: AnyID,
     options: DeleteOptions.() -> Unit
 ) = deleteOneById(id, DeleteOptions(options))
 
@@ -342,7 +342,7 @@ fun OpCollection.updateOne(
  * @since 2.0.0
  */
 fun OpCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocument,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
@@ -364,7 +364,7 @@ fun OpCollection.updateOneById(
  * @since 2.0.0
  */
 fun OpCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
 ) = updateOneById(id, BsonDocument(update), UpdateOptions(options))
@@ -382,7 +382,7 @@ fun OpCollection.updateOneById(
  * @since 2.0.0
  */
 fun OpCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     update: List<BsonDocument>,
     options: UpdateOptions = UpdateOptions()
 ): UpdateOneOp {
@@ -404,7 +404,7 @@ fun OpCollection.updateOneById(
  * @since 2.0.0
  */
 fun OpCollection.updateOneById(
-    id: AnyId,
+    id: AnyID,
     vararg update: BsonDocumentBlock,
     options: UpdateOptions.() -> Unit = {}
 ) = updateOneById(id, update.map { BsonDocument(it) }, UpdateOptions(options))
@@ -530,7 +530,7 @@ fun OpCollection.replaceOne(
  * @since 2.0.0
  */
 fun OpCollection.replaceOneById(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocument,
     options: ReplaceOptions = ReplaceOptions()
 ): ReplaceOneOp {
@@ -552,7 +552,7 @@ fun OpCollection.replaceOneById(
  * @since 2.0.0
  */
 fun OpCollection.replaceOneById(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocumentBlock,
     options: ReplaceOptions.() -> Unit = {}
 ) = replaceOneById(id, BsonDocument(replacement), ReplaceOptions(options))
@@ -693,7 +693,7 @@ fun OpCollection.findOneAndDelete(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndDelete(
-    id: AnyId,
+    id: AnyID,
     options: FindOneAndDeleteOptions = FindOneAndDeleteOptions()
 ): FindOneAndDeleteOp {
     return findOneAndDelete(
@@ -712,7 +712,7 @@ fun OpCollection.findOneByIdAndDelete(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndDelete(
-    id: AnyId,
+    id: AnyID,
     options: FindOneAndDeleteOptions.() -> Unit
 ) = findOneByIdAndDelete(id, FindOneAndDeleteOptions(options))
 
@@ -765,7 +765,7 @@ fun OpCollection.findOneAndReplace(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndReplace(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocument,
     options: FindOneAndReplaceOptions = FindOneAndReplaceOptions()
 ): FindOneAndReplaceOp {
@@ -787,7 +787,7 @@ fun OpCollection.findOneByIdAndReplace(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndReplace(
-    id: AnyId,
+    id: AnyID,
     replacement: BsonDocumentBlock,
     options: FindOneAndReplaceOptions.() -> Unit = {}
 ) = findOneByIdAndReplace(id, BsonDocument(replacement), FindOneAndReplaceOptions(options))
@@ -877,7 +877,7 @@ fun OpCollection.findOneAndUpdate(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocument,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
@@ -899,7 +899,7 @@ fun OpCollection.findOneByIdAndUpdate(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     update: BsonDocumentBlock,
     options: FindOneAndUpdateOptions.() -> Unit = {}
 ) = findOneByIdAndUpdate(id, BsonDocument(update), FindOneAndUpdateOptions(options))
@@ -917,7 +917,7 @@ fun OpCollection.findOneByIdAndUpdate(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     update: List<BsonDocument>,
     options: FindOneAndUpdateOptions = FindOneAndUpdateOptions()
 ): FindOneAndUpdateOp {
@@ -939,7 +939,7 @@ fun OpCollection.findOneByIdAndUpdate(
  * @since 2.0.0
  */
 fun OpCollection.findOneByIdAndUpdate(
-    id: AnyId,
+    id: AnyID,
     vararg update: BsonDocumentBlock,
     options: FindOneAndUpdateOptions.() -> Unit = {}
 ) = findOneByIdAndUpdate(id, update.map { BsonDocument(it) }, FindOneAndUpdateOptions(options))
@@ -1023,7 +1023,7 @@ fun OpCollection.findOne(
  * @since 2.0.0
  */
 fun OpCollection.findOneById(
-    id: AnyId,
+    id: AnyID,
     options: FindOptions = FindOptions()
 ): Op<BsonDocument?> {
     return findOne(
@@ -1042,7 +1042,7 @@ fun OpCollection.findOneById(
  * @since 2.0.0
  */
 fun OpCollection.findOneById(
-    id: AnyId,
+    id: AnyID,
     options: FindOptions.() -> Unit
 ) = findOneById(id, FindOptions(options))
 

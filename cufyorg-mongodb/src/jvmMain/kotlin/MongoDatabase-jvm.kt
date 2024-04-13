@@ -13,6 +13,8 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb
 
 import kotlinx.coroutines.flow.toList
@@ -24,11 +26,8 @@ import org.cufy.bson.kt
 
 /* ============= ------------------ ============= */
 
-typealias JavaMongoDatabase =
-        com.mongodb.reactivestreams.client.MongoDatabase
-
-actual interface MongoDatabase {
-    val java: JavaMongoDatabase
+actual data class MongoDatabase(val java: JavaMongoDatabase) {
+    override fun toString() = "MongoDatabase($name)"
 }
 
 /* ============= ------------------ ============= */
@@ -40,12 +39,7 @@ actual interface MongoDatabase {
  * @since 2.0.0
  */
 val JavaMongoDatabase.kt: MongoDatabase
-    get() = object : MongoDatabase {
-        override val java = this@kt
-
-        override fun toString() =
-            "MongoDatabase($name)"
-    }
+    get() = MongoDatabase(this)
 
 /* ============= ------------------ ============= */
 

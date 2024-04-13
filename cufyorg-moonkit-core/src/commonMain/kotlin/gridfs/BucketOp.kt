@@ -23,7 +23,7 @@ import org.cufy.moonkit.OpClient
 
 /**
  * A type of ops that is focused on [MongoBucket].
- * This type of operations only produces operations
+ * This type of operation only produces operations
  * that are of type [BucketOperation].
  *
  * @author LSafer

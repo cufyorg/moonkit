@@ -15,27 +15,10 @@
  */
 package org.cufy.mongodb.gridfs
 
-import kotlinx.datetime.toKotlinInstant
-import org.cufy.bson.kt
+typealias JavaMongoFile = com.mongodb.client.gridfs.model.GridFSFile
+typealias JavaMongoBucket = com.mongodb.reactivestreams.client.gridfs.GridFSBucket
 
-/* ============= ------------------ ============= */
+typealias JavaDownloadPublisher = com.mongodb.reactivestreams.client.gridfs.GridFSDownloadPublisher
+typealias JavaBucketFindPublisher = com.mongodb.reactivestreams.client.gridfs.GridFSFindPublisher
 
-/**
- * Create a new [MongoFile] instance wrapping
- * this file instance.
- *
- * @since 2.0.0
- */
-val JavaMongoFile.kt: MongoFile
-    get() {
-        return MongoFile(
-            id = id.kt,
-            filename = filename,
-            length = length,
-            chunkSize = chunkSize,
-            uploadDate = uploadDate.toInstant().toKotlinInstant(),
-            metadata = metadata?.toBsonDocument()?.kt
-        )
-    }
-
-/* ============= ------------------ ============= */
+typealias JavaUploadOptions = com.mongodb.client.gridfs.model.GridFSUploadOptions

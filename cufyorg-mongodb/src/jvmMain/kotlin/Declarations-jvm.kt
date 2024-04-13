@@ -25,9 +25,6 @@ import kotlin.time.toDuration
 
 /* ============= ------------------ ============= */
 
-typealias JavaCursorType =
-        com.mongodb.CursorType
-
 /**
  * Return a java version of this.
  */
@@ -40,9 +37,6 @@ val CursorType.java: JavaCursorType
 
 /* ============= ------------------ ============= */
 
-typealias JavaReturnDocument =
-        com.mongodb.client.model.ReturnDocument
-
 /**
  * Return a java version of this.
  */
@@ -53,9 +47,6 @@ val ReturnDocument.java: JavaReturnDocument
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaFullDocument =
-        com.mongodb.client.model.changestream.FullDocument
 
 /**
  * Return a java version of this.
@@ -69,9 +60,6 @@ val FullDocument.java: JavaFullDocument
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCommitQuorum =
-        com.mongodb.CreateIndexCommitQuorum
 
 /**
  * Return a java version of this.
@@ -88,9 +76,6 @@ val CommitQuorum.java: JavaCommitQuorum
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaMongoNamespace =
-        com.mongodb.MongoNamespace
 
 /**
  * Return a java version of this.
@@ -110,9 +95,6 @@ val JavaMongoNamespace.kt: MongoNamespace
 
 /* ============= ------------------ ============= */
 
-typealias JavaCreateIndexModel =
-        com.mongodb.client.model.IndexModel
-
 /**
  * Return a java version of this.
  */
@@ -122,9 +104,6 @@ val CreateIndexModel.java: JavaCreateIndexModel
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaIndexOptionDefaults =
-        com.mongodb.client.model.IndexOptionDefaults
 
 /**
  * Return a java version of this.
@@ -136,9 +115,6 @@ val IndexOptionDefaults.java: JavaIndexOptionDefaults
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaClusteredIndexOptions =
-        com.mongodb.client.model.ClusteredIndexOptions
 
 /**
  * Return a java version of this.
@@ -152,9 +128,6 @@ val ClusteredIndexOptions.java: JavaClusteredIndexOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaChangeStreamPreAndPostImagesOptions =
-        com.mongodb.client.model.ChangeStreamPreAndPostImagesOptions
-
 /**
  * Return a java version of this.
  */
@@ -164,9 +137,6 @@ val ChangeStreamPreAndPostImagesOptions.java: JavaChangeStreamPreAndPostImagesOp
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCollationCaseFirst =
-        com.mongodb.client.model.CollationCaseFirst
 
 /**
  * Return a java version of this.
@@ -181,9 +151,6 @@ val CollationCaseFirst.java: JavaCollationCaseFirst
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCollationStrength =
-        com.mongodb.client.model.CollationStrength
 
 /**
  * Return a java version of this.
@@ -201,9 +168,6 @@ val CollationStrength.java: JavaCollationStrength
 
 /* ============= ------------------ ============= */
 
-typealias JavaCollationAlternate =
-        com.mongodb.client.model.CollationAlternate
-
 /**
  * Return a java version of this.
  */
@@ -217,9 +181,6 @@ val CollationAlternate.java: JavaCollationAlternate
 
 /* ============= ------------------ ============= */
 
-typealias JavaCollationMaxVariable =
-        com.mongodb.client.model.CollationMaxVariable
-
 /**
  * Return a java version of this.
  */
@@ -232,9 +193,6 @@ val CollationMaxVariable.java: JavaCollationMaxVariable
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaCollation =
-        com.mongodb.client.model.Collation
 
 /**
  * Return a java version of this.
@@ -255,9 +213,6 @@ val Collation.java: JavaCollation
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaReadConcern =
-        com.mongodb.ReadConcern
 
 /**
  * Return a java version of this.
@@ -287,9 +242,6 @@ val JavaReadConcern.kt: ReadConcern
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaWriteConcern =
-        com.mongodb.WriteConcern
 
 /**
  * Return a java version of this.
@@ -333,9 +285,6 @@ val JavaWriteConcern.kt: WriteConcern
 
 /* ============= ------------------ ============= */
 
-typealias JavaTransactionOptions =
-        com.mongodb.TransactionOptions
-
 /**
  * Return a java version of this.
  */
@@ -351,9 +300,6 @@ val TransactionOptions.java: JavaTransactionOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaValidationLevel =
-        com.mongodb.client.model.ValidationLevel
-
 /**
  * Return a java version of this.
  */
@@ -366,9 +312,6 @@ val ValidationLevel.java: JavaValidationLevel
 
 /* ============= ------------------ ============= */
 
-typealias JavaValidationAction =
-        com.mongodb.client.model.ValidationAction
-
 /**
  * Return a java version of this.
  */
@@ -379,9 +322,6 @@ val ValidationAction.java: JavaValidationAction
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaValidationOptions =
-        com.mongodb.client.model.ValidationOptions
 
 /**
  * Return a java version of this.
@@ -396,9 +336,6 @@ val ValidationOptions.java: JavaValidationOptions
 
 /* ============= ------------------ ============= */
 
-typealias JavaTimeSeriesGranularity =
-        com.mongodb.client.model.TimeSeriesGranularity
-
 /**
  * Return a java version of this.
  */
@@ -411,9 +348,6 @@ val TimeSeriesGranularity.java: JavaTimeSeriesGranularity
 
 /* ============= ------------------ ============= */
 
-typealias JavaTimeSeriesOptions =
-        com.mongodb.client.model.TimeSeriesOptions
-
 /**
  * Return a java version of this.
  */
@@ -425,9 +359,6 @@ val TimeSeriesOptions.java: JavaTimeSeriesOptions
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaWriteModel =
-        com.mongodb.client.model.WriteModel<org.bson.BsonDocument>
 
 /**
  * Return a java version of this.
@@ -444,9 +375,6 @@ val WriteModel.java: JavaWriteModel
 
 /* ============= ------------------ ============= */
 
-typealias JavaDeleteOneModel =
-        com.mongodb.client.model.DeleteOneModel<org.bson.BsonDocument>
-
 /**
  * Return a java version of this.
  */
@@ -459,9 +387,6 @@ val DeleteOneModel.java: JavaDeleteOneModel
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaDeleteManyModel =
-        com.mongodb.client.model.DeleteManyModel<org.bson.BsonDocument>
 
 /**
  * Return a java version of this.
@@ -476,9 +401,6 @@ val DeleteManyModel.java: JavaDeleteManyModel
 
 /* ============= ------------------ ============= */
 
-typealias JavaInsertOneModel =
-        com.mongodb.client.model.InsertOneModel<org.bson.BsonDocument>
-
 /**
  * Return a java version of this.
  */
@@ -490,9 +412,6 @@ val InsertOneModel.java: JavaInsertOneModel
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaReplaceOneModel =
-        com.mongodb.client.model.ReplaceOneModel<org.bson.BsonDocument>
 
 /**
  * Return a java version of this.
@@ -507,9 +426,6 @@ val ReplaceOneModel.java: JavaReplaceOneModel
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaUpdateOneModel =
-        com.mongodb.client.model.UpdateOneModel<org.bson.BsonDocument>
 
 /**
  * Return a java version of this.
@@ -537,9 +453,6 @@ val UpdateOneModel.java: JavaUpdateOneModel
 
 /* ============= ------------------ ============= */
 
-typealias JavaUpdateManyModel =
-        com.mongodb.client.model.UpdateManyModel<org.bson.BsonDocument>
-
 /**
  * Return a java version of this.
  */
@@ -566,9 +479,6 @@ val UpdateManyModel.java: JavaUpdateManyModel
 
 /* ============= ------------------ ============= */
 
-typealias JavaDeleteResult =
-        com.mongodb.client.result.DeleteResult
-
 /**
  * Return the kotlin version of this bson element.
  */
@@ -590,9 +500,6 @@ val JavaDeleteResult.kt: DeleteResult
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaInsertOneResult =
-        com.mongodb.client.result.InsertOneResult
 
 /**
  * Return the kotlin version of this bson element.
@@ -616,9 +523,6 @@ val JavaInsertOneResult.kt: InsertOneResult
 
 /* ============= ------------------ ============= */
 
-typealias JavaInsertManyResult =
-        com.mongodb.client.result.InsertManyResult
-
 /**
  * Return the kotlin version of this bson element.
  */
@@ -640,9 +544,6 @@ val JavaInsertManyResult.kt: InsertManyResult
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaUpdateResult =
-        com.mongodb.client.result.UpdateResult
 
 /**
  * Return the kotlin version of this bson element.
@@ -669,9 +570,6 @@ val JavaUpdateResult.kt: UpdateResult
     }
 
 /* ============= ------------------ ============= */
-
-typealias JavaBulkWriteResult =
-        com.mongodb.bulk.BulkWriteResult
 
 /**
  * Return the kotlin version of this bson element.

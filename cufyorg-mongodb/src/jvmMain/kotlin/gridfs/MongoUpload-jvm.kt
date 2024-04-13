@@ -13,13 +13,18 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb.gridfs
 
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import org.cufy.bson.BsonElement
+import org.cufy.mongodb.ExperimentalMongodbApi
 import org.cufy.mongodb.gridfs.internal.MongoUploadOutputStream
 import java.io.File
 import java.io.InputStream
@@ -28,14 +33,41 @@ import java.nio.ByteBuffer
 
 /* ============= ------------------ ============= */
 
-actual interface MongoUpload : Deferred<Unit>, AutoCloseable {
-    actual val isClosedForWrite: Boolean
-    actual val chunkSizeBytes: Int
-    actual val id: Deferred<BsonElement>
+@ExperimentalMongodbApi
+actual class MongoUpload internal constructor(
+    actual val id: Deferred<BsonElement>,
+    actual val chunkSizeBytes: Int,
+    job: Deferred<Unit>,
+    private val channel: SendChannel<ByteBuffer>,
+    private val onClose: () -> Unit,
+) : Deferred<Unit> by job, AutoCloseable {
+    actual val isClosedForWrite get() = channel.isClosedForSend
+    actual override fun close() = onClose()
 
-    actual suspend fun closeAndAwait(): BsonElement
-    actual suspend fun write(src: ByteArray)
-    actual suspend fun write(src: ByteArray, offset: Int, length: Int)
+    actual suspend fun closeAndAwait(): BsonElement {
+        close()
+        await()
+        return id.await()
+    }
+
+    actual suspend fun write(src: ByteArray) {
+        write(src, 0, src.size)
+    }
+
+    actual suspend fun write(src: ByteArray, offset: Int, length: Int) {
+        if (offset + length > src.size) {
+            throw IndexOutOfBoundsException("range: ${offset..offset + length} while size: ${src.size}")
+        }
+        // ignore this comment; only uncomment if encountered a bug
+        //        // we can't just wrap the array, the receiver might receive
+        //        // the buffer after the return of this function.
+        //        val buffer = allocate(limit)
+        //        buffer.put(src, offset, limit)
+        //        buffer.flip()
+
+        val buffer = ByteBuffer.wrap(src, offset, length)
+        write(buffer)
+    }
 
     /**
      * Write using the given [buffer] and **suspend**
@@ -44,7 +76,9 @@ actual interface MongoUpload : Deferred<Unit>, AutoCloseable {
      * @param buffer the buffer to consume.
      * @since 2.0.0
      */
-    suspend fun write(buffer: ByteBuffer)
+    suspend fun write(buffer: ByteBuffer) {
+        channel.send(buffer)
+    }
 }
 
 /* ============= ------------------ ============= */
@@ -55,6 +89,7 @@ actual interface MongoUpload : Deferred<Unit>, AutoCloseable {
  *
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 fun MongoUpload.asOutputStream(): OutputStream {
     return MongoUploadOutputStream(this)
 }
@@ -67,6 +102,7 @@ fun MongoUpload.asOutputStream(): OutputStream {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoUpload.writeFrom(file: File): Long {
     return file.inputStream().use { writeFrom(it) }
 }
@@ -81,6 +117,7 @@ suspend fun MongoUpload.writeFrom(file: File): Long {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoUpload.writeFrom(stream: InputStream): Long {
     var transferred = 0L
     val buffer = ByteArray(chunkSizeBytes)
@@ -106,6 +143,7 @@ suspend fun MongoUpload.writeFrom(stream: InputStream): Long {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoUpload.writeFrom(flow: Flow<ByteBuffer>): Long {
     var transferred = 0L
 
@@ -129,6 +167,7 @@ suspend fun MongoUpload.writeFrom(flow: Flow<ByteBuffer>): Long {
  * @return how many bytes have been written.
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoUpload.writeFrom(channel: ReceiveChannel<ByteBuffer>): Long {
     var transferred = 0L
 

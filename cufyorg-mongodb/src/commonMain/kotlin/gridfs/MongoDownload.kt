@@ -13,9 +13,12 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb.gridfs
 
 import kotlinx.coroutines.Deferred
+import org.cufy.mongodb.ExperimentalMongodbApi
 
 /* ============= ------------------ ============= */
 
@@ -39,7 +42,8 @@ import kotlinx.coroutines.Deferred
  * @author LSafer
  * @since 2.0.0
  */
-expect interface MongoDownload : Deferred<Unit>, AutoCloseable {
+@ExperimentalMongodbApi
+expect class MongoDownload : Deferred<Unit>, AutoCloseable {
     /**
      * The preferred download buffer size as set in the
      * [DownloadOptions].
@@ -109,6 +113,7 @@ expect interface MongoDownload : Deferred<Unit>, AutoCloseable {
  * @return the number of bytes written.
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoDownload.writeTo(upload: MongoUpload): Long
 
 /* ============= ------------------ ============= */

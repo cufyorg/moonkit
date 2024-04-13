@@ -21,7 +21,7 @@ import org.cufy.mongodb.MongoDatabase
 
 /**
  * A type of ops that is focused on [MongoDatabase].
- * This type of operations only produces operations
+ * This type of operation only produces operations
  * that are of type [DatabaseOperation].
  *
  * @author LSafer

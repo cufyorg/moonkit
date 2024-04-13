@@ -22,7 +22,7 @@ import org.cufy.mongodb.MongoDatabase
 
 /**
  * A type of operations that is focused on [MongoDatabase].
- * This type of operations have a default behaviour that only
+ * This type of operation have a default behaviour that only
  * require an instance of [MongoDatabase].
  *
  * @author LSafer

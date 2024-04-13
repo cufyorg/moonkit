@@ -1,16 +1,16 @@
 [versions]
 kotlin = "1.9.20"
-cufyorg-ped = "2.0.0-RC.2"
+cufyorg-serialization = "2.0.0-RC.7"
 
 [libraries]
-kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.4.1" }
-kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
-kotlin-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version = "1.6.4" }
-kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.4.0" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.6.3" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.8.0" }
+kotlin-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version = "1.8.0" }
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.0-RC.2" }
 
 mongodb-sync = { module = "org.mongodb:mongodb-driver-sync", version = "4.10.2" }
 mongodb-reactivestreams = { module = "org.mongodb:mongodb-driver-reactivestreams", version = "4.10.2" }
 
-cufyorg-bson = { module = "org.cufy.ped:bson", version.ref = "cufyorg-ped" }
-cufyorg-ped-core = { module = "org.cufy.ped:ped-core", version.ref = "cufyorg-ped" }
-cufyorg-ped-bson = { module = "org.cufy.ped:ped-bson", version.ref = "cufyorg-ped" }
+cufyorg-bson = { module = "org.cufy.serialization:cufyorg-bson", version.ref = "cufyorg-serialization" }
+cufyorg-PED-core = { module = "org.cufy.serialization:cufyorg-PED-core", version.ref = "cufyorg-serialization" }
+cufyorg-PED-bson = { module = "org.cufy.serialization:cufyorg-PED-bson", version.ref = "cufyorg-serialization" }

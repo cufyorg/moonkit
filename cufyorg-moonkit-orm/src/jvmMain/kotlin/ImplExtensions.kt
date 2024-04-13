@@ -21,8 +21,11 @@ import org.cufy.mongodb.MongoClient
 import org.cufy.mongodb.MongoDatabase
 import org.cufy.mongodb.createMongoClient
 import org.cufy.mongodb.get
-import org.cufy.monkt.internal.*
-import org.cufy.monkt.schema.*
+import org.cufy.monkt.internal.OptionsInvocation
+import org.cufy.monkt.schema.IdSchema
+import org.cufy.monkt.schema.LenientIdDecoder
+import org.cufy.monkt.schema.OptionData
+import org.cufy.monkt.schema.SignalHandler
 
 /*==================================================
 ================ Options Operations ================
@@ -90,7 +93,6 @@ fun <T : Any> Model<T>.obtainAllOptions(): List<OptionData<Unit, Unit, *>> {
  * of this monkt instance.
  */
 @AdvancedMonktApi("This usually used as a part of a bigger operation.")
-@OptIn(InternalMonktApi::class)
 suspend fun Monkt.performOption(options: List<OptionData<*, *, *>>) {
     val invocation = OptionsInvocation(options)
 
@@ -162,7 +164,6 @@ fun <T : Any> Document.Companion.performEncoding(instance: T): BsonDocument {
  * Register the given [model] to this monkt
  * instance.
  */
-@OptIn(InternalMonktApi::class)
 operator fun Monkt.plusAssign(model: Model<*>) {
     _models += model
 }
@@ -171,7 +172,6 @@ operator fun Monkt.plusAssign(model: Model<*>) {
  * Register the given [handler] to this monkt
  * instance.
  */
-@OptIn(InternalMonktApi::class)
 operator fun Monkt.plusAssign(handler: SignalHandler) {
     _handlers += handler
 }
@@ -187,7 +187,6 @@ operator fun Monkt.plusAssign(handler: SignalHandler) {
  * @param database the new database.
  * @throws IllegalStateException if already connected
  */
-@OptIn(InternalMonktApi::class)
 fun Monkt.connect(client: MongoClient, database: MongoDatabase) {
     require(!isConnected) { "Already Connected" }
     isConnected = true
@@ -216,7 +215,7 @@ fun Monkt.connect(uri: String, name: String) {
 /**
  * Shutdown the current connection. (If connected)
  */
-@OptIn(ExperimentalMonktApi::class, InternalMonktApi::class)
+@OptIn(ExperimentalMonktApi::class)
 fun Monkt.shutdown() {
     if (isConnected && !isShutdown) {
         this.client.use { }

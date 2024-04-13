@@ -24,7 +24,7 @@ import org.cufy.mongodb.*
 
 /**
  * A type of operations that is focused on [MongoCollection].
- * This type of operations have a default behaviour that only
+ * This type of operation have a default behaviour that only
  * require an instance of [MongoCollection].
  *
  * @author LSafer

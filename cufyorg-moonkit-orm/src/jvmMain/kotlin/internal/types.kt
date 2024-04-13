@@ -15,8 +15,8 @@
  */
 package org.cufy.monkt.internal
 
-import org.cufy.monkt.*
-import org.cufy.monkt.schema.*
+import org.cufy.monkt.schema.Signal
+import org.cufy.monkt.schema.SignalHandler
 
 /**
  * An option invocation is a wrapper over an
@@ -29,8 +29,7 @@ import org.cufy.monkt.schema.*
  * The invocation doesn't start until the first
  * [OptionInvocation.next] is invoked.
  */
-@InternalMonktApi
-interface OptionInvocation<T, C> {
+internal interface OptionInvocation<T, C> {
     /**
      * Returns true, if there is more code to be
      * resolved.
@@ -52,8 +51,7 @@ interface OptionInvocation<T, C> {
     suspend fun next(items: List<Any?>): List<Signal<*>>
 }
 
-@InternalMonktApi
-interface OptionsInvocation {
+internal interface OptionsInvocation {
     suspend fun hasNext(): Boolean
 
     suspend fun next(handlers: List<SignalHandler>)

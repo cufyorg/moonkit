@@ -16,22 +16,6 @@
 package org.cufy.monkt
 
 /**
- * Marks the annotated component as internal.
- *
- * @since 2.0.0
- */
-@RequiresOptIn(
-    message = "This is an internal API and was not designed to be used directly",
-    level = RequiresOptIn.Level.ERROR
-)
-annotation class InternalMonktApi(
-    /**
-     * Optionally, the reason why the component was marked with this annotation.
-     */
-    val reason: String = "This is an internal API and was not designed to be used directly"
-)
-
-/**
  * Marks the annotated component as experimental.
  *
  * @since 2.0.0

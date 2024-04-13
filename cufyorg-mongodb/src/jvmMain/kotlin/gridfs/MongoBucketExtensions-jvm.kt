@@ -29,14 +29,14 @@ import org.cufy.bson.BsonDocument
 import org.cufy.bson.BsonElement
 import org.cufy.bson.kt
 import org.cufy.mongodb.ClientSession
-import org.cufy.mongodb.gridfs.internal.MongoDownloadImpl
-import org.cufy.mongodb.gridfs.internal.MongoUploadImpl
+import org.cufy.mongodb.ExperimentalMongodbApi
 import org.cufy.mongodb.gridfs.internal.downloadToPublisher0
 import org.cufy.mongodb.gridfs.internal.uploadFromPublisher0
 import java.nio.ByteBuffer
 
 /* ============= ------------------ ============= */
 
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.asyncUpload(
     filename: String,
     metadata: BsonDocument,
@@ -59,13 +59,14 @@ actual suspend fun MongoBucket.asyncUpload(
         }
     }
 
-    return MongoUploadImpl(job, idJob, channel, chunkSize) {
+    return MongoUpload(idJob, chunkSize, job, channel) {
         // no need to close the job.
         // the job already depends on the channel
         channel.close()
     }
 }
 
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.asyncUpload(
     filename: String,
     id: BsonElement,
@@ -86,7 +87,7 @@ actual suspend fun MongoBucket.asyncUpload(
         // no need to notify idJob
     }
 
-    return MongoUploadImpl(job, idJob, channel, chunkSize) {
+    return MongoUpload(idJob, chunkSize, job, channel) {
         // no need to close the job.
         // the job already depends on the channel
         channel.close()
@@ -109,6 +110,7 @@ actual suspend fun MongoBucket.asyncUpload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.asyncDownload(
     id: BsonElement,
     options: DownloadOptions,
@@ -134,7 +136,7 @@ actual suspend fun MongoBucket.asyncDownload(
         }
     }
 
-    return MongoDownloadImpl(job, fileJob, channel, chunkSize) {
+    return MongoDownload(fileJob, chunkSize, job, channel) {
         // no need to close the job.
         // the job already depends on the channel
         channel.cancel()
@@ -158,6 +160,7 @@ actual suspend fun MongoBucket.asyncDownload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 actual suspend fun MongoBucket.asyncDownload(
     filename: String,
     options: DownloadOptions,
@@ -184,7 +187,7 @@ actual suspend fun MongoBucket.asyncDownload(
         }
     }
 
-    return MongoDownloadImpl(job, fileJob, channel, chunkSize) {
+    return MongoDownload(fileJob, chunkSize, job, channel) {
         // no need to close the job.
         // the job already depends on the channel
         channel.cancel()

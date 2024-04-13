@@ -13,6 +13,8 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb.gridfs
 
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -34,7 +36,7 @@ import java.nio.ByteBuffer
  * @author LSafer
  * @since 2.0.0
  */
-expect interface MongoBucket
+expect class MongoBucket
 
 /* ============= ------------------ ============= */
 
@@ -123,6 +125,7 @@ expect val MongoBucket.readConcern: ReadConcern
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
@@ -153,6 +156,7 @@ expect suspend fun MongoBucket.upload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
@@ -184,6 +188,7 @@ expect suspend fun MongoBucket.upload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
@@ -222,6 +227,7 @@ suspend fun MongoBucket.upload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.uploadFromPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.upload(
     channel: ReceiveChannel<ByteBuffer>,
     filename: String,
@@ -258,6 +264,7 @@ suspend fun MongoBucket.upload(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.download(
     channel: SendChannel<ByteBuffer>,
     id: BsonElement,
@@ -282,6 +289,7 @@ expect suspend fun MongoBucket.download(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 expect suspend fun MongoBucket.download(
     channel: SendChannel<ByteBuffer>,
     filename: String,
@@ -306,6 +314,7 @@ expect suspend fun MongoBucket.download(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.download(
     channel: SendChannel<ByteBuffer>,
     id: BsonElement,
@@ -337,6 +346,7 @@ suspend fun MongoBucket.download(
  * @see com.mongodb.reactivestreams.client.gridfs.GridFSBucket.downloadToPublisher
  * @since 2.0.0
  */
+@ExperimentalMongodbApi
 suspend fun MongoBucket.download(
     channel: SendChannel<ByteBuffer>,
     filename: String,

@@ -13,15 +13,14 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb
 
 /* ============= ------------------ ============= */
 
-typealias JavaClientSession =
-        com.mongodb.reactivestreams.client.ClientSession
-
-actual interface ClientSession {
-    val java: JavaClientSession
+actual data class ClientSession(val java: JavaClientSession) {
+    override fun toString() = "ClientSession#${hashCode()}"
 }
 
 /* ============= ------------------ ============= */
@@ -33,8 +32,6 @@ actual interface ClientSession {
  * @since 2.0.0
  */
 val JavaClientSession.kt: ClientSession
-    get() = object : ClientSession {
-        override val java = this@kt
-    }
+    get() = ClientSession(this)
 
 /* ============= ------------------ ============= */

@@ -15,9 +15,10 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.*
-import org.cufy.monkt.*
-import org.cufy.monkt.internal.*
+import org.cufy.bson.BsonDocument
+import org.cufy.bson.MutableBsonDocumentLike
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.internal.ObjectSchemaBuilderImpl
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -130,7 +131,6 @@ interface ObjectSchemaBuilder<T : Any> :
  *
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T : Any> ObjectSchemaBuilder(): ObjectSchemaBuilder<T> {
     return ObjectSchemaBuilderImpl()
 }

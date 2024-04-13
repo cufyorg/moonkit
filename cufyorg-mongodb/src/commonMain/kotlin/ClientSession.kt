@@ -13,6 +13,8 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package org.cufy.mongodb
 
 /* ============= ------------------ ============= */
@@ -24,6 +26,6 @@ package org.cufy.mongodb
  * @author LSafer
  * @since 2.0.0
  */
-expect interface ClientSession
+expect class ClientSession
 
 /* ============= ------------------ ============= */

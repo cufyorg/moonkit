@@ -15,11 +15,16 @@
  */
 package org.cufy.monkt.schema
 
-import org.cufy.bson.*
+import org.cufy.bson.BsonElement
+import org.cufy.bson.MutableBsonDocumentLike
+import org.cufy.bson.bson
 import org.cufy.mongodb.`$unset`
 import org.cufy.monkt.*
-import org.cufy.monkt.internal.*
-import org.cufy.monkt.schema.extension.*
+import org.cufy.monkt.internal.FieldDefinitionBuilderImpl
+import org.cufy.monkt.schema.extension.WritesConfiguration
+import org.cufy.monkt.schema.extension.normalization
+import org.cufy.monkt.schema.extension.update
+import org.cufy.monkt.schema.extension.writes
 import java.util.*
 import kotlin.reflect.KMutableProperty1
 
@@ -215,7 +220,6 @@ interface FieldDefinitionBuilder<T : Any, M> :
  *
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T : Any, M> FieldDefinitionBuilder(): FieldDefinitionBuilder<T, M> {
     return FieldDefinitionBuilderImpl()
 }
@@ -293,7 +297,7 @@ fun <T : Any, M> FantomFieldDefinition(
 @OptIn(AdvancedMonktApi::class)
 val <T : Any, M, C> OptionScope<T, M, C>.fieldDefinition: FieldDefinition<T, M>
     get() = declaration as? FieldDefinition<T, M>
-            ?: error("Option was not declared in a FieldDefinition")
+        ?: error("Option was not declared in a FieldDefinition")
 
 //
 

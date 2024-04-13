@@ -17,8 +17,8 @@ package org.cufy.monkt.schema
 
 import org.cufy.bson.BsonElement
 import org.cufy.bson.BsonType
-import org.cufy.monkt.*
-import org.cufy.monkt.internal.*
+import org.cufy.monkt.AdvancedMonktApi
+import org.cufy.monkt.internal.ScalarDecoderBuilderImpl
 
 /**
  * A decoder for scalar values.
@@ -91,7 +91,6 @@ interface ScalarDecoderBuilder<T> :
  *
  * @since 2.0.0
  */
-@OptIn(InternalMonktApi::class)
 fun <T> ScalarDecoderBuilder(): ScalarDecoderBuilder<T> {
     return ScalarDecoderBuilderImpl()
 }

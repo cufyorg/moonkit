@@ -21,8 +21,11 @@ import org.cufy.mongodb.MongoClient
 import org.cufy.mongodb.MongoCollection
 import org.cufy.mongodb.MongoDatabase
 import org.cufy.mongodb.get
-import org.cufy.monkt.schema.*
-import org.cufy.monkt.schema.extension.*
+import org.cufy.monkt.schema.ObjectSchema
+import org.cufy.monkt.schema.ObjectSchemaBuilderBlock
+import org.cufy.monkt.schema.ObjectSchemaConstructor
+import org.cufy.monkt.schema.SignalHandler
+import org.cufy.monkt.schema.extension.AggregateSignalHandler
 
 /**
  * A class representing a single connection to some
@@ -35,20 +38,17 @@ open class Monkt {
     /**
      * The monkt client completable deferred.
      */
-    @InternalMonktApi
-    val deferredClient = CompletableDeferred<MongoClient>()
+    internal val deferredClient = CompletableDeferred<MongoClient>()
 
     /**
      * The monkt database completable deferred.
      */
-    @InternalMonktApi
-    val deferredDatabase = CompletableDeferred<MongoDatabase>()
+    internal val deferredDatabase = CompletableDeferred<MongoDatabase>()
 
     /**
      * The client to be used by the models that
      * uses this monkt instance.
      */
-    @OptIn(InternalMonktApi::class)
     suspend fun client(): MongoClient {
         return deferredClient.await()
     }
@@ -57,7 +57,6 @@ open class Monkt {
      * The database to be used by the models that
      * uses this monkt instance.
      */
-    @OptIn(InternalMonktApi::class)
     suspend fun database(): MongoDatabase {
         return deferredDatabase.await()
     }
@@ -80,34 +79,32 @@ open class Monkt {
      * True, if this instance was shutdown.
      */
     var isShutdown: Boolean = false
-        @InternalMonktApi set
+        internal set
 
     /**
      * True, if the instance was connected.
      */
     var isConnected: Boolean = false
-        @InternalMonktApi set
+        internal set
 
     /**
      * True, if the instance was initialized.
      */
     var isInitialized: Boolean = false
-        @InternalMonktApi set
+        internal set
 
     /**
      * The signal handlers registered to this
      * monkt instance.
      */
     @Suppress("PropertyName")
-    @InternalMonktApi
-    val _handlers: MutableList<SignalHandler> = mutableListOf()
+    internal val _handlers: MutableList<SignalHandler> = mutableListOf()
 
     /**
      * The models registered to this monkt instance.
      */
     @Suppress("PropertyName")
-    @InternalMonktApi
-    val _models: MutableList<Model<*>> = mutableListOf()
+    internal val _models: MutableList<Model<*>> = mutableListOf()
 
     /**
      * The signal handlers registered to this
@@ -115,7 +112,6 @@ open class Monkt {
      *
      * @since 2.0.0
      */
-    @OptIn(InternalMonktApi::class)
     @AdvancedMonktApi
     val handlers: List<SignalHandler> get() = _handlers
 
@@ -124,7 +120,6 @@ open class Monkt {
      *
      * @since 2.0.0
      */
-    @OptIn(InternalMonktApi::class)
     @AdvancedMonktApi
     val models: List<Model<*>> get() = _models
 
@@ -183,15 +178,13 @@ open class Model<T : Any>(
     /**
      * The monkt instance completable deferred.
      */
-    @InternalMonktApi
-    val deferredMonkt = CompletableDeferred<Monkt>()
+    internal val deferredMonkt = CompletableDeferred<Monkt>()
 
     /**
      * The monkt instance.
      *
      * @since 2.0.0
      */
-    @OptIn(InternalMonktApi::class)
     suspend fun monkt(): Monkt {
         return deferredMonkt.await()
     }
