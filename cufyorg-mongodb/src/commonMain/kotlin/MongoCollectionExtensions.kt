@@ -179,9 +179,40 @@ suspend fun MongoCollection.updateOneById(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.updateOne
  */
+@Deprecated("Use updateOneById with listOf()")
 suspend fun MongoCollection.updateOneById(
     id: AnyID,
     vararg update: BsonDocumentBlock,
+    session: ClientSession? = null,
+    options: UpdateOptions.() -> Unit = {},
+): UpdateResult {
+    return updateOneById(
+        id = id,
+        update = update.map { BsonDocument(it) },
+        options = UpdateOptions(options),
+        session = session
+    )
+}
+
+/**
+ * Update a single document in the collection
+ * according to the specified arguments.
+ *
+ * Note: Supports retryable writes on MongoDB
+ * server versions 3.6 or higher when the
+ * retryWrites setting is enabled.
+ *
+ * @param session the client session with which to associate this operation.
+ * @param id the id of the document.
+ * @param update a pipeline describing the update, which may not be null.
+ * @param options the options to apply to the update operation
+ * @return the UpdateResult
+ * @since 2.0.0
+ * @see com.mongodb.client.MongoCollection.updateOne
+ */
+suspend fun MongoCollection.updateOneById(
+    id: AnyID,
+    update: List<BsonDocumentBlock>,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {},
 ): UpdateResult {
@@ -465,9 +496,42 @@ suspend fun MongoCollection.findOneByIdAndUpdate(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
+@Deprecated("Use findOneByIdAndUpdate with listOf()")
 suspend fun MongoCollection.findOneByIdAndUpdate(
     id: AnyID,
     vararg update: BsonDocumentBlock,
+    session: ClientSession? = null,
+    options: FindOneAndUpdateOptions.() -> Unit = {},
+): BsonDocument? {
+    return findOneByIdAndUpdate(
+        id = id,
+        update = update.map { BsonDocument(it) },
+        options = FindOneAndUpdateOptions(options),
+        session = session
+    )
+}
+
+/**
+ * Atomically find a document and update it.
+ *
+ * Note: Supports retryable writes on MongoDB
+ * server versions 3.6 or higher when the
+ * retryWrites setting is enabled.
+ *
+ * @param session the client session with which to associate this operation.
+ * @param id the id of the document.
+ * @param update a pipeline describing the update, which may not be null.
+ * @param options the options to apply to the operation.
+ * @return the document that was updated.
+ *         Depending on the value of the `returnOriginal` property, this will either be
+ *         the document as it was before the update or as it is after the update.
+ *         If no documents matched the query filter, then null will be returned.
+ * @since 2.0.0
+ * @see com.mongodb.client.MongoCollection.findOneAndUpdate
+ */
+suspend fun MongoCollection.findOneByIdAndUpdate(
+    id: AnyID,
+    update: List<BsonDocumentBlock>,
     session: ClientSession? = null,
     options: FindOneAndUpdateOptions.() -> Unit = {},
 ): BsonDocument? {
