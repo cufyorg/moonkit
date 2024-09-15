@@ -348,9 +348,40 @@ suspend fun MongoCollection.updateOne(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.updateOne
  */
+@Deprecated("Use updateOne with listOf()")
 suspend fun MongoCollection.updateOne(
     filter: BsonDocumentBlock,
     vararg update: BsonDocumentBlock,
+    session: ClientSession? = null,
+    options: UpdateOptions.() -> Unit = {},
+): UpdateResult {
+    return updateOne(
+        filter = BsonDocument(filter),
+        update = update.map { BsonDocument(it) },
+        options = UpdateOptions(options),
+        session = session
+    )
+}
+
+/**
+ * Update a single document in the collection
+ * according to the specified arguments.
+ *
+ * Note: Supports retryable writes on MongoDB
+ * server versions 3.6 or higher when the
+ * retryWrites setting is enabled.
+ *
+ * @param session the client session with which to associate this operation.
+ * @param filter a document describing the query filter, which may not be null.
+ * @param update a pipeline describing the update, which may not be null.
+ * @param options the options to apply to the update operation
+ * @return the UpdateResult
+ * @since 2.0.0
+ * @see com.mongodb.client.MongoCollection.updateOne
+ */
+suspend fun MongoCollection.updateOne(
+    filter: BsonDocumentBlock,
+    update: List<BsonDocumentBlock>,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {},
 ): UpdateResult {
@@ -375,6 +406,7 @@ suspend fun MongoCollection.updateOne(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.updateOne
  */
+@Deprecated("Use updateOne with either explicit BsonDocument or explicit BsonArray")
 suspend fun MongoCollection.updateOne(
     filter: BsonDocument,
     update: BsonElement,
@@ -481,9 +513,36 @@ suspend fun MongoCollection.updateMany(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.updateMany
  */
+@Deprecated("Use updateMany with listOf()")
 suspend fun MongoCollection.updateMany(
     filter: BsonDocumentBlock,
     vararg update: BsonDocumentBlock,
+    session: ClientSession? = null,
+    options: UpdateOptions.() -> Unit = {},
+): UpdateResult {
+    return updateMany(
+        filter = BsonDocument(filter),
+        update = update.map { BsonDocument(it) },
+        options = UpdateOptions(options),
+        session = session
+    )
+}
+
+/**
+ * Update all documents in the collection
+ * according to the specified arguments.
+ *
+ * @param session the client session with which to associate this operation.
+ * @param filter a document describing the query filter, which may not be null.
+ * @param update a pipeline describing the update, which may not be null.
+ * @param options the options to apply to the update operation
+ * @return the UpdateResult
+ * @since 2.0.0
+ * @see com.mongodb.client.MongoCollection.updateMany
+ */
+suspend fun MongoCollection.updateMany(
+    filter: BsonDocumentBlock,
+    update: List<BsonDocumentBlock>,
     session: ClientSession? = null,
     options: UpdateOptions.() -> Unit = {},
 ): UpdateResult {
@@ -508,6 +567,7 @@ suspend fun MongoCollection.updateMany(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.updateMany
  */
+@Deprecated("Use updateMany with either explicit BsonDocument or explicit BsonArray")
 suspend fun MongoCollection.updateMany(
     filter: BsonDocument,
     update: BsonElement,
@@ -886,9 +946,42 @@ suspend fun MongoCollection.findOneAndUpdate(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
+@Deprecated("Use findOneAndUpdate with listOf()")
 suspend fun MongoCollection.findOneAndUpdate(
     filter: BsonDocumentBlock,
     vararg update: BsonDocumentBlock,
+    session: ClientSession? = null,
+    options: FindOneAndUpdateOptions.() -> Unit = {},
+): BsonDocument? {
+    return findOneAndUpdate(
+        filter = BsonDocument(filter),
+        update = update.map { BsonDocument(it) },
+        options = FindOneAndUpdateOptions(options),
+        session = session
+    )
+}
+
+/**
+ * Atomically find a document and update it.
+ *
+ * Note: Supports retryable writes on MongoDB
+ * server versions 3.6 or higher when the
+ * retryWrites setting is enabled.
+ *
+ * @param session the client session with which to associate this operation.
+ * @param filter a document describing the query filter, which may not be null.
+ * @param update a pipeline describing the update, which may not be null.
+ * @param options the options to apply to the operation.
+ * @return the document that was updated.
+ *         Depending on the value of the `returnOriginal` property, this will either be
+ *         the document as it was before the update or as it is after the update.
+ *         If no documents matched the query filter, then null will be returned.
+ * @since 2.0.0
+ * @see com.mongodb.client.MongoCollection.findOneAndUpdate
+ */
+suspend fun MongoCollection.findOneAndUpdate(
+    filter: BsonDocumentBlock,
+    update: List<BsonDocumentBlock>,
     session: ClientSession? = null,
     options: FindOneAndUpdateOptions.() -> Unit = {},
 ): BsonDocument? {
@@ -915,6 +1008,7 @@ suspend fun MongoCollection.findOneAndUpdate(
  * @since 2.0.0
  * @see com.mongodb.client.MongoCollection.findOneAndUpdate
  */
+@Deprecated("Use findOneAndUpdate with either explicit BsonDocument or explicit BsonArray")
 suspend fun MongoCollection.findOneAndUpdate(
     filter: BsonDocument,
     update: BsonElement,
