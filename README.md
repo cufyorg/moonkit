@@ -1,3 +1,5 @@
+> This repository was archived. Its successor is https://github.com/cufyorg/mongokt
+
 # Moonkit [![](https://jitpack.io/v/org.cufy/moonkit.svg)](https://jitpack.io/#org.cufy/moonkit)
 
 DSL Based MongoDB driver wrapper for kotlin with an optional schema system.
